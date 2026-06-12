@@ -8,6 +8,7 @@ export function initCh3(section: HTMLElement): void {
   // 历史卡片里的雹宝（默哀）与安全卡里的雹宝（戴盔）
   const historyMascot = createMascot(84, 'happy');
   section.querySelector('.history-mascot-slot')!.appendChild(historyMascot.el);
+  // safetyMascot 创建后不再操作：'safety' 戴盔即其静态终态，属有意设计
   const safetyMascot = createMascot(64, 'safety');
   section.querySelector('.safety-mascot-slot')!.appendChild(safetyMascot.el);
 
@@ -25,7 +26,7 @@ export function initCh3(section: HTMLElement): void {
     transformOrigin: '50% 100%',
     stagger: 0.18,
     ease: 'back.out(2)',
-    scrollTrigger: { trigger: section.querySelector('.size-ladder'), start: 'top 72%' },
+    scrollTrigger: { trigger: section.querySelector('.size-ladder'), start: 'top 72%', once: true },
   });
 
   // ② 危险色带指针随滚动右移（绿→红）
@@ -83,6 +84,6 @@ export function initCh3(section: HTMLElement): void {
     y: 60,
     opacity: 0,
     stagger: 0.18,
-    scrollTrigger: { trigger: section.querySelector('.safety-cards'), start: 'top 80%' },
+    scrollTrigger: { trigger: section.querySelector('.safety-cards'), start: 'top 80%', once: true },
   });
 }
