@@ -83,6 +83,12 @@
 
 .scroll-hint { opacity: 0.7; letter-spacing: 0.15em; }
 
+/* JS 可用时预隐藏 hero 入场元素，避免 GSAP 首 tick 前闪现（无 JS 时保持可见） */
+html.js #hero .hero-title,
+html.js #hero .num-card,
+html.js #hero .hero-mascot-slot,
+html.js #hero .scroll-hint { opacity: 0; }
+
 /* ===== 第一章 ===== */
 .ch1-stage { margin: 0 auto; max-width: 720px; }
 .cloud-svg { width: 100%; height: auto; display: block; }

@@ -31,21 +31,24 @@ export function initHero(section: HTMLElement): void {
 
   if (reducedMotion) {
     mascot.setExpression('happy');
+    gsap.set([section.querySelector('.hero-title'), section.querySelector('.hero-mascot-slot'), section.querySelectorAll('.num-card')], { opacity: 1 });
+    gsap.set(section.querySelector('.scroll-hint'), { opacity: 0.7 });
     return;
   }
 
   const inner = section.querySelector<HTMLElement>('.hero-inner')!;
   const cards = section.querySelectorAll('.num-card');
+  const slot = section.querySelector<HTMLElement>('.hero-mascot-slot')!;
 
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  tl.from(section.querySelector('.hero-title'), { y: -120, opacity: 0, duration: 0.7 })
-    .from(mascot.el, { y: -400, duration: 0.6, ease: 'bounce.out' }, '-=0.3')
+  tl.fromTo(section.querySelector('.hero-title'), { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 })
+    .fromTo(slot, { y: -400, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'bounce.out' }, '-=0.3')
     // 落地挤压回弹
     .to(mascot.el, { scaleY: 0.8, scaleX: 1.15, transformOrigin: '50% 100%', duration: 0.1 })
     .to(mascot.el, { scaleY: 1, scaleX: 1, duration: 0.25, ease: 'back.out(3)' })
     .add(() => mascot.setExpression('happy'))
-    .from(cards, { y: 60, opacity: 0, scale: 0.85, stagger: 0.15, duration: 0.5 }, '-=0.1')
-    .from(section.querySelector('.scroll-hint'), { opacity: 0, duration: 0.6 });
+    .fromTo(cards, { y: 60, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, stagger: 0.15, duration: 0.5 }, '-=0.1')
+    .fromTo(section.querySelector('.scroll-hint'), { opacity: 0 }, { opacity: 0.7, duration: 0.6 });
 
   // 滚动离场视差
   gsap.to(inner, {
