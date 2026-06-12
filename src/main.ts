@@ -7,6 +7,7 @@ import { initSky } from './background/sky';
 import { initRuler } from './background/ruler';
 import { initHero } from './scenes/hero';
 import { initCh1 } from './scenes/ch1-height';
+import { initCh2 } from './scenes/ch2-speed';
 
 gsap.registerPlugin(ScrollTrigger);
 initSky();
@@ -17,3 +18,6 @@ if (hero) initHero(hero);
 
 const ch1 = document.querySelector<HTMLElement>('#ch1');
 if (ch1) initCh1(ch1);
+
+const ch2 = document.querySelector<HTMLElement>('#ch2');
+if (ch2) initCh2(ch2);
