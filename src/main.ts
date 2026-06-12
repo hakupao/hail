@@ -9,6 +9,7 @@ import { initHero } from './scenes/hero';
 import { initCh1 } from './scenes/ch1-height';
 import { initCh2 } from './scenes/ch2-speed';
 import { initCh3 } from './scenes/ch3-danger';
+import { initCh4 } from './scenes/ch4-lab';
 
 gsap.registerPlugin(ScrollTrigger);
 initSky();
@@ -25,3 +26,6 @@ if (ch2) initCh2(ch2);
 
 const ch3 = document.querySelector<HTMLElement>('#ch3');
 if (ch3) initCh3(ch3);
+
+const ch4 = document.querySelector<HTMLElement>('#ch4');
+if (ch4) initCh4(ch4);
