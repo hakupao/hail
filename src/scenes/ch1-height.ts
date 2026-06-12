@@ -33,6 +33,7 @@ export function initCh1(section: HTMLElement): void {
 
   // ② 四次翻滚：托起→下落，同步长大一圈、洋葱剖面点亮一环
   rings.forEach((ring, i) => {
+    // 故意不带 scale：雹胚保持上一圈长大后的尺寸（累积生长效果），勿加 scale 重置
     tl.to(embryo, { y: -90, duration: 0.8, ease: 'power1.inOut' })
       .to(embryo, { y: 0, duration: 0.8, ease: 'power1.inOut' })
       .to(embryo, { scale: 1 + (i + 1) * 0.28, transformOrigin: '50% 50%', duration: 0.3 }, '<')
