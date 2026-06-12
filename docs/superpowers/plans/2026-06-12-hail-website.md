@@ -301,7 +301,8 @@ export const rulerMarks = [
   { km: 0, label: '🏡 地面' },
 ];
 
-// 第二章坠落竞速的四条赛道（d: cm，v: m/s，取表格典型值）
+// 第二章坠落竞速的四条赛道：规格速度表给的是范围（如 2–3 cm → 15–20 m/s），
+// 动画需要单点，故取各范围的典型采样值（d: cm，v: m/s）；页面上的表格仍展示原始范围
 export const raceLanes = [
   { name: '黄豆', d: 1, v: 10 },
   { name: '乒乓球', d: 2.5, v: 17.5 },
@@ -1755,7 +1756,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { raceLanes } from '../content';
 import { rollNumber } from '../utils/counter';
-import { reducedMotion } from '../utils/motion';
+import { isMobile, reducedMotion } from '../utils/motion';
 
 export function initCh2(section: HTMLElement): void {
   const lanes = Array.from(section.querySelectorAll<HTMLElement>('.lane'));
@@ -1767,9 +1768,13 @@ export function initCh2(section: HTMLElement): void {
       const { v } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
       const dial = lane.querySelector<HTMLElement>('.race-dial')!;
-      const dist = lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
+      // 桌面：纵向下落赛道；移动端（Task 14 将赛道改为上下排列的横向条带）：沿 x 轴竞速
+      const axis = isMobile ? 'x' : 'y';
+      const dist = isMobile
+        ? lane.clientWidth - ball.clientWidth - 130 // 右侧留出标签空间
+        : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
       const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
-      gsap.fromTo(ball, { y: 0 }, { y: dist, duration: dur, ease: 'power1.in' });
+      gsap.fromTo(ball, { [axis]: 0 }, { [axis]: dist, duration: dur, ease: 'power1.in' });
       rollNumber(dial, Math.round(v * 3.6), { duration: dur, suffix: ' km/h' });
     });
   }
@@ -2216,8 +2221,12 @@ JS 侧的 `prefers-reduced-motion` 分支已在各场景内实现（Task 8–13�
   .num-cards { gap: 10px; }
   .num-card { min-width: 140px; padding: 14px 16px; }
 
-  .race-track { height: 60vh; }
-  .lane-label { font-size: 10px; }
+  /* 竞速改为上下排列的横向条带（规格 §7"纵向轨道"），JS 侧 ch2-speed.ts 按 isMobile 切到 x 轴动画 */
+  .race-track { flex-direction: column; height: auto; gap: 10px; }
+  .lane { flex-direction: row; align-items: center; min-height: 64px; padding: 0 12px; gap: 12px; }
+  .race-dial { padding: 0; min-width: 90px; font-size: 14px; }
+  .race-ball { margin-top: 0; }
+  .lane-label { position: static; margin-left: auto; font-size: 10px; }
 
   .size-ladder { gap: 4%; }
 
@@ -2246,7 +2255,7 @@ JS 侧的 `prefers-reduced-motion` 分支已在各场景内实现（Task 8–13�
 npm run dev
 ```
 
-浏览器 DevTools 设备模拟（375×812）预期：高度尺只剩细条+指示牌；卡片、能量条、安全卡、实验室全部单列堆叠不溢出；横向无滚动条。再在 DevTools「Rendering → Emulate CSS prefers-reduced-motion」下刷新：无粒子 Canvas、无 pin 滚动动画、内容全部直接可读。
+浏览器 DevTools 设备模拟（375×812）预期：高度尺只剩细条+指示牌；竞速变为四条上下排列的横向条带、冰雹沿横向赛跑（速度读数在左、标签在右）；卡片、能量条、安全卡、实验室全部单列堆叠不溢出；横向无滚动条。再在 DevTools「Rendering → Emulate CSS prefers-reduced-motion」下刷新：无粒子 Canvas、无 pin 滚动动画、内容全部直接可读。
 
 - [ ] **Step 3: Commit**
 
