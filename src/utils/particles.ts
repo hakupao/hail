@@ -36,6 +36,7 @@ export class ParticleField {
   resize(): void {
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
+    this.ps = [];
   }
 
   setMode(mode: ParticleMode): void {
