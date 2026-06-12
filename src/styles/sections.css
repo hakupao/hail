@@ -434,3 +434,11 @@ html.js #hero .scroll-hint { opacity: 0; }
 /* ===== 雹宝 ===== */
 .mascot-wrap { display: inline-block; }
 .mascot-wrap svg { width: 100%; height: 100%; display: block; }
+
+/* 第三章历史卡片在场时整章收敛 */
+#ch3.dimmed .size-ladder,
+#ch3.dimmed .danger-band,
+#ch3.dimmed .energy-bars {
+  opacity: 0.45;
+  transition: opacity 0.5s;
+}
