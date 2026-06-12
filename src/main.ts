@@ -1,1 +1,5 @@
-console.log('hail: scaffold ok');
+import './styles/tokens.css';
+import './styles/base.css';
+import './styles/sections.css';
+
+console.log('hail: static skeleton ok');

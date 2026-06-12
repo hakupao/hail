@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  /* 无 JS 时的兜底背景（JS 会注入 #sky 固定层盖住它） */
+  background: linear-gradient(180deg, var(--c-sky-top), var(--c-sky-low) 70%, var(--c-sky-ground));
+  overflow-x: hidden;
+}
+
+/* JS 注入的固定背景层 */
+#sky {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+}
+
+h1, h2, h3 {
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.on-dark { color: var(--c-ink-light); }
+.on-light { color: var(--c-ink-dark); }
+
+.scene {
+  position: relative;
+  min-height: 100vh;
+  padding: 12vh 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-inner {
+  width: 100%;
+  max-width: var(--maxw);
+  position: relative;
+  z-index: 1;
+}
+
+.scene-inner.center { text-align: center; }
+
+/* 场景内通铺 Canvas（hero 粒子等） */
+.scene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+h2 { font-size: var(--fs-h2); margin-bottom: 0.6em; }
+
+.ch-no {
+  display: block;
+  font-size: 0.4em;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  opacity: 0.65;
+  margin-bottom: 0.4em;
+}
+
+.lead { max-width: 46em; margin-bottom: 2em; }
+
+.note {
+  font-size: 0.82em;
+  opacity: 0.6;
+  margin-top: 1.5em;
+}
+
+.kicker {
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  opacity: 0.7;
+  margin-bottom: 1.2em;
+}
