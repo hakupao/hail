@@ -303,13 +303,15 @@
 .lab-controls label {
   font-weight: 700;
   font-size: 0.9em;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
   gap: 8px;
 }
 
+.lab-controls label input[type='range'] { grid-column: 1 / -1; }
+
 .lab-controls output {
-  float: right;
   font-weight: 800;
   color: #1f5fa8;
 }
