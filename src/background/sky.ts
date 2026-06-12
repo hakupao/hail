@@ -37,14 +37,20 @@ export function initSky(): void {
   const el = document.createElement('div');
   el.id = 'sky';
   document.body.prepend(el);
+
+  function updateSky(progress: number): void {
+    const top = skyColorAt(progress);
+    const bottom = skyColorAt(progress + 0.08);
+    el.style.background = `linear-gradient(180deg, ${top}, ${bottom})`;
+  }
+
   ScrollTrigger.create({
     trigger: document.body,
     start: 'top top',
     end: 'bottom bottom',
     onUpdate(self) {
-      const top = skyColorAt(self.progress);
-      const bottom = skyColorAt(self.progress + 0.08);
-      el.style.background = `linear-gradient(180deg, ${top}, ${bottom})`;
+      updateSky(self.progress);
     },
   });
+  updateSky(0); // 首屏立即渲染
 }

@@ -21,17 +21,22 @@ export function initRuler(): void {
   const altEl = ruler.querySelector<HTMLElement>('.ruler-alt')!;
   const marks = Array.from(ruler.querySelectorAll<HTMLElement>('.ruler-mark'));
 
+  function updateRuler(progress: number): void {
+    const alt = 10 * (1 - progress); // 滚动进度 0→1 映射高度 10km→0m
+    indicator.style.top = `${(1 - alt / 10) * 100}%`;
+    altEl.textContent = alt.toFixed(1);
+    for (const m of marks) {
+      m.classList.toggle('active', Math.abs(Number(m.dataset.km) - alt) < 0.6);
+    }
+  }
+
   ScrollTrigger.create({
     trigger: document.body,
     start: 'top top',
     end: 'bottom bottom',
     onUpdate(self) {
-      const alt = 10 * (1 - self.progress); // 滚动进度 0→1 映射高度 10km→0m
-      indicator.style.top = `${(1 - alt / 10) * 100}%`;
-      altEl.textContent = alt.toFixed(1);
-      for (const m of marks) {
-        m.classList.toggle('active', Math.abs(Number(m.dataset.km) - alt) < 0.6);
-      }
+      updateRuler(self.progress);
     },
   });
+  updateRuler(0); // 首屏立即渲染，民航巡航标记点亮
 }
