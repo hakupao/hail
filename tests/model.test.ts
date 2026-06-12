@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { simulate, terminalVelocity } from '../src/lab/model';
 
 // 第二章速度表（规格 §3.1）：终端速度须落在表格范围 ±15% 内
+// d=1 行是点估计（~10 m/s），区间宽度全部来自 ±15% 容差
 const tableRows = [
   { d: 1, vLo: 10, vHi: 10 },
   { d: 2.5, vLo: 15, vHi: 20 },
@@ -45,5 +46,14 @@ describe('结局判定', () => {
       expect(d).toBeGreaterThan(prev);
       prev = d;
     }
+  });
+
+  test('小雹结局可达：(18, 4) → small-hail', () => {
+    expect(simulate(18, 4).outcome).toBe('small-hail');
+  });
+
+  test('融化分支生效：同一 W 下抬高 0℃ 层会把小雹化成雨', () => {
+    expect(simulate(15, 2).outcome).toBe('small-hail');
+    expect(simulate(15, 6).outcome).toBe('rain');
   });
 });
