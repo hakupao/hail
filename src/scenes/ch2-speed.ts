@@ -11,7 +11,7 @@ export function initCh2(section: HTMLElement): void {
 
   function run(): void {
     lanes.forEach((lane, i) => {
-      const { v } = raceLanes[i];
+      const { v, kmh } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
       const dial = lane.querySelector<HTMLElement>('.race-dial')!;
       // 桌面：纵向下落赛道；移动端（Task 14 将赛道改为上下排列的横向条带）：沿 x 轴竞速
@@ -21,7 +21,7 @@ export function initCh2(section: HTMLElement): void {
         : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
       const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
       gsap.fromTo(ball, { [axis]: 0 }, { [axis]: dist, duration: dur, ease: 'power1.in' });
-      rollNumber(dial, Math.round(v * 3.6), { duration: dur, suffix: ' km/h' });
+      rollNumber(dial, kmh, { duration: dur, suffix: ' km/h' });
     });
   }
 
@@ -48,6 +48,6 @@ export function initCh2(section: HTMLElement): void {
     opacity: 0,
     x: -40,
     stagger: 0.2,
-    scrollTrigger: { trigger: section.querySelector('.speed-table'), start: 'top 80%' },
+    scrollTrigger: { trigger: section.querySelector('.speed-table'), start: 'top 80%', once: true },
   });
 }
