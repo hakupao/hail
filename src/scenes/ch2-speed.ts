@@ -16,11 +16,12 @@ export function initCh2(section: HTMLElement): void {
       const { v, kmh } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
       const dial = lane.querySelector<HTMLElement>('.race-dial')!;
+      const label = lane.querySelector<HTMLElement>('.lane-label')!;
       // 桌面：纵向下落赛道；移动端（CSS 把赛道改成上下排列的横向条带）：沿 x 轴竞速。
       const axis = mobile ? 'x' : 'y';
-      // translateX 相对球当前布局位置（dial 之后），故用 offsetLeft 算可走距离，给右侧标签留约 80px。
+      // translateX 相对球当前布局位置（dial 之后）；移动端按标签实测宽度留白，球落点止于标签左侧约 12px。
       const dist = mobile
-        ? lane.clientWidth - ball.offsetLeft - ball.clientWidth - 80 // 球落点止于标签左侧
+        ? lane.clientWidth - ball.offsetLeft - ball.clientWidth - label.offsetWidth - 24
         : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
       const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
       gsap.fromTo(ball, { [axis]: 0 }, { [axis]: dist, duration: dur, ease: 'power1.in' });
