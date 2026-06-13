@@ -32,3 +32,6 @@ for (const [sel, init] of scenes) {
   const el = document.querySelector<HTMLElement>(sel);
   if (el) init(el);
 }
+
+// 全部 ScrollTrigger 创建完毕后刷新一次：ch1 的 pin 会撑高文档，确保背景层的 end:'bottom bottom' 测量正确
+ScrollTrigger.refresh();

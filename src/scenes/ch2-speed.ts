@@ -12,6 +12,8 @@ export function initCh2(section: HTMLElement): void {
   function run(): void {
     // 运行时判定（非模块级 isMobile 快照），这样 resize 跨断点后重赛会用正确的轴。
     const mobile = window.matchMedia('(max-width: 768px)').matches;
+    // 清除上一次竞速残留的轴变换（resize 跨断点后另一轴的旧 translate 不会被新 fromTo 复位）
+    gsap.set(lanes.map((l) => l.querySelector('.race-ball')!), { clearProps: 'x,y' });
     lanes.forEach((lane, i) => {
       const { v, kmh } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
