@@ -61,8 +61,8 @@ export function initCh4(section: HTMLElement): void {
     dfinalEl.textContent = r.outcome === 'rain' ? '—（全化了）' : `${r.finalDiameterCm.toFixed(1)} cm`;
     vlandEl.textContent = r.outcome === 'rain' ? '—' : `${r.landingSpeedMs.toFixed(0)} m/s`;
 
-    // 云越"凶"越暗：上升气流 5→50 映射阴影透明度 0.1→0.75
-    cloudShade.style.opacity = String(0.1 + ((w - 5) / 45) * 0.65);
+    // 云越"凶"越暗：上升气流 5→50 映射阴影透明度 0.1→0.75（clamp 防滑杆范围外的程序化赋值越界）
+    cloudShade.style.opacity = String(Math.min(0.75, Math.max(0.1, 0.1 + ((w - 5) / 45) * 0.65)));
 
     if (!reducedMotion) field.setMode(OUTCOME_MODE[r.outcome]);
   }
