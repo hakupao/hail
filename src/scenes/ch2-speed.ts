@@ -10,16 +10,17 @@ export function initCh2(section: HTMLElement): void {
   const fastest = Math.max(...raceLanes.map((l) => l.v));
 
   function run(): void {
+    // 运行时判定（非模块级 isMobile 快照），这样 resize 跨断点后重赛会用正确的轴。
+    const mobile = window.matchMedia('(max-width: 768px)').matches;
     lanes.forEach((lane, i) => {
       const { v, kmh } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
       const dial = lane.querySelector<HTMLElement>('.race-dial')!;
       // 桌面：纵向下落赛道；移动端（CSS 把赛道改成上下排列的横向条带）：沿 x 轴竞速。
-      // 运行时判定（非模块级 isMobile 快照），这样 resize 跨断点后重赛会用正确的轴。
-      const mobile = window.matchMedia('(max-width: 768px)').matches;
       const axis = mobile ? 'x' : 'y';
+      // translateX 相对球当前布局位置（dial 之后），故用 offsetLeft 算可走距离，给右侧标签留约 80px。
       const dist = mobile
-        ? lane.clientWidth - ball.clientWidth - 130 // 右侧留出标签空间
+        ? lane.clientWidth - ball.offsetLeft - ball.clientWidth - 80 // 球落点止于标签左侧
         : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
       const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
       gsap.fromTo(ball, { [axis]: 0 }, { [axis]: dist, duration: dur, ease: 'power1.in' });
