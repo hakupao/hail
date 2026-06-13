@@ -1,0 +1,484 @@
+/* ===== 高度尺（JS 注入） ===== */
+#ruler {
+  position: fixed;
+  top: 8vh;
+  bottom: 8vh;
+  right: 18px;
+  width: 56px;
+  z-index: 10;
+}
+
+.ruler-track {
+  position: relative;
+  height: 100%;
+  border-right: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.ruler-mark {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0.45;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.ruler-mark.active {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.15);
+}
+
+.ruler-indicator {
+  position: absolute;
+  right: -8px;
+  transform: translateY(-50%);
+  background: var(--c-accent);
+  color: #1a2b4a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ===== HERO ===== */
+#hero { text-align: center; }
+
+.hero-title {
+  font-size: var(--fs-hero);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 32px rgba(120, 170, 255, 0.45);
+}
+
+.hero-mascot-slot { display: flex; justify-content: center; margin: 24px 0; }
+
+.num-cards {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 32px 0;
+}
+
+.num-card {
+  background: var(--c-card-dark);
+  border: 1px solid rgba(191, 227, 255, 0.25);
+  border-radius: var(--radius);
+  padding: 20px 26px;
+  min-width: 200px;
+  text-align: center;
+}
+
+.on-light .num-card,
+#ending .num-card {
+  background: var(--c-card-light);
+  border-color: rgba(19, 41, 74, 0.12);
+}
+
+.num { font-size: var(--fs-num); font-weight: 800; line-height: 1.1; }
+.num small { font-size: 0.45em; font-weight: 600; opacity: 0.75; }
+.num-label { font-weight: 700; letter-spacing: 0.2em; margin-top: 6px; opacity: 0.85; }
+.num-card p { font-size: 0.78em; opacity: 0.7; margin-top: 8px; }
+
+.scroll-hint { opacity: 0.7; letter-spacing: 0.15em; }
+
+/* JS 可用时预隐藏 hero 入场元素，避免 GSAP 首 tick 前闪现（无 JS 时保持可见） */
+html.js #hero .hero-title,
+html.js #hero .num-card,
+html.js #hero .hero-mascot-slot,
+html.js #hero .scroll-hint { opacity: 0; }
+
+/* ===== 第一章 ===== */
+.ch1-stage { margin: 0 auto; max-width: 720px; }
+.cloud-svg { width: 100%; height: auto; display: block; }
+.melt-note { max-width: 46em; }
+.melt-demo { font-size: 1.4em; margin-left: 0.5em; }
+
+/* ===== 第二章 竞速 ===== */
+.race { margin: 3em 0; }
+
+.race-track {
+  display: flex;
+  gap: 8px;
+  height: 52vh;
+  min-height: 360px;
+}
+
+.lane {
+  flex: 1;
+  position: relative;
+  border-radius: 12px;
+  background: rgba(191, 227, 255, 0.06);
+  border: 1px dashed rgba(191, 227, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.race-dial {
+  font-weight: 800;
+  font-size: clamp(14px, 2vw, 22px);
+  color: var(--c-accent);
+  padding: 10px 0 4px;
+}
+
+.race-ball {
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: #eef8ff;
+  border: 3px solid #9fcbe8;
+  margin-top: 6px;
+}
+
+.lane-label {
+  position: absolute;
+  bottom: 8px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.race-replay {
+  margin-top: 14px;
+  background: transparent;
+  color: var(--c-ice);
+  border: 1px solid rgba(191, 227, 255, 0.5);
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: 14px;
+}
+
+.race-replay:hover { background: rgba(191, 227, 255, 0.12); }
+
+.formula {
+  color: var(--c-accent);
+  font-weight: 700;
+  display: inline-block;
+}
+
+.speed-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.speed-table th,
+.speed-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(191, 227, 255, 0.18);
+}
+
+.speed-table th {
+  font-size: 0.8em;
+  letter-spacing: 0.2em;
+  opacity: 0.6;
+}
+
+/* ===== 第三章 ===== */
+.size-ladder {
+  display: flex;
+  align-items: flex-end;
+  gap: 9%;
+  margin: 2.5em 0 1em;
+  padding: 0 4%;
+}
+
+.size-item { text-align: center; }
+
+.size-dot {
+  display: block;
+  width: var(--d);
+  height: var(--d);
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #9fcbe8;
+  box-shadow: 0 4px 14px rgba(19, 41, 74, 0.18);
+}
+
+.size-name { font-size: 12px; opacity: 0.8; }
+
+.danger-band {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  margin: 0 4% 3em;
+  background: linear-gradient(90deg, #7ac96f, #ffd84d 38%, #f29b38 66%, #e8503a);
+}
+
+.danger-pointer {
+  position: absolute;
+  top: -7px;
+  left: 4%;
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  background: var(--c-ink-dark);
+}
+
+.energy-bars { display: grid; gap: 22px; margin: 2em 0; }
+
+.energy-bar {
+  display: grid;
+  grid-template-columns: 160px 1fr 90px;
+  gap: 14px;
+  align-items: center;
+}
+
+.energy-bar p {
+  grid-column: 2 / 4;
+  font-size: 0.82em;
+  opacity: 0.75;
+}
+
+.energy-head { font-weight: 700; font-size: 0.9em; }
+
+.energy-track {
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(19, 41, 74, 0.1);
+  overflow: hidden;
+}
+
+.energy-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f29b38, var(--c-danger));
+}
+
+.energy-num { font-weight: 800; font-size: 1.3em; }
+
+.history-card {
+  background: #1c2433;
+  color: #dce6f5;
+  border-radius: var(--radius);
+  padding: 26px 30px;
+  margin: 2.5em 0;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  transition: opacity 0.4s;
+}
+
+.history-card h3 { margin-bottom: 0.3em; }
+
+.safety-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.safety-card {
+  background: var(--c-card-light);
+  border: 1px solid rgba(19, 41, 74, 0.12);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+}
+
+.safety-card h3 { margin-bottom: 0.4em; }
+
+.safety-mascot-slot { position: absolute; right: 14px; bottom: 10px; }
+
+.season-tip {
+  margin-top: 2em;
+  font-weight: 600;
+}
+
+/* ===== 第四章 实验室 ===== */
+.lab {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 26px;
+  align-items: stretch;
+}
+
+.lab-controls {
+  background: var(--c-card-light);
+  border: 1px solid rgba(19, 41, 74, 0.12);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lab-controls label {
+  font-weight: 700;
+  font-size: 0.9em;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.lab-controls label input[type='range'] { grid-column: 1 / -1; }
+
+.lab-controls output {
+  font-weight: 800;
+  color: #1f5fa8;
+}
+
+.lab-controls input[type='range'] { width: 100%; accent-color: #1f5fa8; }
+
+.lab-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.lab-presets button {
+  border: 1px solid rgba(19, 41, 74, 0.25);
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.lab-presets button:hover { background: #eaf3ff; }
+
+.lab-mascot-slot { margin-top: auto; align-self: center; }
+
+.lab-stage {
+  position: relative;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #9cc3e4, #dceaf6);
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.lab-cloud {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 84px;
+  border-radius: 999px;
+  background: #e8f2fb;
+  box-shadow: -60px 16px 0 -10px #e8f2fb, 70px 18px 0 -14px #e8f2fb;
+}
+
+.lab-cloud-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #2d3c52;
+  opacity: 0.2; /* JS 随上升气流强度调整 */
+}
+
+#lab-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lab-outcome {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.lab-outcome-emoji { font-size: 40px; line-height: 1; }
+.lab-outcome-label { font-weight: 800; font-size: 1.1em; margin: 4px 0 10px; }
+
+.lab-outcome dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  font-size: 12.5px;
+}
+
+.lab-outcome dt { opacity: 0.6; }
+.lab-outcome dd { font-weight: 700; }
+
+/* ===== 结尾 ===== */
+.ending-stage {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 1em 0 2em;
+}
+
+.ending-mascot-slot { position: relative; z-index: 1; }
+
+.puddle {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(127, 200, 235, 0.65);
+}
+
+.grass {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 90%);
+  height: 10px;
+  border-radius: 999px;
+  background: #7ac96f;
+}
+
+.credits { font-size: 0.8em; opacity: 0.55; margin-top: 3em; }
+
+/* ===== 雹宝 ===== */
+.mascot-wrap { display: inline-block; }
+.mascot-wrap svg { width: 100%; height: 100%; display: block; }
+
+/* 第三章历史卡片在场时整章收敛 */
+#ch3.dimmed .size-ladder,
+#ch3.dimmed .danger-band,
+#ch3.dimmed .energy-bars {
+  opacity: 0.45;
+  transition: opacity 0.5s;
+}
+
+/* ===== 移动端（规格 §7）===== */
+@media (max-width: 768px) {
+  /* 高度尺收窄成色带：藏参照物文字，只留指示牌 */
+  #ruler { width: 26px; right: 6px; }
+  .ruler-mark span { display: none; }
+  .ruler-mark { width: 8px; height: 2px; background: rgba(255, 255, 255, 0.5); }
+
+  .num-cards { gap: 10px; }
+  .num-card { min-width: 140px; padding: 14px 16px; }
+
+  /* 竞速改为上下排列的横向条带（规格 §7"纵向轨道"），JS 侧 ch2-speed.ts 按视口运行时切到 x 轴动画 */
+  .race-track { flex-direction: column; height: auto; gap: 10px; }
+  .lane { flex-direction: row; align-items: center; min-height: 64px; padding: 0 12px; gap: 12px; }
+  .race-dial { padding: 0; min-width: 90px; font-size: 14px; }
+  .race-ball { margin-top: 0; }
+  .lane-label { position: static; margin-left: auto; font-size: 10px; }
+
+  .size-ladder { gap: 4%; }
+
+  .energy-bar { grid-template-columns: 1fr; gap: 6px; }
+  .energy-bar p { grid-column: 1; }
+
+  .safety-cards { grid-template-columns: 1fr; }
+
+  /* 实验室滑杆竖排堆叠 */
+  .lab { grid-template-columns: 1fr; }
+  .lab-stage { min-height: 340px; }
+
+  .history-card { flex-direction: column; text-align: center; }
+}
+
+/* ===== prefers-reduced-motion 的 CSS 兜底 ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scene-canvas, #lab-canvas { display: none; }
+}
+
+/* 安全卡（含戴盔雹宝的那张）底部留白，避免雹宝压到长文案（评审遗留：ckpt_step_11） */
+.safety-card:has(.safety-mascot-slot) { padding-bottom: 76px; }

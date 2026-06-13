@@ -1,0 +1,59 @@
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { raceLanes } from '../content';
+import { rollNumber } from '../utils/counter';
+import { reducedMotion } from '../utils/motion';
+
+export function initCh2(section: HTMLElement): void {
+  const lanes = Array.from(section.querySelectorAll<HTMLElement>('.lane'));
+  const replay = section.querySelector<HTMLButtonElement>('.race-replay')!;
+  const fastest = Math.max(...raceLanes.map((l) => l.v));
+
+  function run(): void {
+    // 运行时判定（非模块级 isMobile 快照），这样 resize 跨断点后重赛会用正确的轴。
+    const mobile = window.matchMedia('(max-width: 768px)').matches;
+    // 清除上一次竞速残留的轴变换（resize 跨断点后另一轴的旧 translate 不会被新 fromTo 复位）
+    gsap.set(lanes.map((l) => l.querySelector('.race-ball')!), { clearProps: 'x,y' });
+    lanes.forEach((lane, i) => {
+      const { v, kmh } = raceLanes[i];
+      const ball = lane.querySelector<HTMLElement>('.race-ball')!;
+      const dial = lane.querySelector<HTMLElement>('.race-dial')!;
+      const label = lane.querySelector<HTMLElement>('.lane-label')!;
+      // 桌面：纵向下落赛道；移动端（CSS 把赛道改成上下排列的横向条带）：沿 x 轴竞速。
+      const axis = mobile ? 'x' : 'y';
+      // translateX 相对球当前布局位置（dial 之后）；移动端按标签实测宽度留白，球落点止于标签左侧约 12px。
+      const dist = mobile
+        ? lane.clientWidth - ball.offsetLeft - ball.clientWidth - label.offsetWidth - 24
+        : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
+      const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
+      gsap.fromTo(ball, { [axis]: 0 }, { [axis]: dist, duration: dur, ease: 'power1.in' });
+      rollNumber(dial, kmh, { duration: dur, suffix: ' km/h' });
+    });
+  }
+
+  // 进入视口自动开跑一次，按钮可重赛
+  ScrollTrigger.create({ trigger: section, start: 'top 60%', once: true, onEnter: run });
+  replay.addEventListener('click', run);
+
+  if (reducedMotion) return;
+
+  // 公式描线式显现
+  gsap.fromTo(
+    section.querySelector('.formula'),
+    { clipPath: 'inset(0 100% 0 0)' },
+    {
+      clipPath: 'inset(0 0% 0 0)',
+      duration: 1.2,
+      ease: 'power2.inOut',
+      scrollTrigger: { trigger: section, start: 'top 70%' },
+    },
+  );
+
+  // 速度表逐行点亮
+  gsap.from(section.querySelectorAll('.speed-row'), {
+    opacity: 0,
+    x: -40,
+    stagger: 0.2,
+    scrollTrigger: { trigger: section.querySelector('.speed-table'), start: 'top 80%', once: true },
+  });
+}

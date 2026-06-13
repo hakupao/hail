@@ -1,0 +1,26 @@
+:root {
+  /* 色彩弧线四站（与 background/sky.ts 的 STOPS 一致） */
+  --c-sky-top: #1a2b4a;
+  --c-sky-mid: #2d4a73;
+  --c-sky-low: #7da7cf;
+  --c-sky-ground: #e9f4fb;
+
+  --c-ink-dark: #13294a;   /* 亮背景上的文字 */
+  --c-ink-light: #eaf3ff;  /* 暗背景上的文字 */
+  --c-ink-light-2: #b8cce8;
+  --c-accent: #ffd84d;
+  --c-danger: #e8503a;
+  --c-ice: #bfe3ff;
+  --c-card-dark: rgba(191, 227, 255, 0.08);
+  --c-card-light: rgba(255, 255, 255, 0.72);
+
+  --fs-hero: clamp(40px, 8vw, 88px);
+  --fs-h2: clamp(28px, 4.5vw, 44px);
+  --fs-num: clamp(32px, 5vw, 56px);
+  --fs-body: clamp(15px, 1.8vw, 18px);
+
+  --maxw: 1080px;
+  --radius: 16px;
+  --font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+}
