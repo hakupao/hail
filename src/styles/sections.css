@@ -442,3 +442,43 @@ html.js #hero .scroll-hint { opacity: 0; }
   opacity: 0.45;
   transition: opacity 0.5s;
 }
+
+/* ===== 移动端（规格 §7）===== */
+@media (max-width: 768px) {
+  /* 高度尺收窄成色带：藏参照物文字，只留指示牌 */
+  #ruler { width: 26px; right: 6px; }
+  .ruler-mark span { display: none; }
+  .ruler-mark { width: 8px; height: 2px; background: rgba(255, 255, 255, 0.5); }
+
+  .num-cards { gap: 10px; }
+  .num-card { min-width: 140px; padding: 14px 16px; }
+
+  /* 竞速改为上下排列的横向条带（规格 §7"纵向轨道"），JS 侧 ch2-speed.ts 按视口运行时切到 x 轴动画 */
+  .race-track { flex-direction: column; height: auto; gap: 10px; }
+  .lane { flex-direction: row; align-items: center; min-height: 64px; padding: 0 12px; gap: 12px; }
+  .race-dial { padding: 0; min-width: 90px; font-size: 14px; }
+  .race-ball { margin-top: 0; }
+  .lane-label { position: static; margin-left: auto; font-size: 10px; }
+
+  .size-ladder { gap: 4%; }
+
+  .energy-bar { grid-template-columns: 1fr; gap: 6px; }
+  .energy-bar p { grid-column: 1; }
+
+  .safety-cards { grid-template-columns: 1fr; }
+
+  /* 实验室滑杆竖排堆叠 */
+  .lab { grid-template-columns: 1fr; }
+  .lab-stage { min-height: 340px; }
+
+  .history-card { flex-direction: column; text-align: center; }
+}
+
+/* ===== prefers-reduced-motion 的 CSS 兜底 ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scene-canvas, #lab-canvas { display: none; }
+}
+
+/* 安全卡（含戴盔雹宝的那张）底部留白，避免雹宝压到长文案（评审遗留：ckpt_step_11） */
+.safety-card:has(.safety-mascot-slot) { padding-bottom: 76px; }

@@ -2,7 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { raceLanes } from '../content';
 import { rollNumber } from '../utils/counter';
-import { isMobile, reducedMotion } from '../utils/motion';
+import { reducedMotion } from '../utils/motion';
 
 export function initCh2(section: HTMLElement): void {
   const lanes = Array.from(section.querySelectorAll<HTMLElement>('.lane'));
@@ -14,9 +14,11 @@ export function initCh2(section: HTMLElement): void {
       const { v, kmh } = raceLanes[i];
       const ball = lane.querySelector<HTMLElement>('.race-ball')!;
       const dial = lane.querySelector<HTMLElement>('.race-dial')!;
-      // 桌面：纵向下落赛道；移动端（Task 14 将赛道改为上下排列的横向条带）：沿 x 轴竞速
-      const axis = isMobile ? 'x' : 'y';
-      const dist = isMobile
+      // 桌面：纵向下落赛道；移动端（CSS 把赛道改成上下排列的横向条带）：沿 x 轴竞速。
+      // 运行时判定（非模块级 isMobile 快照），这样 resize 跨断点后重赛会用正确的轴。
+      const mobile = window.matchMedia('(max-width: 768px)').matches;
+      const axis = mobile ? 'x' : 'y';
+      const dist = mobile
         ? lane.clientWidth - ball.clientWidth - 130 // 右侧留出标签空间
         : lane.clientHeight - ball.clientHeight - 60; // 底部留出标签空间
       const dur = reducedMotion ? 0.01 : 1.2 * (fastest / v); // 用时 ∝ 1/速度
