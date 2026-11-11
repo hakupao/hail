@@ -139,6 +139,89 @@
   stroke-width: 2;
 }
 
+/* ---------- v3 细节动画 ----------
+   下面这些类都由场景 JS 在 init 成功后才加上 / 才创建：无 JS、reduced-motion、init 抛错时不存在，图就是静止的原图。 */
+
+/* 云团极慢地呼吸：只放大不缩小，云团之间不会露缝；三组错开周期与相位 */
+.ch1-puff {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ch1-breathe 7s var(--ease-in-out) infinite alternate;
+}
+
+.ch1-puff:nth-child(3n) { animation-duration: 9s; animation-delay: -3s; }
+.ch1-puff:nth-child(3n + 1) { animation-duration: 8s; animation-delay: -5.5s; }
+
+@keyframes ch1-breathe {
+  from { scale: 1; }
+  to { scale: 1.07; }
+}
+
+/* 上升气流：虚线一直往上流（一个周期正好挪一组虚线 12 + 9，首尾无缝） */
+.ch1-flow { animation: ch1-flow 1.5s linear infinite; }
+
+@keyframes ch1-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -21; }
+}
+
+.ch1-melt-plop {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke; /* 圈荡开时线不跟着变粗 */
+  opacity: 0; /* 只在时间线里亮一下 */
+}
+
+/* init 中途抛错：已经加上的类和已经创建的图形不留痕迹 */
+#ch1[data-init-failed] .anim-loop { animation: none; }
+
+/* 小脸的叠加层：图上方的零尺寸锚点，场景 JS 把它对到雹胚 / 小雹子 / 水滴的圆心上，--d 是那个图形此刻的直径（px）。
+   脸和冰晶都挂在锚点里面，不碰 SVG 里被 MotionPath 驱动、被测量的那个圆。 */
+.ch1-fig { position: relative; }
+
+.ch1-rider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+#ch1[data-init-failed] .ch1-rider { display: none; }
+
+/* 身体直径占雹宝盒子的 73%：盒子取直径的 1.3 倍，五官落在圆内 */
+.ch1-rider .mascot-wrap {
+  position: absolute;
+  left: calc(var(--d) * -0.65);
+  top: calc(var(--d) * -0.65);
+  width: calc(var(--d) * 1.3);
+  height: calc(var(--d) * 1.3);
+}
+
+/* 雹胚在翻滚，脸自己不再另外浮动（眨眼保留） */
+.ch1-rider .mascot-bob { animation: none; }
+
+/* 长大一级时闪的一圈冰晶：四角星，沿半径方向摆在雹胚外缘 */
+.ch1-burst {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.ch1-burst i {
+  --s: max(5px, var(--d) * 0.3);
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  background: var(--c-ice);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  transform: rotate(var(--a)) translateY(calc(var(--d) * -0.8));
+}
+
 /* ---------- 桌面：两栏（左文字，右图） ---------- */
 @media (min-width: 900px) {
   .ch1-inner {
