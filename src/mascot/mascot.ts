@@ -13,6 +13,9 @@ export type Reaction = 'squash' | 'hop' | 'shake' | 'pop';
 
 export type MascotDetail = 'auto' | 'coarse';
 
+/** 装备：护目镜 / 安全帽 */
+export type Gear = 'goggles' | 'helmet';
+
 export interface MascotOptions {
   /**
    * 只要脸、不画冰雹身体（圆、描边、高光弧）：用来给别的图形（竞速球、雹胚、水滴…）贴一张小脸。
@@ -34,6 +37,12 @@ export interface Mascot {
   el: HTMLDivElement;
   /** 切换表情（嘴形 / 眼睛交叉淡入约 0.18s，安全帽和护目镜弹入）。重复设同一个表情是空操作 */
   setExpression(e: Expression): void;
+  /**
+   * 让装备独立于表情：setGear('goggles' | 'helmet') 之后装备一直戴着，setExpression 换成任何表情都不摘（也不会重新弹一次）。
+   * setGear(null) 恢复默认：装备跟着表情走（'lab' 自带护目镜、'safety' 自带安全帽、其它表情没有）。
+   * 装备出现 / 消失带回弹；同一时刻只戴一件。戴着装备时眉毛、汗滴、大圆眼等会自动让位（mascot.css 的 data-gear 规则）
+   */
+  setGear(gear: Gear | null): void;
   /** 播一次反应动画，作用在 .mascot-bob 上，结束后自动复位；播放中再调用会打断并重新开始。reduced-motion 下是空操作 */
   react(kind: Reaction): void;
   /** 运行中开关待机浮动与眨眼（react() 不受影响）。关掉时两者立刻回到静止位；重新打开时从各自的相位接着走 */
@@ -104,7 +113,9 @@ const FACE = `
     <path d="M56 52 h8" stroke="${INK}" stroke-width="3"/>
   </g>`;
 
-/** 每种表情点亮哪些部件。solemn 保持素净：没有腮红 */
+const GEAR: readonly string[] = ['goggles', 'helmet'] satisfies Gear[];
+
+/** 每种表情点亮哪些部件（helmet / goggles 是表情自带的装备，setGear 可以盖过它）。solemn 保持素净：没有腮红 */
 const PARTS: Record<Expression, string[]> = {
   happy: ['eyes-open', 'mouth-smile', 'blush'],
   scared: ['eyes-open', 'brows', 'mouth-o', 'sweat'],
@@ -186,13 +197,31 @@ export function createMascot(sizePx = 96, expression: Expression = 'happy', opti
     el.classList.toggle('mascot-coarse', detail === 'coarse');
   }
 
-  let current: Expression | null = null;
+  let current: Expression = expression;
+  let gear: Gear | null = null; // null：装备跟着表情走
+  function apply(): void {
+    el.dataset.expr = current; // CSS 按它关掉 solemn 的待机、给闭眼类表情停掉眨眼
+    const own = PARTS[current];
+    const worn = gear ?? own.find((p) => GEAR.includes(p)) ?? null;
+    if (worn) el.dataset.gear = worn; // CSS 按它给眉毛、汗滴、大圆眼让位
+    else delete el.dataset.gear;
+    for (const p of parts) {
+      const name = p.dataset.part!;
+      // 已经亮着的部件保持 .on 不动：装备不会因为换表情重新弹一次
+      p.classList.toggle('on', GEAR.includes(name) ? name === worn : own.includes(name));
+    }
+  }
+
   function setExpression(e: Expression): void {
     if (e === current) return;
     current = e;
-    el.dataset.expr = e; // CSS 按它关掉 solemn 的待机、给闭眼类表情停掉眨眼
-    const on = PARTS[e];
-    for (const p of parts) p.classList.toggle('on', on.includes(p.dataset.part!));
+    apply();
+  }
+
+  function setGear(g: Gear | null): void {
+    if (g === gear) return;
+    gear = g;
+    apply();
   }
 
   let running: Animation | null = null;
@@ -211,6 +240,6 @@ export function createMascot(sizePx = 96, expression: Expression = 'happy', opti
 
   setIdle(options.idle !== false);
   setDetail(options.detail ?? 'auto');
-  setExpression(expression);
-  return { el, setExpression, react, setIdle, setDetail };
+  apply();
+  return { el, setExpression, setGear, react, setIdle, setDetail };
 }

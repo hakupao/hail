@@ -56,6 +56,21 @@
 
 .mascot-wrap .m-gear.on { transform: none; }
 
+/* 戴着装备时别的部件让位（data-gear 是当前戴着的装备，表情自带的也算；'lab' / 'safety' 本身不含下面这些部件，样子不变）。
+   位移是 SVG 用户单位，跟着雹宝一起缩放；不加过渡，和装备弹入同一刻到位 */
+/* 护目镜：眉毛抬到镜框上面，汗滴挪出镜框右上角，大圆眼上移一点、上下都留在镜片里 */
+.mascot-wrap[data-gear='goggles'] [data-part='brows'] { transform: translateY(-5px); }
+.mascot-wrap[data-gear='goggles'] [data-part='sweat'] { transform: translate(3px, -3px); }
+.mascot-wrap[data-gear='goggles'] [data-part='eyes-wide'] { transform: translateY(-1px); }
+/* 安全帽：眉毛整个在帽子底下，不画；汗滴从帽子后面挪到帽檐下的脸颊上；大圆眼、旋涡眼、闭眼和弯眼下移，不被帽檐压住。
+   普通的圆眼不动——'safety' 表情本来就是眼睛从帽檐下露出半截的样子 */
+.mascot-wrap[data-gear='helmet'] [data-part='brows'] { display: none; }
+.mascot-wrap[data-gear='helmet'] [data-part='sweat'] { transform: translate(1px, 29px); }
+.mascot-wrap[data-gear='helmet'] [data-part='eyes-wide'] { transform: translateY(5px); }
+.mascot-wrap[data-gear='helmet'] [data-part='eyes-spiral'] { transform: translateY(4px); }
+.mascot-wrap[data-gear='helmet'] [data-part='eyes-closed'],
+.mascot-wrap[data-gear='helmet'] [data-part='eyes-arc'] { transform: translateY(3px); }
+
 /* ---------- 眨眼：整组眼睛压扁一下，每个实例周期与相位不同 ---------- */
 .mascot-wrap .m-eyes {
   transform-origin: 60px 54px;
