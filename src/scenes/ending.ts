@@ -8,20 +8,41 @@ const HOP_LIFT = 150; // 跳离高度尺时比起点再高出多少（px）；�
 const HOP_MIN_LIFT = 40;
 const HOLD = 0.34; // 起跳前在原位停一下，盖住尺上主角 0.3s 的淡出，交棒时看不到两个雹宝
 const HOP_TIME = 1.1; // 从离开高度尺到触地（s）
-const NEAR_BOTTOM = 12; // 距页面底多少 px 以内算「到底」：此时尺上读数已是 0.0 km
+// 距页面底多少 px 以内算「到底」。按移动端地址栏的高度量级取（Chrome 约 56px）：
+// 即使 innerHeight 比真实可视高度滞后一个地址栏，滚到底也一定进得了这个范围。此时尺上读数已是（或马上是）0.0 km
+const NEAR_BOTTOM = 56;
+
+// 「到没到底」「草地还在不在视口里」都在事件里现算，不用 ScrollTrigger 的 start/end：
+// 那是 refresh 时按当时 innerHeight 缓存的绝对滚动值，而触屏设备上地址栏伸缩（只改高度的 resize）不触发 refresh，
+// 地址栏一动缓存就过期——页面变矮后滚到底也够不着旧的 start。旅程层的 relayout 处理的是同一件事。
+function onViewportChange(check: () => void): void {
+  // 攒到下一帧再判定：同一个事件里旅程层的监听排在后面，等它先把尺上主角挪到位，交棒时才对得齐
+  let queued = false;
+  const run = (): void => {
+    queued = false;
+    check();
+  };
+  const queue = (): void => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(run);
+  };
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue, { passive: true });
+  window.visualViewport?.addEventListener('resize', queue);
+  // 首次判定也走这里：main.ts 在旅程层建好之后才 refresh，那时 getHailRect() 已可用
+  ScrollTrigger.addEventListener('refresh', queue);
+}
 
 // 结尾（v2 规格 §4）：高度尺上的主角跳下来落到草地上，融化成带笑脸的水洼。
 // 静态 HTML 就是终态（水洼）；这里只负责交棒和那一段动画。
 export function initEnding(section: HTMLElement): void {
   const ground = section.querySelector<HTMLElement>('.ground')!;
+  const landing = ground.querySelector<HTMLElement>('.landing')!;
 
   // reduced-motion：水洼一直在。水洼进入视口就收起尺上的主角（它已经化在草地上了），离开再放回，无动画。
   if (reducedMotion) {
-    ScrollTrigger.create({
-      trigger: ground.querySelector('.landing'),
-      start: 'top bottom',
-      onToggle: (self) => setStage('landed', self.isActive ? 1 : 0),
-    });
+    onViewportChange(() => setStage('landed', landing.getBoundingClientRect().top < window.innerHeight ? 1 : 0));
     return;
   }
 
@@ -103,8 +124,19 @@ export function initEnding(section: HTMLElement): void {
     anim = gsap.to({}, { duration: HOLD, onUpdate: alignToRuler, onComplete: hop });
   }
 
-  // 滚到页面底才交棒
-  ScrollTrigger.create({ trigger: section, start: `bottom bottom+=${NEAR_BOTTOM}`, onEnter: play });
-  // 草地整个滚出视口后才收回：读者看不到水洼消失，下次到底可以重播
-  ScrollTrigger.create({ trigger: ground, start: 'top bottom', onLeaveBack: reset });
+  onViewportChange(() => {
+    // 滚到页面底才交棒
+    if (window.scrollY >= ScrollTrigger.maxScroll(window) - NEAR_BOTTOM) play();
+    // 草地整个滚出视口后才收回：读者看不到水洼消失，下次到底可以重播
+    else if (ground.getBoundingClientRect().top >= window.innerHeight) reset();
+  });
+
+  // 兜底：不依赖上面的滚动量计算。只要落点实实在在整个出现在视口里（浏览器自己判定的可见性），就交棒——
+  // 读者停在页面底时，水洼这个终态不会因为「到底」没判出来而永远不出现。正常情况下上面的判定先到，这里是空操作。
+  new IntersectionObserver(
+    (entries) => {
+      if (entries[entries.length - 1].intersectionRatio >= 0.9) play();
+    },
+    { threshold: 0.9 },
+  ).observe(landing);
 }
