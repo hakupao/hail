@@ -86,7 +86,7 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
 
 /* 第四章每条式子后面跟着的常数（k = 11 这类）退到次级色。只限第四章：
    第三章分段后面的是质量和 ≈20 J、≈170 J 这些结果，那是那几行的重点，不能淡 */
-.ch4-math .tex-seg + .tex-seg { opacity: 0.82; }
+.ch4-math .tex-seg + .tex-seg { opacity: 0.7; }
 
 /* 符号图例：一个符号一格，不再挤成一句话 */
 .math-legend {
@@ -123,12 +123,20 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
   padding-top: 18px;
   border-top: 1px solid rgba(159, 203, 232, 0.28);
   max-width: 40em;
+  text-wrap: pretty; /* 末行不剩孤零零一两个字 */
   color: var(--c-ice);
 }
 
 .on-light .math-note {
   border-top-color: rgba(16, 35, 63, 0.12);
   color: var(--c-ink-muted);
+}
+
+/* 第四章有六个符号：排成整齐的三列两行（窄屏两列），而不是一长串或参差的折行 */
+.ch4-math .math-legend {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px 36px;
 }
 
 /* 图例后面紧跟的说明：两者是一组，不再重复画分隔线 */
@@ -144,6 +152,7 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
   .math-legend { gap: 8px 18px; margin-top: 20px; padding-top: 14px; }
   .math-note { margin-top: 20px; padding-top: 14px; }
   .math-legend + .math-note { margin-top: 12px; padding-top: 0; }
+  .ch4-math .math-legend { grid-template-columns: 1fr; gap: 6px; } /* 窄屏一行一个：两列会把带单位的项挤得折行 */
 
   .tex-display { --tex-size: 0.88em; }
 }

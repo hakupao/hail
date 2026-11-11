@@ -54,7 +54,7 @@ npm run build      # 类型检查 + 产物构建（纯静态，可托管任何�
 <div class="tex-display" data-tex="E=\tfrac{1}{2}mv^{2}" data-display></div>  <!-- 独立 -->
 ```
 
-TeX 写错或占位没被转换，构建会失败并报行号。第四章三条模型式子里的常数有单测绑定到 `src/lab/model.ts`，改模型常数而忘了改页面时测试会红。
+TeX 写错，构建会失败并给出 KaTeX 的报错位置；占位没被转换，构建会失败并报行号。第四章三条模型式子里的常数有单测绑定到 `src/lab/model.ts`，改模型常数而忘了改页面时测试会红。
 
 ## 写动画
 

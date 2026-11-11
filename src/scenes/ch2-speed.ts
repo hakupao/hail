@@ -110,7 +110,10 @@ export function initCh2(section: HTMLElement): void {
   });
   const moving = lanes.flatMap((l, i) => [l.ball, l.fill, l.body, l.ground, fx[i].streak, ...fx[i].dust]);
 
+  let started = false; // 带着滚动位置刷新、竞速已在视口上方时，ScrollTrigger 创建的那一刻就会同步开跑
+
   function run(): void {
+    started = true;
     race.classList.remove('is-waiting');
     gsap.killTweensOf(moving);
     gsap.set(moving, { clearProps: 'transform,opacity' }); // 清掉被打断的上一场留下的变换
@@ -198,6 +201,9 @@ export function initCh2(section: HTMLElement): void {
 
   // 开跑前：球停在赛道顶、读数归零（CSS 的 .is-waiting）。
   // 放在 init 的最后：这两步不归 gsap.context 管，前面任何一步抛错时不能已经把赛道留在「开跑前」
-  race.classList.add('is-waiting');
-  for (const { read } of lanes) read.textContent = '0';
+  // 已经开跑了就不能再加回去：否则球被留在赛道顶，而 once 的触发已经用掉，滚回来也不会重跑
+  if (!started) {
+    race.classList.add('is-waiting');
+    for (const { read } of lanes) read.textContent = '0';
+  }
 }
