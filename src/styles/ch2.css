@@ -29,6 +29,7 @@
 
 /* 一条赛道自上而下三段：参照物标签 / 只装球的落区 / 落地读数。球出不了落区，所以压不到文字。 */
 .lane {
+  --size: calc(var(--d) * var(--cm)); /* 这条赛道上那颗球的直径 */
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -63,25 +64,101 @@
   white-space: nowrap;
 }
 
-/* 落区：底边就是地面线。球的静态位置在地面上（终态），JS 只做「从顶上落回来」的位移。 */
+/* 落区：底边就是地面线。球的静态位置在地面上（终态），JS 只做「从顶上落回来」的位移。
+   2px 的底边框只占位（透明），线本身画在 .lane-ground 上：落地时线能颤，落区的盒子不动。 */
 .lane-drop {
   flex: 1;
   min-height: 0;
   position: relative;
-  border-bottom: 2px solid var(--c-ice-line);
+  border-bottom: 2px solid transparent;
 }
 
+.lane-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 2px;
+  background: var(--c-ice-line);
+  transform-origin: 50% 0; /* 上沿不动：球始终贴着线 */
+}
+
+/* 球盒：被 GSAP 位移、被测量的就是它，尺寸位置永远不变。看得见的球是里面的 .race-ball-body。 */
 .race-ball {
-  --size: calc(var(--d) * var(--cm));
   position: absolute;
   left: calc(50% - var(--size) / 2);
   bottom: 0;
   width: var(--size);
   height: var(--size);
+}
+
+.race-ball-body {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
   background: var(--c-ice);
   /* 冰线描边 3px；最小的两颗球按直径收细，免得只剩一圈边 */
   border: clamp(1.5px, calc(var(--size) * 0.07), 3px) solid var(--c-ice-line);
+  transform-origin: 50% 100%; /* 落地挤压以底边为原点：不会陷进地面线 */
+}
+
+/* 小脸（只要脸的雹宝）：雹宝视图盒 120、身体外径 93，按这个比例套在球上，五官正好落在球里。
+   不要待机浮动（脸在球里漂会像五官松了），只留眨眼。 */
+.race-face {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--size) * 1.29);
+  height: calc(var(--size) * 1.29);
+  margin: calc(var(--size) * -0.645) 0 0 calc(var(--size) * -0.645);
+}
+
+.race-face .mascot-bob { animation: none; }
+
+/* 黄豆：贴不下脸，只点两只眼睛 */
+.race-ball-body.has-dots::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle closest-side, #222 60%, transparent 100%) 18% 40% / 2.2px 2.2px no-repeat,
+    radial-gradient(circle closest-side, #222 60%, transparent 100%) 82% 40% / 2.2px 2.2px no-repeat;
+}
+
+/* 速度线：球身后（上方）的三道竖线，长度上限 ∝ 速度；JS 让它随下落变长，落地即收 */
+.race-streak {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  width: calc(var(--size) * 0.56);
+  height: calc(var(--v) * var(--cm) * 0.16);
+  margin-left: calc(var(--size) * -0.28);
+  background:
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 0 100% / 2px 60%,
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 50% 100% / 2px 100%,
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 100% 100% / 2px 60%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+.race-streak.is-thin {
+  background: linear-gradient(var(--c-ice-line), var(--c-ice-line)) 50% 100% / 2px 100% no-repeat;
+}
+
+/* 尘团：落地时从球脚边向两侧散开的小圆，个头跟着球走 */
+.race-dust {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--size) * 0.16 + 4px);
+  height: calc(var(--size) * 0.16 + 4px);
+  margin-left: calc(var(--size) * -0.08 - 2px);
+  border-radius: 50%;
+  background: var(--c-ice-line);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* 开跑前（JS 加的状态类）：球停在落区顶、速度条归零 */
@@ -99,6 +176,8 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+.lane-kmh { display: inline-block; } /* 读数停住时要 pop：行内盒不吃缩放 */
 
 .lane-unit {
   font-size: 13px;
@@ -280,6 +359,7 @@ html:not(.js) .race-replay,
   border-radius: 50%;
   background: var(--c-ice);
   border: 2px solid var(--c-ice-line);
+  transform-origin: 50% 100%; /* 落到位时的回弹以底边为原点 */
 }
 
 .vdot-label { font-size: 13px; font-weight: 600; color: var(--c-ice); }
@@ -382,6 +462,7 @@ html:not(.js) .race-replay,
 
   .lane-speed { padding-top: 8px; text-align: center; }
   .lane-read { font-size: 22px; }
+  .race-ball-body.has-dots::after { display: none; } /* 黄豆只剩 6px 左右：眼睛也省了 */
   .lane-unit { display: block; margin-top: 2px; font-size: 12px; }
 
   .vchart { padding: 14px 12px 12px; }
