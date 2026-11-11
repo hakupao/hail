@@ -383,6 +383,7 @@
   font-size: 20px;
   font-weight: 600;
   line-height: 1.3;
+  margin-top: 3px; /* 上面的名称带下标（d_max、d_落地），留一点空，下标不碰到数字 */
 }
 
 /* 无 JS 或本章 init 抛错：地图和预设按钮都是 JS 生成的交互件，空壳不显示；滑杆、读数、舞台静态图照常可读 */
