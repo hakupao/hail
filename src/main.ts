@@ -37,10 +37,14 @@ const scenes: Array<[string, (el: HTMLElement) => void]> = [
 for (const [sel, init] of scenes) {
   const el = document.querySelector<HTMLElement>(sel);
   if (!el) continue;
+  // gsap.context 记下本章 init 期间创建的 set / tween / ScrollTrigger：中途抛错时整体撤回，
+  // 否则已写上的内联 opacity:0 和已建好的 pin 会残留，CSS 的失败出口撤不掉它们
+  const ctx = gsap.context(() => {});
   try {
-    init(el);
+    ctx.add(() => init(el));
   } catch (e) {
     console.error(`[hail] 场景 ${sel} 初始化失败`, e);
+    ctx.revert();
     // 各章 CSS 里「等本章 JS 接管」的预隐藏和 pin 布局都排除带这个标记的章，失败的章退回静态排版
     el.dataset.initFailed = '';
   }
