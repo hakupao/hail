@@ -1,0 +1,14 @@
+/* ===== 第一章（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
+/* pin 的舞台要整屏：整屏高 + 垂直居中；SVG 限高，避免 pin 时内容超出视口 */
+#ch1 {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 5vh;
+  padding-bottom: 5vh;
+}
+
+.ch1-stage { margin: 0 auto; max-width: 720px; }
+.cloud-svg { width: 100%; height: auto; max-height: 46vh; display: block; }
+.melt-note { max-width: 46em; }
+.melt-demo { font-size: 1.4em; margin-left: 0.5em; }

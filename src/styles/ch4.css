@@ -1,0 +1,118 @@
+/* ===== 第四章 实验室（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
+.lab {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 26px;
+  align-items: stretch;
+}
+
+.lab-controls {
+  background: var(--c-card-light);
+  border: 1px solid rgba(16, 35, 63, 0.12);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lab-controls label {
+  font-weight: 700;
+  font-size: 0.9em;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.lab-controls label input[type='range'] { grid-column: 1 / -1; }
+
+.lab-controls output {
+  font-weight: 700;
+  color: #1f5fa8;
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-controls input[type='range'] { width: 100%; accent-color: #1f5fa8; }
+
+.lab-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.lab-presets button {
+  border: 1px solid rgba(16, 35, 63, 0.25);
+  background: #fff;
+  color: var(--c-ink);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.lab-presets button:hover { background: var(--c-ice); }
+
+.lab-mascot-slot { margin-top: auto; align-self: center; }
+
+.lab-stage {
+  position: relative;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #9cc3e4, #dceaf6);
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.lab-cloud {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 84px;
+  border-radius: 999px;
+  background: #e8f2fb;
+  box-shadow: -60px 16px 0 -10px #e8f2fb, 70px 18px 0 -14px #e8f2fb;
+}
+
+.lab-cloud-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #2d3c52;
+  opacity: 0.2; /* JS 随上升气流强度调整 */
+}
+
+#lab-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lab-outcome {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.lab-outcome-emoji { font-size: 40px; line-height: 1; }
+.lab-outcome-label { font-weight: 700; font-size: 1.1em; margin: 4px 0 10px; }
+
+.lab-outcome dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  font-size: 12.5px;
+}
+
+.lab-outcome dt { color: var(--c-ink-muted); }
+.lab-outcome dd { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 768px) {
+  /* 实验室滑杆竖排堆叠 */
+  .lab { grid-template-columns: 1fr; }
+  .lab-stage { min-height: 340px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #lab-canvas { display: none; }
+}

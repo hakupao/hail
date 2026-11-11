@@ -1,0 +1,45 @@
+/* ===== 结尾（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
+#ending {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-bottom: var(--space-section);
+}
+
+.ending-stage {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 1em 0 2em;
+}
+
+.ending-mascot-slot { position: relative; z-index: 1; }
+
+.puddle {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(127, 200, 235, 0.65);
+}
+
+.grass {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 90%);
+  height: 10px;
+  border-radius: 999px;
+  background: var(--c-grass);
+}
+
+#ending .lead { margin-left: auto; margin-right: auto; }
+#ending .num-cards { margin: 0 auto; text-align: left; }
+
+.credits { font-size: var(--fs-small); color: var(--c-ink-muted); margin-top: 3em; }

@@ -1,0 +1,133 @@
+/* ===== 第三章（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
+.size-ladder {
+  display: flex;
+  align-items: flex-end;
+  gap: 9%;
+  margin: 2.5em 0 1em;
+  padding: 0 4%;
+}
+
+.size-item { text-align: center; }
+
+.size-dot {
+  display: block;
+  width: var(--d);
+  height: var(--d);
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--c-ice-line);
+}
+
+.size-name { font-size: 12px; }
+
+.danger-band {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  margin: 0 4% 3em;
+  background: linear-gradient(90deg, var(--c-grass), var(--c-accent) 38%, var(--c-warn) 66%, var(--c-danger));
+}
+
+.danger-pointer {
+  position: absolute;
+  top: -7px;
+  left: 4%;
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  background: var(--c-ink);
+}
+
+.energy-bars { display: grid; gap: 22px; margin: 2em 0; }
+
+.energy-bar {
+  display: grid;
+  grid-template-columns: 160px 1fr 90px;
+  gap: 14px;
+  align-items: center;
+}
+
+.energy-bar p {
+  grid-column: 2 / 4;
+  font-size: var(--fs-small);
+  color: var(--c-ink-muted);
+}
+
+.energy-head { font-weight: 700; font-size: 0.9em; }
+
+.energy-track {
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(16, 35, 63, 0.1);
+  overflow: hidden;
+}
+
+.energy-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--c-warn), var(--c-danger));
+}
+
+.energy-num { font-weight: 700; font-size: 1.3em; font-variant-numeric: tabular-nums; }
+
+.history-card {
+  background: #1c2433;
+  color: #dce6f5;
+  border-radius: var(--radius);
+  padding: 26px 30px;
+  margin: 2.5em 0;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  transition: opacity 0.4s;
+}
+
+.history-card h3 { margin-bottom: 0.3em; }
+
+.safety-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.safety-card {
+  background: var(--c-card-light);
+  border: 1px solid rgba(16, 35, 63, 0.12);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+}
+
+.safety-card h3 { margin-bottom: 0.4em; }
+
+.safety-mascot-slot { position: absolute; right: 14px; bottom: 10px; }
+
+/* 安全卡（含戴盔雹宝的那张）底部留白，避免雹宝压到长文案 */
+.safety-card:has(.safety-mascot-slot) { padding-bottom: 76px; }
+
+.season-tip {
+  margin-top: 2em;
+  font-weight: 600;
+  max-width: var(--measure);
+}
+
+/* 历史卡片在场时整章收敛 */
+#ch3.dimmed .size-ladder,
+#ch3.dimmed .danger-band,
+#ch3.dimmed .energy-bars {
+  opacity: 0.45;
+  transition: opacity 0.5s;
+}
+
+@media (max-width: 768px) {
+  .size-ladder { gap: 4%; }
+
+  .energy-bar { grid-template-columns: 1fr; gap: 6px; }
+  .energy-bar p { grid-column: 1; }
+
+  .safety-cards { grid-template-columns: 1fr; }
+
+  .history-card { flex-direction: column; text-align: center; }
+}

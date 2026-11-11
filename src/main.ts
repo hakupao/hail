@@ -1,10 +1,15 @@
 import './styles/tokens.css';
 import './styles/base.css';
-import './styles/sections.css';
+import './styles/journey.css';
+import './styles/hero.css';
+import './styles/ch1.css';
+import './styles/ch2.css';
+import './styles/ch3.css';
+import './styles/ch4.css';
+import './styles/ending.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initRuler } from './background/ruler';
-import { initSky } from './background/sky';
+import { initJourney } from './journey/journey';
 import { initCh1 } from './scenes/ch1-height';
 import { initCh2 } from './scenes/ch2-speed';
 import { initCh3 } from './scenes/ch3-danger';
@@ -29,9 +34,11 @@ for (const [sel, init] of scenes) {
   if (el) init(el);
 }
 
-// 背景贯穿层必须在各章之后创建：ScrollTrigger 按创建顺序刷新，
-// 先建的话 end:'bottom bottom' 会在 ch1 的 pin 撑高文档之前测量，少算 2400px（天空/高度尺提前走完）
-initSky();
-initRuler();
+// 旅程层必须在各章之后创建：ScrollTrigger 按创建顺序刷新，
+// 量锚点的探针要排在 ch1 的 pin 之后，才能把它撑高文档的那段算进去
+initJourney();
 
 ScrollTrigger.refresh();
+
+// Fredoka 是 swap 加载的，换字后各章高度会变：字体就绪后重新测量一次
+void document.fonts.ready.then(() => ScrollTrigger.refresh());

@@ -1,0 +1,145 @@
+/* ===== 旅程层：高度尺 + 主角雹宝 + 云底分界（规格 §2） ===== */
+
+/* 高度尺是一块实色夜云底的仪表条：它固定在视口里，背后的天空会从暗变亮，
+   自带深底才能让刻度、图标、读数的对比度在整个旅程里都确定。 */
+#journey-ruler {
+  position: fixed;
+  top: 5vh;
+  bottom: 5vh;
+  right: 4px;
+  width: 88px;
+  z-index: 10;
+  padding: 34px 0 78px; /* 上：给 10 km 处的主角留半个身位；下：给 0 km 处的读数留位置 */
+  border-radius: 28px;
+  background: var(--c-night);
+  border: 1.5px solid rgba(159, 203, 232, 0.4);
+  color: var(--c-ice-line);
+  pointer-events: none;
+}
+
+.jr-track {
+  position: relative;
+  height: 100%;
+}
+
+.jr-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 29px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--c-ice-line);
+}
+
+.jr-tick {
+  position: absolute;
+  right: 31px;
+  width: 5px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--c-ice-line);
+}
+
+.jr-mark {
+  position: absolute;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  transition: color 0.3s;
+}
+
+.jr-mark .icon { display: block; }
+.jr-mark.active { color: var(--c-accent); }
+
+/* 主角：JS 只写 transform（translateY 到当前高度）。top:-18px 让 36px 的盒子中心落在刻度上。 */
+.journey-hail {
+  position: absolute;
+  top: -18px;
+  right: 36px;
+  width: 36px;
+  will-change: transform;
+}
+
+.jr-hail-drop { transition: opacity 0.3s; }
+#journey-ruler.is-handed-off .jr-hail-drop { opacity: 0; }
+
+.jr-hail-body {
+  width: 36px;
+  height: 36px;
+  transform: scale(var(--hail-scale, 0.5));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.jr-readout {
+  position: absolute;
+  top: 38px;
+  right: -2px;
+  width: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.jr-alt-line { color: var(--c-accent); }
+.jr-alt { font-size: 15px; font-weight: 600; }
+.jr-unit { font-size: 10px; font-weight: 500; margin-left: 2px; }
+.jr-temp { font-size: 12px; font-weight: 500; color: var(--c-ice); }
+.jr-ref { font-size: 10px; margin-top: 2px; color: var(--c-ice-line); }
+
+/* ===== 云底分界（规格 §2.3）：第二、三章之间的 1.5 km 云底 ===== */
+/* 云体填色 = 天空在分界上缘的颜色（#3f6ea6），所以与上方天空无缝；下缘之外露出亮天空。 */
+.cloudbase {
+  margin-top: var(--space-section);
+  line-height: 0;
+}
+
+.cloudbase svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+}
+
+.cloudbase + .scene { padding-top: calc(var(--space-section) * 0.5); }
+
+@media (max-width: 768px) {
+  #journey-ruler {
+    right: 3px;
+    width: 54px;
+    padding: 26px 0 60px;
+    border-radius: 20px;
+  }
+
+  .jr-line { right: 11px; }
+  .jr-tick { right: 13px; width: 4px; }
+
+  /* 窄屏没有位置放参照物图标：只留刻度，参照高度处的刻度加长加亮 */
+  .jr-mark {
+    right: 3px;
+    width: 8px;
+    height: 2px;
+    margin-top: -1px;
+    border-radius: 1px;
+    background: var(--c-ice);
+  }
+
+  .jr-mark .icon { display: none; }
+  .jr-mark.active { background: var(--c-accent); }
+
+  .journey-hail { right: 12px; }
+  .jr-readout { top: 33px; right: 0; width: 40px; }
+  .jr-alt { font-size: 12px; }
+  .jr-unit { font-size: 8px; margin-left: 1px; }
+  .jr-temp { font-size: 10px; }
+  .jr-ref { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jr-hail-body, .jr-hail-drop, .jr-mark { transition: none; }
+}

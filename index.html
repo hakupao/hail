@@ -13,9 +13,7 @@
     <!-- ========== HERO ========== -->
     <section id="hero" class="scene on-dark">
       <div class="scene-inner hero-inner">
-        <p class="kicker">HAIL · 一份会动的科普</p>
-        <h1 class="hero-title">一颗冰雹的<br />诞生与坠落</h1>
-        <div class="hero-mascot-slot"></div>
+        <h1 class="hero-title">一颗冰雹的<br class="hero-br" />诞生与坠落</h1>
         <div class="num-cards">
           <div class="num-card">
             <div class="num">5–10 <small>km</small></div>
@@ -118,6 +116,38 @@
       </div>
     </section>
 
+    <!-- ========== 云底分界（1.5 km）：上方深色云体的下缘，下方露出亮天空 ========== -->
+    <div class="cloudbase" aria-hidden="true">
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="xMidYMin slice" focusable="false">
+        <!-- 后层：更暗的云腹，从前层的缝隙里探出来 -->
+        <g fill="#234a7d">
+          <ellipse cx="128" cy="60" rx="74" ry="52" />
+          <ellipse cx="292" cy="58" rx="70" ry="44" />
+          <ellipse cx="442" cy="60" rx="64" ry="50" />
+          <ellipse cx="604" cy="62" rx="76" ry="58" />
+          <ellipse cx="756" cy="60" rx="66" ry="50" />
+          <ellipse cx="908" cy="62" rx="70" ry="54" />
+          <ellipse cx="1050" cy="58" rx="64" ry="46" />
+          <ellipse cx="1196" cy="62" rx="74" ry="56" />
+          <ellipse cx="1340" cy="58" rx="62" ry="46" />
+        </g>
+        <!-- 前层：填色与分界上缘的天空色相同，和上方天空无缝 -->
+        <g fill="#3f6ea6">
+          <rect width="1440" height="46" />
+          <ellipse cx="50" cy="48" rx="96" ry="52" />
+          <ellipse cx="205" cy="52" rx="112" ry="72" />
+          <ellipse cx="372" cy="46" rx="84" ry="44" />
+          <ellipse cx="506" cy="50" rx="122" ry="86" />
+          <ellipse cx="684" cy="46" rx="96" ry="54" />
+          <ellipse cx="826" cy="52" rx="106" ry="76" />
+          <ellipse cx="984" cy="46" rx="88" ry="46" />
+          <ellipse cx="1114" cy="52" rx="116" ry="82" />
+          <ellipse cx="1272" cy="48" rx="92" ry="54" />
+          <ellipse cx="1404" cy="50" rx="100" ry="70" />
+        </g>
+      </svg>
+    </div>
+
     <!-- ========== 第三章 危险阈值 ========== -->
     <section id="ch3" class="scene on-light">
       <div class="scene-inner">
@@ -160,7 +190,7 @@
             <div class="safety-mascot-slot"></div>
           </div>
         </div>
-        <p class="season-tip">☂️ 应季提醒：六月正是关东地区冰雹高发季——强对流多发于初夏午后。</p>
+        <p class="season-tip">关东地区的冰雹多发在 5–7 月的午后——初夏强对流最活跃的时候。</p>
       </div>
     </section>
 

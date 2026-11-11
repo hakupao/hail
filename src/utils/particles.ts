@@ -11,7 +11,7 @@ const MODES: Record<
   Exclude<ParticleMode, 'off'>,
   { count: number; rMin: number; rMax: number; vMin: number; vMax: number; streak: boolean }
 > = {
-  'hail-light': { count: 90, rMin: 2, rMax: 5, vMin: 3, vMax: 6, streak: false },
+  'hail-light': { count: 45, rMin: 2, rMax: 5, vMin: 3, vMax: 6, streak: false },
   rain: { count: 160, rMin: 1, rMax: 1.6, vMin: 9, vMax: 13, streak: true },
   'small-hail': { count: 110, rMin: 1.5, rMax: 3, vMin: 5, vMax: 8, streak: false },
   hail: { count: 90, rMin: 4, rMax: 7, vMin: 8, vMax: 11, streak: false },

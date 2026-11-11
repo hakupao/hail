@@ -1,26 +1,61 @@
-:root {
-  /* 色彩弧线四站（与 background/sky.ts 的 STOPS 一致） */
-  --c-sky-top: #1a2b4a;
-  --c-sky-mid: #2d4a73;
-  --c-sky-low: #7da7cf;
-  --c-sky-ground: #e9f4fb;
+/* v2 视觉系统（规格 §3）。只自托管 Fredoka 的 latin 子集；中文走系统字体栈。 */
+@font-face {
+  font-family: 'Fredoka Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url('@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
-  --c-ink-dark: #13294a;   /* 亮背景上的文字 */
-  --c-ink-light: #eaf3ff;  /* 暗背景上的文字 */
-  --c-ink-light-2: #b8cce8;
-  --c-accent: #ffd84d;
-  --c-danger: #e8503a;
-  --c-ice: #bfe3ff;
-  --c-card-dark: rgba(191, 227, 255, 0.08);
+:root {
+  /* 色彩 §3.1 */
+  --c-night: #132544;     /* 夜云：天空顶、深色卡片 */
+  --c-storm: #234a7d;     /* 风暴蓝：云体、深色面 */
+  --c-ice: #eef8ff;       /* 冰白：冰雹填充、暗底文字 */
+  --c-ice-line: #9fcbe8;  /* 冰线：冰雹描边、暗底辅线（不用于第二章的正文，对比度不够） */
+  --c-accent: #ffd23f;    /* 警示黄：唯一强调色 */
+  --c-danger: #e5484d;    /* 危险红：只用于危险最高档 */
+  --c-grass: #6fbf73;     /* 草地绿：地面、安全档 */
+  --c-ink: #10233f;       /* 墨蓝：亮底文字 */
+  --c-ink-muted: #3d5273; /* 亮底次级文字（实色，不用 opacity 降调，保证对比度） */
+  --c-warn: #f2994a;      /* 危险色带第三档 */
   --c-card-light: rgba(255, 255, 255, 0.72);
 
-  --fs-hero: clamp(40px, 8vw, 88px);
-  --fs-h2: clamp(28px, 4.5vw, 44px);
-  --fs-num: clamp(32px, 5vw, 56px);
-  --fs-body: clamp(15px, 1.8vw, 18px);
+  /* 天空色标（journey/anchors.ts 的 SKY_STOPS 与此一致） */
+  --c-sky-10: #132544;
+  --c-sky-5: #234a7d;
+  --c-sky-cloud: #3f6ea6; /* 1.6 km，云底分界上缘 */
+  --c-sky-below: #cfe6f7; /* 1.4 km，破云之后 */
+  --c-sky-0: #eaf5fc;
 
-  --maxw: 1080px;
-  --radius: 16px;
-  --font: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+  /* 字体 §3.2：拉丁与数字 Fredoka，中文系统栈；标题优先圆体，正文不用圆体 */
+  --font: 'Fredoka Variable', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --font-title: 'Fredoka Variable', 'Yuanti SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans CJK SC', sans-serif;
+
+  /* 字号阶梯（比例 1.25） */
+  --fs-small: 14px;
+  --fs-body: 17px;
+  --fs-h3: 21px;
+  --fs-h2: clamp(30px, 4.4vw, 46px);
+  --fs-hero: clamp(44px, 8vw, 96px);
+  --fs-num: clamp(34px, 4.6vw, 58px);
+
+  /* 布局 §3.5 */
+  --maxw: 1080px;
+  --measure: 38em;                          /* 正文行宽上限：38 个汉字 */
+  --rail: 96px;                             /* 右侧留给高度尺的通道 */
+  --page-left: max(clamp(20px, 6vw, 96px), calc((100vw - var(--maxw) - var(--rail)) / 2));
+  --space-section: clamp(72px, 14vh, 160px); /* 章节之间的留白 */
+  --radius: 16px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --rail: 58px;
+    --page-left: 16px;
+  }
 }
