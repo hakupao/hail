@@ -188,8 +188,9 @@
 .race-replay:hover { background: rgba(238, 248, 255, 0.14); }
 .race-replay:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 
-/* 重赛按钮只有在 JS 可用且允许动效时才有事可做 */
-html:not(.js) .race-replay { display: none; }
+/* 重赛按钮只有在 JS 可用且允许动效时才有事可做（本章 init 抛错时同样没接上事件） */
+html:not(.js) .race-replay,
+#ch2[data-init-failed] .race-replay { display: none; }
 
 .race-legend {
   flex: 1 1 280px;

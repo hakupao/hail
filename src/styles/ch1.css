@@ -152,46 +152,48 @@
   .ch1-svg text { font-size: 16px; }
 }
 
-/* ---------- pin 布局：章节高度 = 视口高度，图吃掉剩余高度，四步文字叠在同一格里一次只显示一步 ---------- */
+/* ---------- pin 布局：章节高度 = 视口高度，图吃掉剩余高度，四步文字叠在同一格里一次只显示一步 ----------
+   整段只在本章 init 成功时生效：init 抛错（main.ts 给章节打 data-init-failed）就退回上面的静态排版，
+   与无 JS / reduced-motion 相同——四步文字顺排、完整的图，不会有文字叠在一格里或永远透明。 */
 @media (prefers-reduced-motion: no-preference) {
-  html.js #ch1 {
+  html.js #ch1:not([data-init-failed]) {
     height: 100vh;
     height: 100svh;
     padding-top: clamp(12px, 3vh, 36px);
     padding-bottom: clamp(12px, 3vh, 36px);
   }
 
-  html.js .ch1-inner { height: 100%; }
-  html.js .ch1-text { flex: none; }
+  html.js #ch1:not([data-init-failed]) .ch1-inner { height: 100%; }
+  html.js #ch1:not([data-init-failed]) .ch1-text { flex: none; }
 
-  html.js .ch1-steps { display: grid; }
+  html.js #ch1:not([data-init-failed]) .ch1-steps { display: grid; }
 
-  html.js .ch1-step {
+  html.js #ch1:not([data-init-failed]) .ch1-step {
     grid-area: 1 / 1;
     margin-top: 0;
   }
 
   /* 预隐藏（时间线接管前不闪）；只用 opacity，读屏仍能读到全部四步 */
-  html.js .ch1-step + .ch1-step,
-  html.js .ch1-ring,
-  html.js .ch1-melt { opacity: 0; }
+  html.js #ch1:not([data-init-failed]) .ch1-step + .ch1-step,
+  html.js #ch1:not([data-init-failed]) .ch1-ring,
+  html.js #ch1:not([data-init-failed]) .ch1-melt { opacity: 0; }
 
   /* 图是正方形：理想边长 = 内容列宽与 46svh 中较小者；放不下时（矮屏）跟着剩余高度缩小 */
-  html.js .ch1-inner { justify-content: center; }
+  html.js #ch1:not([data-init-failed]) .ch1-inner { justify-content: center; }
 
-  html.js .ch1-fig {
+  html.js #ch1:not([data-init-failed]) .ch1-fig {
     flex: 0 1 min(46vh, 100vw - var(--rail) - var(--page-left));
     flex-basis: min(46svh, 100vw - var(--rail) - var(--page-left));
   }
 
-  html.js .ch1-svg {
+  html.js #ch1:not([data-init-failed]) .ch1-svg {
     height: 100%;
     max-height: none;
   }
 
   @media (min-width: 900px) {
-    html.js .ch1-inner { grid-template-rows: minmax(0, 1fr); }
+    html.js #ch1:not([data-init-failed]) .ch1-inner { grid-template-rows: minmax(0, 1fr); }
 
-    html.js .ch1-fig { height: 100%; }
+    html.js #ch1:not([data-init-failed]) .ch1-fig { height: 100%; }
   }
 }

@@ -30,11 +30,11 @@
 }
 
 /* JS 可用且允许动效时预隐藏入场元素，避免 GSAP 首 tick 前闪现。
-   无 JS、或 prefers-reduced-motion 时不隐藏，内容直接可见。 */
+   无 JS、prefers-reduced-motion、或本章 init 抛错（data-init-failed）时不隐藏，内容直接可见。 */
 @media (prefers-reduced-motion: no-preference) {
-  html.js #hero .hero-title,
-  html.js #hero .num-card,
-  html.js #hero .scroll-hint { opacity: 0; }
+  html.js #hero:not([data-init-failed]) .hero-title,
+  html.js #hero:not([data-init-failed]) .num-card,
+  html.js #hero:not([data-init-failed]) .scroll-hint { opacity: 0; }
 }
 
 @media (max-width: 768px) {

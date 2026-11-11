@@ -194,10 +194,10 @@
 .energy-ticks span:nth-child(4) { left: 75%; }
 .energy-ticks span:nth-child(5) { left: 100%; transform: translateX(-100%); }
 
-/* JS 可用且允许动效时，条先收在左侧等主菜动画揭开；无 JS / reduced-motion 直接是终态 */
+/* JS 可用且允许动效时，条先收在左侧等主菜动画揭开；无 JS / reduced-motion / 本章 init 抛错 直接是终态 */
 @media (prefers-reduced-motion: no-preference) {
-  html.js #ch3 .energy-fill,
-  html.js #ch3 .energy-rider { transform: translateX(-100%); }
+  html.js #ch3:not([data-init-failed]) .energy-fill,
+  html.js #ch3:not([data-init-failed]) .energy-rider { transform: translateX(-100%); }
 }
 
 /* ---------- 1986 历史卡 ---------- */

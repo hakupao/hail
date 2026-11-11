@@ -95,9 +95,9 @@
   will-change: transform, opacity;
 }
 
-/* 允许动效时预隐藏水洼，等雹宝落地融化后再出现；无 JS、reduced-motion 时直接是终态 */
+/* 允许动效时预隐藏水洼，等雹宝落地融化后再出现；无 JS、reduced-motion、本章 init 抛错时直接是终态 */
 @media (prefers-reduced-motion: no-preference) {
-  html.js #ending .puddle { opacity: 0; }
+  html.js #ending:not([data-init-failed]) .puddle { opacity: 0; }
 }
 
 /* 矮的桌面视口：收紧地面和间距，尽量让结尾仍是一屏 */

@@ -286,9 +286,11 @@
   border-radius: 3px;
 }
 
-/* 无 JS：地图和预设按钮都是 JS 生成的交互件，空壳不显示；滑杆、读数、舞台静态图照常可读 */
+/* 无 JS 或本章 init 抛错：地图和预设按钮都是 JS 生成的交互件，空壳不显示；滑杆、读数、舞台静态图照常可读 */
 html:not(.js) .lab-map,
-html:not(.js) .lab-presets { display: none; }
+html:not(.js) .lab-presets,
+#ch4[data-init-failed] .lab-map,
+#ch4[data-init-failed] .lab-presets { display: none; }
 
 /* 内容列放不下三列时（平板到小桌面）：舞台靠右，结果读数排到左列 */
 @media (max-width: 1100px) {

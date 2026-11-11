@@ -39,6 +39,8 @@ for (const [sel, init] of scenes) {
     init(el);
   } catch (e) {
     console.error(`[hail] 场景 ${sel} 初始化失败`, e);
+    // 各章 CSS 里「等本章 JS 接管」的预隐藏和 pin 布局都排除带这个标记的章，失败的章退回静态排版
+    el.dataset.initFailed = '';
   }
 }
 
