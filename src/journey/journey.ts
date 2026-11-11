@@ -107,11 +107,11 @@ export function initJourney(): void {
         .join('')}
       <div class="journey-hail">
         <div class="jr-hail-drop"><i class="jr-speed"></i><div class="jr-hail-body"></div></div>
-        <div class="jr-readout">
-          <span class="jr-alt-line"><b class="jr-alt">10.0</b><span class="jr-unit">km</span></span>
-          <span class="jr-temp"></span>
-          <span class="jr-ref"></span>
-        </div>
+      </div>
+      <div class="jr-readout">
+        <span class="jr-alt-line"><b class="jr-alt">10.0</b><span class="jr-unit">km</span></span>
+        <span class="jr-temp"></span>
+        <span class="jr-ref"></span>
       </div>
     </div>`;
   document.body.appendChild(ruler);
@@ -216,7 +216,11 @@ export function initJourney(): void {
     }
 
     const alt = altitudeAt(window.scrollY, anchors);
-    hail.style.transform = `translate3d(0, ${((1 - alt / 10) * trackH).toFixed(1)}px, 0)`;
+    const hailY = ((1 - alt / 10) * trackH).toFixed(1);
+    hail.style.transform = `translate3d(0, ${hailY}px, 0)`;
+    // 读数是主角的兄弟节点、不在它的 transform 里：宽屏下 CSS 用 --hail-y 让它跟着主角走，
+    // 窄屏下它是固定在右上角的角标（position: fixed 不能放在带 transform 的祖先里）
+    track.style.setProperty('--hail-y', `${hailY}px`);
 
     const altText = alt.toFixed(1);
     if (altEl.textContent !== altText) altEl.textContent = altText;

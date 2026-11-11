@@ -156,3 +156,8 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
 
   .tex-display { --tex-size: 0.88em; }
 }
+
+/* 最窄的一档（320px 级）：第四章最长的那条式子在 0.88em 下刚好顶到卡片内边，再收一点留出余量 */
+@media (max-width: 340px) {
+  .tex-display { --tex-size: 0.82em; }
+}

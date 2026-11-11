@@ -116,11 +116,14 @@
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* 读数：主角的兄弟节点，靠 JS 写在 .jr-track 上的 --hail-y 跟着主角走（位置 = 主角盒子下方 2px） */
 .jr-readout {
   position: absolute;
-  top: 38px;
-  right: -2px;
+  top: 20px;
+  right: 34px;
   width: 52px;
+  transform: translate3d(0, var(--hail-y, 0px), 0);
+  will-change: transform;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,20 +169,26 @@
 }
 
 @media (max-width: 768px) {
+  /* 窄屏：高度尺收成贴右边缘的一根细轨，读数拿出来做右上角的角标。
+     细轨仍然自带深底（理由同上：背后的天空会从暗变亮），但只有 18px 宽，正文右侧只让出 --rail = 30px（与细轨之间留 6px）。 */
   #journey-ruler {
-    right: 3px;
-    width: 54px;
-    padding: 26px 0 60px;
-    border-radius: 20px;
+    top: calc(54px + env(safe-area-inset-top, 0px));
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: 6px; /* 主角比细轨宽 4px：留出这点边距它才不会贴到屏幕边 */
+    width: 18px;
+    padding: 18px 0; /* 上下各留半个主角的身位 */
+    border: 0;
+    border-radius: 9px;
+    box-shadow: 0 0 0 1px rgba(159, 203, 232, 0.4);
   }
 
-  .jr-line { right: 11px; }
-  .jr-tick { right: 13px; width: 4px; }
+  .jr-line { right: 8px; }
+  .jr-tick { right: 10px; width: 3px; }
 
   /* 窄屏没有位置放参照物图标：只留刻度，参照高度处的刻度加长加亮 */
   .jr-mark {
-    right: 3px;
-    width: 8px;
+    right: 2px;
+    width: 6px;
     height: 2px;
     margin-top: -1px;
     border-radius: 1px;
@@ -189,11 +198,27 @@
   .jr-mark .icon { display: none; }
   .jr-mark.active { background: var(--c-accent); }
 
-  .journey-hail { right: 12px; }
-  .jr-readout { top: 33px; right: 0; width: 40px; }
-  .jr-alt { font-size: 12px; }
-  .jr-unit { font-size: 8px; margin-left: 1px; }
-  .jr-temp { font-size: 10px; }
+  /* 主角 36px 的盒子居中压在轨道中线上（缩放后约 25px，比细轨宽一圈，像串在轨上的珠子） */
+  .journey-hail { right: -9px; }
+
+  /* 角标：固定在视口右上角，不跟主角走 */
+  .jr-readout {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    right: 6px;
+    width: auto;
+    min-width: 50px;
+    padding: 4px 7px 5px;
+    border-radius: 12px;
+    background: var(--c-night);
+    box-shadow: 0 0 0 1px rgba(159, 203, 232, 0.4);
+    transform: none;
+    will-change: auto;
+  }
+
+  .jr-alt { font-size: 13px; }
+  .jr-unit { font-size: 9px; margin-left: 1px; }
+  .jr-temp { font-size: 11px; }
   .jr-ref { display: none; }
 }
 

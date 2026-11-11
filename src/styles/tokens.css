@@ -68,7 +68,7 @@
 
 @media (max-width: 768px) {
   :root {
-    --rail: 58px;
+    --rail: 30px; /* 窄屏的高度尺是贴边细轨（见 journey.css） */
     --page-left: 16px;
   }
 }
