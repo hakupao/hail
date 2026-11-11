@@ -76,6 +76,8 @@ describe('公式预渲染', () => {
       ' r = 1',
     ]);
     expect(splitDisplayTex('a_{1,\\qquad 2}')).toHaveLength(1);
+    // \\leftarrow / \\rightarrow 不是定界符，不能把后面的顶层逗号算进括号里
+    expect(splitDisplayTex('a \\leftarrow b,\\qquad c \\rightarrow d,\\qquad e')).toHaveLength(3);
     // 分段不丢内容：除了被 margin 取代的间距命令，拼回去等于原式
     const strip = (t: string): string => t.replace(/\\qquad|\\quad|\\;|\s/g, '');
     for (const tex of allTex) {

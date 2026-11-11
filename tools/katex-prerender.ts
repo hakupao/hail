@@ -31,8 +31,8 @@ export function splitDisplayTex(tex: string): Array<{ tex: string; gapEm: number
     const c = tex[i];
     if (c === '{') depth++;
     else if (c === '}') depth--;
-    else if (tex.startsWith('\\left', i)) depth++;
-    else if (tex.startsWith('\\right', i)) depth--;
+    else if (/^\\left(?![a-zA-Z])/.test(tex.slice(i, i + 6))) depth++; // \left( 算，\leftarrow 不算
+    else if (/^\\right(?![a-zA-Z])/.test(tex.slice(i, i + 7))) depth--;
     else if (c === ',' && depth === 0) {
       let rest = tex.slice(i + 1);
       let gap = 0;
