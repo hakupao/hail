@@ -3,6 +3,8 @@
    待机和 react() 只动里面的 .mascot-bob，所以盒子本身永远不动。 */
 .mascot-wrap {
   display: inline-block;
+  /* 永远是正方形：调用方只给宽或只给高时另一边跟着来（作了容器之后，不给宽度的话宽度会塌成 0） */
+  aspect-ratio: 1;
   /* 作容器：按实际渲染宽度决定画多少细节（章节 CSS 会用 !important 把它压小，不能只看创建时的 sizePx） */
   container-type: inline-size;
 }
@@ -21,8 +23,14 @@
   overflow: visible;
 }
 
-/* 只要脸：没有身体，可以叠在别的图形上 */
+/* 只要脸：没有身体，可以叠在别的图形上。默认铺满宿主（最近的定位祖先）；
+   :where() 让这组默认值的优先级为 0，调用方任何一条定位 / 定尺寸的 CSS 都压得过它 */
 .mascot-bare { pointer-events: none; }
+
+:where(.mascot-bare) {
+  position: absolute;
+  inset: 0;
+}
 
 /* ---------- 表情部件：叠放，交叉淡入 ---------- */
 .mascot-wrap [data-part] {
@@ -72,8 +80,17 @@
   97% { transform: scaleY(0.1); }
 }
 
-/* ---------- 小尺寸：省掉腮红、高光，线条加粗，旋涡眼换成叉 ---------- */
+/* ---------- 粗线简化版：省掉腮红、高光，线条加粗，旋涡眼换成叉 ----------
+   两个入口，画法逐条相同，改一处要同时改另一处：
+   - 自动：渲染宽度 ≤ 44px（下面的 @container）
+   - 强制：.mascot-coarse（createMascot 的 detail: 'coarse' / setDetail('coarse')），不论多大 */
 .mascot-wrap .m-coarse { display: none; }
+
+.mascot-coarse .m-fine { display: none; }
+.mascot-coarse .m-coarse { display: inline; }
+.mascot-coarse .m-eye { stroke: #222; stroke-width: 3; }
+.mascot-coarse .m-line { stroke-width: 4.6; }
+.mascot-coarse .m-mouth { stroke-width: 5.5; }
 
 @container (max-width: 44px) {
   .mascot-wrap .m-fine { display: none; }

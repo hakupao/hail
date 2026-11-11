@@ -11,14 +11,22 @@ export type Expression = 'happy' | 'scared' | 'solemn' | 'safety' | 'lab' | 'wow
 /** 一次性反应：squash 落地挤压回弹 / hop 小跳 / shake 发抖 / pop 放大回弹 */
 export type Reaction = 'squash' | 'hop' | 'shake' | 'pop';
 
+export type MascotDetail = 'auto' | 'coarse';
+
 export interface MascotOptions {
   /**
    * 只要脸、不画冰雹身体（圆、描边、高光弧）：用来给别的图形（竞速球、雹胚、水滴…）贴一张小脸。
-   * 把返回的 el 放进那个图形里，自己用 CSS 定位和定尺寸；被测量的那个元素的尺寸不会因此改变。
+   * 把返回的 el 放进那个图形里：默认绝对定位铺满最近的定位祖先（宿主要有 position），被测量的那个元素的尺寸不会因此改变。
+   * 想要别的位置 / 大小就用自己的 CSS 覆盖（任何选择器都压得过默认值）。bare 模式下 sizePx 不起作用。
    */
   bare?: boolean;
-  /** false：不要待机浮动和眨眼（react() 仍可用）。默认 true */
+  /** false：不要待机浮动和眨眼（react() 仍可用）。默认 true；之后可用 setIdle() 开关 */
   idle?: boolean;
+  /**
+   * 'auto'（默认）：按渲染宽度自动判定，44px 及以下画粗线简化版（省掉腮红和高光、线条加粗、旋涡眼换成叉）。
+   * 'coarse'：不论多大都画粗线简化版。之后可用 setDetail() 切换
+   */
+  detail?: MascotDetail;
 }
 
 export interface Mascot {
@@ -28,6 +36,10 @@ export interface Mascot {
   setExpression(e: Expression): void;
   /** 播一次反应动画，作用在 .mascot-bob 上，结束后自动复位；播放中再调用会打断并重新开始。reduced-motion 下是空操作 */
   react(kind: Reaction): void;
+  /** 运行中开关待机浮动与眨眼（react() 不受影响）。关掉时两者立刻回到静止位；重新打开时从各自的相位接着走 */
+  setIdle(on: boolean): void;
+  /** 运行中切换画法：'coarse' 强制粗线简化版，'auto' 回到按渲染宽度自动判定。切换是即时的，没有过渡 */
+  setDetail(detail: MascotDetail): void;
 }
 
 const INK = '#222';
@@ -142,27 +154,36 @@ const REACTIONS: Record<Reaction, { frames: Keyframe[]; duration: number }> = {
 };
 
 /**
- * @param sizePx 尺寸盒边长（px）。传 0 表示尺寸交给调用方的 CSS（自己清掉内联宽高或用 CSS 覆盖）
+ * @param sizePx 尺寸盒边长（px），写成内联宽高。传 0（或 bare 模式）时不写内联宽高，尺寸交给调用方的 CSS：
+ *   尺寸盒自带 1:1 的宽高比，只给宽或只给高也是正方形；非 bare 时宽高都不给则是 0×0。
  * @param expression 初始表情
  */
 export function createMascot(sizePx = 96, expression: Expression = 'happy', options: MascotOptions = {}): Mascot {
   const el = document.createElement('div');
   el.className = options.bare ? 'mascot-wrap mascot-bare' : 'mascot-wrap';
-  el.style.width = `${sizePx}px`;
-  el.style.height = `${sizePx}px`;
+  if (!options.bare && sizePx > 0) {
+    el.style.width = `${sizePx}px`;
+    el.style.height = `${sizePx}px`;
+  }
   el.innerHTML = `<div class="mascot-bob anim-loop"><svg viewBox="0 0 120 120" aria-hidden="true">${options.bare ? '' : BODY}${FACE}</svg></div>`;
 
   const bob = el.firstElementChild as HTMLElement;
   const parts = Array.from(el.querySelectorAll<SVGElement>('[data-part]'));
 
-  if (options.idle === false) {
-    el.classList.add('mascot-still');
-  } else {
+  let phased = false;
+  function setIdle(on: boolean): void {
+    el.classList.toggle('mascot-still', !on);
+    if (!on || phased) return;
+    phased = true;
     // 每个实例错开相位：浮动从周期里的随机位置开始，眨眼间隔 3–5 秒
     el.style.setProperty('--bob-delay', `${(-Math.random() * 3).toFixed(2)}s`);
     el.style.setProperty('--blink-dur', `${(3 + Math.random() * 2).toFixed(2)}s`);
     el.style.setProperty('--blink-delay', `${(-Math.random() * 4).toFixed(2)}s`);
-    observeInView(el);
+    observeInView(el); // 循环动画「在场才动」（base.css 的 .anim-loop）
+  }
+
+  function setDetail(detail: MascotDetail): void {
+    el.classList.toggle('mascot-coarse', detail === 'coarse');
   }
 
   let current: Expression | null = null;
@@ -188,6 +209,8 @@ export function createMascot(sizePx = 96, expression: Expression = 'happy', opti
     anim.oncancel = clear;
   }
 
+  setIdle(options.idle !== false);
+  setDetail(options.detail ?? 'auto');
   setExpression(expression);
-  return { el, setExpression, react };
+  return { el, setExpression, react, setIdle, setDetail };
 }
