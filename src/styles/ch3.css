@@ -69,7 +69,6 @@
   right: 0;
   top: calc(var(--u) * 5.5);
   border-top: 2px dashed var(--c-ink);
-  transition: opacity 0.5s;
 }
 
 .ladder-line span {
@@ -223,7 +222,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 历史卡在场时只把图形压淡（实物、色带、门槛线、动能条），文字一律不动，对比度不受影响 */
+/* 历史卡在场时只把图形压淡（实物、色带、动能条的填充），文字一律不动，对比度不受影响 */
 .rung-obj,
 .rung-band { transition: opacity 0.5s; }
 
@@ -276,13 +275,8 @@
   font-weight: 600;
 }
 
-@media (max-width: 768px) {
-  .rung-name { font-size: 13px; }
-  .rung-size { font-size: 13px; }
-  .rung-harm { font-size: 12px; }
-  .ladder-line span { font-size: 12px; }
-
-  /* 窄屏：标签在上、条在下；读数挪到标签行右端，免得 170 J 在条尾放不下 */
+/* 绘图区不够宽时（手机与窄窗口）：标签在上、条在下；读数挪到标签行右端，免得 170 J 在条尾放不下 */
+@media (max-width: 1000px) {
   .energy-row {
     position: relative;
     grid-template-columns: minmax(0, 1fr);
@@ -308,6 +302,13 @@
     font-size: 20px;
     line-height: 23px;
   }
+}
+
+@media (max-width: 768px) {
+  .rung-name { font-size: 13px; }
+  .rung-size { font-size: 13px; }
+  .rung-harm { font-size: 12px; }
+  .ladder-line span { font-size: 12px; }
 
   .history-card { padding: 20px; gap: 16px; }
 
