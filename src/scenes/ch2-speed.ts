@@ -162,7 +162,7 @@ export function initCh2(section: HTMLElement): void {
       face?.setExpression('scared');
       gsap.fromTo(ball, { y: -dist }, { y: 0, duration, ease: EASE.fall, clearProps: 'transform', onComplete: land });
       // 速度线与球用同一条缓动：线长 = 上限 × 进度 ≤ 已下落距离（上限 < 落差），不会伸到起点以上
-      gsap.fromTo(streak, { scaleY: 0, opacity: 0.85 }, { scaleY: 1, duration, ease: EASE.fall });
+      gsap.fromTo(streak, { scaleY: 0, opacity: 0.85 }, { scaleY: 1, duration, ease: EASE.fall, clearProps: 'transform,opacity' });
       gsap.fromTo(
         fill,
         { scaleX: 0 },
