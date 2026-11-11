@@ -65,8 +65,10 @@
 
 .jr-hail-drop { position: relative; transition: opacity 0.3s; }
 #journey-ruler.is-handed-off .jr-hail-drop { opacity: 0; }
-/* 交棒后尺上的主角看不见了：它的待机和眨眼也停掉 */
-#journey-ruler.is-handed-off .anim-loop { animation-play-state: paused !important; }
+/* 交棒：尺上的主角把浮动和眨眼归零（不是停在某个相位上）。这样它画出来的位置就是 getHailRect() 量到的盒子，
+   结尾的雹宝叠上来接棒时两个严丝合缝；淡出之后它看不见了，本来也该停。收回（landed 回到 0）时重新开始浮动 */
+#journey-ruler.is-handed-off .jr-hail-body .mascot-bob,
+#journey-ruler.is-handed-off .jr-hail-body .m-eyes { animation: none; }
 
 /* 主角的待机浮动：加在雹宝内层的 .mascot-bob 上（.jr-hail-body 是 getHailRect() 量的盒子，不能动）。
    尺上的主角只有 18–36px，按百分比浮动不到 1px，这里用 px 幅度；不摇头，免得小脸发虚 */
@@ -95,7 +97,11 @@
   opacity: 0;
   transform: scaleY(0.3);
   transform-origin: 50% 100%;
-  transition: opacity var(--dur-instant) linear, transform var(--dur-instant) var(--ease-soft);
+  /* bottom 跟着 --hail-scale 变：用和主角本体（.jr-hail-body）长大时一样的过渡，不抢在它前面跳过去 */
+  transition:
+    opacity var(--dur-instant) linear,
+    transform var(--dur-instant) var(--ease-soft),
+    bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #journey-ruler.is-fast .jr-speed {

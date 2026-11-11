@@ -37,15 +37,32 @@ const SPEED_LINE_MIN = 1.1; // 滚动速度超过多少 px/ms 才画速度线（
 const SPEED_LINE_HOLD = 140; // 停下后多久收起速度线（ms）
 const CLOUD_PARALLAX = 12; // 云底后层随滚动相对前层的最大位移（SVG 用户单位）；前层反向走它的 1/3
 
-const landedListeners: Array<() => void> = [];
+const landedListeners: Array<{ cb: () => void; host?: Element }> = [];
+let hailLanded = false;
+let landedScope: Element | undefined;
+
+/**
+ * main.ts 专用：跑某一章的 init 之前传入那一章的元素、跑完传 undefined。
+ * 这期间（同步）注册的 onHailLanded 回调默认归属这一章，不用每个调用方自己传 host。
+ */
+export function scopeHailLanded(host: Element | undefined): void {
+  landedScope = host;
+}
 
 /**
  * 订阅「Hero 入场时雹胚落到高度尺 10 km 处的那一下」（Hero 标题的「被震到」用它对时）。
  * 只在入场动画真的播了的时候触发一次：带滚动位置加载、reduced-motion、旅程层初始化失败时都不会触发——
  * 所以只能拿它做锦上添花的效果，不能把「显示内容」挂在它上面。可在 initJourney 之前调用。
+ * 落地之后才注册的回调不会被调用（开发模式下会 console.warn）。
+ * @param host 回调所属的章节元素：那一章 init 抛错、被 main.ts 打上 data-init-failed 之后，回调不再触发。
+ *   不传时默认是正在跑 init 的那一章（在 init 里同步注册的都算）；init 之外注册又不传，就不属于任何一章
  */
-export function onHailLanded(cb: () => void): void {
-  landedListeners.push(cb);
+export function onHailLanded(cb: () => void, host: Element | undefined = landedScope): void {
+  if (hailLanded) {
+    if (import.meta.env.DEV) console.warn('[journey] onHailLanded 注册得太晚：雹胚已经落地，这个回调不会被调用', cb);
+    return;
+  }
+  landedListeners.push({ cb, host });
 }
 
 /**
@@ -134,6 +151,8 @@ export function initJourney(): void {
   let anchors: Anchor[] = normalizeAnchors([], 1);
   let trackH = 0;
   let mobile = false;
+  let cloudTop = 0; // 云底分界上缘的文档坐标（不随滚动变）
+  let cloudH = 0;
   let lastStage: Stage | null = null;
 
   function measure(): void {
@@ -163,7 +182,16 @@ export function initJourney(): void {
 
     trackH = track.clientHeight;
     mobile = window.matchMedia('(max-width: 768px)').matches;
+    measureCloud();
     render();
+  }
+
+  // 云底分界的位置只在这里量（refresh 与 relayout 各一次），render() 每次滚动只拿 scrollY 去算，不再读布局
+  function measureCloud(): void {
+    if (!cloudbase) return;
+    const r = cloudbase.getBoundingClientRect();
+    cloudTop = r.top + window.scrollY;
+    cloudH = r.height;
   }
 
   // 触屏设备上 ScrollTrigger 默认忽略「只改高度」的 resize（地址栏伸缩），不会触发 refresh。
@@ -171,17 +199,18 @@ export function initJourney(): void {
   function relayout(): void {
     anchors = normalizeAnchors(measured, ScrollTrigger.maxScroll(window));
     trackH = track.clientHeight;
+    measureCloud();
     render();
   }
 
   function render(): void {
-    // 云底分界的视差：按分界此刻在视口里的位置现算（-1 刚从底边进来 … 1 从顶边出去），不缓存滚动值。
-    // 先读后写：这次布局读取放在本函数所有样式写入之前
+    // 云底分界的视差：按分界此刻在视口里的位置算（-1 刚从底边进来 … 1 从顶边出去）。
+    // 分界的文档坐标和高度是 measureCloud() 缓存的；视口高度现取（手机地址栏伸缩时它会变）
     if (cloudbase && !reducedMotion) {
-      const r = cloudbase.getBoundingClientRect();
+      const top = cloudTop - window.scrollY;
       const vh = window.innerHeight;
-      if (r.bottom > -vh && r.top < 2 * vh) {
-        const p = Math.min(1, Math.max(-1, (vh / 2 - (r.top + r.height / 2)) / ((vh + r.height) / 2)));
+      if (top + cloudH > -vh && top < 2 * vh) {
+        const p = Math.min(1, Math.max(-1, (vh / 2 - (top + cloudH / 2)) / ((vh + cloudH) / 2)));
         cloudbase.style.setProperty('--cb-shift', (p * CLOUD_PARALLAX).toFixed(2));
       }
     }
@@ -265,7 +294,9 @@ export function initJourney(): void {
         ease: EASE.fall,
         onComplete: () => {
           mascot.react('squash');
-          for (const cb of landedListeners) {
+          hailLanded = true;
+          for (const { cb, host } of landedListeners.splice(0)) {
+            if (host?.hasAttribute('data-init-failed')) continue; // 那一章 init 抛错被撤回了：它的回调不再生效
             try {
               cb();
             } catch (e) {

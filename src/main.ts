@@ -12,7 +12,7 @@ import './styles/ch4.css';
 import './styles/ending.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initJourney } from './journey/journey';
+import { initJourney, scopeHailLanded } from './journey/journey';
 import { initCh1 } from './scenes/ch1-height';
 import { initCh2 } from './scenes/ch2-speed';
 import { initCh3 } from './scenes/ch3-danger';
@@ -43,6 +43,7 @@ for (const [sel, init] of scenes) {
   // gsap.context 记下本章 init 期间创建的 set / tween / ScrollTrigger：中途抛错时整体撤回，
   // 否则已写上的内联 opacity:0 和已建好的 pin 会残留，CSS 的失败出口撤不掉它们
   const ctx = gsap.context(() => {});
+  scopeHailLanded(el); // 本章 init 里注册的 onHailLanded 回调归属本章：init 失败后不再触发
   try {
     ctx.add(() => init(el));
   } catch (e) {
@@ -51,6 +52,7 @@ for (const [sel, init] of scenes) {
     // 各章 CSS 里「等本章 JS 接管」的预隐藏和 pin 布局都排除带这个标记的章，失败的章退回静态排版
     el.dataset.initFailed = '';
   }
+  scopeHailLanded(undefined);
 }
 
 // 旅程层在各章之后创建（它的探针另有 refreshPriority:-1 兜底，保证排在所有 pin 之后测量）
