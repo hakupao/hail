@@ -43,7 +43,7 @@ npm run build      # 类型检查 + 产物构建（纯静态，可托管任何�
 ## 降级
 
 - 无 JavaScript：全部文案与静态图可读（产物里 CSS 是独立文件；dev 模式下 CSS 由 JS 注入，关 JS 测试请用 `npm run build && npm run preview`）
-- 模块脚本没跑起来，或某一章初始化抛错：该章退回静态排版，其余章节不受影响
+- 模块脚本没跑起来（3 秒失效保护）、迟到，或某一章初始化抛错：内容退回静态排版，其余章节不受影响
 - `prefers-reduced-motion`：无 pin、无 scrub、无粒子，直接呈现终态
 - 移动端 375px 宽可用，无横向滚动
 
