@@ -1,0 +1,19 @@
+// Cloudflare Workers 静态资源部署：纯静态站点，没有 Worker 脚本，只上传 vite build 的产物。
+// 部署：npm run deploy（先构建再 wrangler deploy）。首次需要 wrangler login。
+{
+  "name": "hail",
+  "compatibility_date": "2026-11-11",
+  "assets": {
+    "directory": "./dist"
+  },
+  // 自定义域名：bojiangz.com 的 DNS 在同一个 Cloudflare 账号下，部署时自动建 DNS 记录并签发证书
+  "routes": [
+    {
+      "pattern": "hail.bojiangz.com",
+      "custom_domain": true
+    }
+  ],
+  // 只保留自定义域名一个入口，不开 *.workers.dev 和预览地址
+  "workers_dev": false,
+  "preview_urls": false
+}
