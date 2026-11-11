@@ -148,6 +148,8 @@ describe('公式预渲染', () => {
     expect(texOf('\\max\\!\\left(0,\\qquad d\\right),\\qquad r = 1')).toEqual(['\\max\\!\\left(0,\\qquad d\\right),', ' r = 1']);
     // \left\{ … \right. ：定界符算在 \left / \right 里，不多计一层，后面的顶层逗号照切
     expect(texOf('\\left\\{a,\\qquad b\\right.,\\qquad c')).toEqual(['\\left\\{a,\\qquad b\\right.,', ' c']);
+    // 第四章落地直径那条的写法：\left( 里是「逗号 + \;」，整条只在 \right) 后面的 ,\qquad 处切一次
+    expect(texOf('\\max\\!\\left(0,\\; d\\right),\\qquad r = 1')).toEqual(['\\max\\!\\left(0,\\; d\\right),', ' r = 1']);
     // 定界符两边种类不同（一边是 . ）也配得上
     expect(texOf('\\left.a,\\qquad b\\right),\\qquad c')).toEqual(['\\left.a,\\qquad b\\right),', ' c']);
     expect(texOf('\\left(a,\\qquad b\\right.,\\qquad c')).toEqual(['\\left(a,\\qquad b\\right.,', ' c']);
