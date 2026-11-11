@@ -14,10 +14,6 @@ import { initHero } from './scenes/hero';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 背景贯穿层
-initSky();
-initRuler();
-
 // 六个章节场景：各自独立，缺一个不影响其他
 const scenes: Array<[string, (el: HTMLElement) => void]> = [
   ['#hero', initHero],
@@ -33,5 +29,9 @@ for (const [sel, init] of scenes) {
   if (el) init(el);
 }
 
-// 全部 ScrollTrigger 创建完毕后刷新一次：ch1 的 pin 会撑高文档，确保背景层的 end:'bottom bottom' 测量正确
+// 背景贯穿层必须在各章之后创建：ScrollTrigger 按创建顺序刷新，
+// 先建的话 end:'bottom bottom' 会在 ch1 的 pin 撑高文档之前测量，少算 2400px（天空/高度尺提前走完）
+initSky();
+initRuler();
+
 ScrollTrigger.refresh();
