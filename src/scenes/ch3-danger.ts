@@ -4,86 +4,51 @@ import { createMascot } from '../mascot/mascot';
 import { rollNumber } from '../utils/counter';
 import { reducedMotion } from '../utils/motion';
 
+// 第三章 · 危险阈值（v2 规格 §4）。
+// 尺寸阶梯、安全卡都是静态 HTML/CSS；本章唯一的主菜动画是动能条。
 export function initCh3(section: HTMLElement): void {
-  // 历史卡片里的雹宝（默哀）与安全卡里的雹宝（戴盔）
-  const historyMascot = createMascot(84, 'happy');
+  // 历史卡里的雹宝（默哀）与安全卡旁的雹宝（戴盔，静态）
+  const historyMascot = createMascot(84, reducedMotion ? 'solemn' : 'happy');
   section.querySelector('.history-mascot-slot')!.appendChild(historyMascot.el);
-  // safetyMascot 创建后不再操作：'safety' 戴盔即其静态终态，属有意设计
-  const safetyMascot = createMascot(64, 'safety');
-  section.querySelector('.safety-mascot-slot')!.appendChild(safetyMascot.el);
+  section.querySelector('.safety-mascot-slot')!.appendChild(createMascot(88, 'safety').el);
 
-  if (reducedMotion) {
-    historyMascot.setExpression('solemn');
-    section.querySelectorAll<HTMLElement>('.energy-fill').forEach((f, i) => {
-      f.style.width = i === 0 ? '12%' : '92%';
-    });
-    return;
+  // reduced-motion：动能条的终态宽度与读数就是 HTML/CSS 的默认值，不需要再做什么
+  if (reducedMotion) return;
+
+  // 主菜：三根动能条在同一把刻度尺上涨起来 + 焦耳数滚动。
+  // 条的终态宽度由 CSS 按 焦耳数 / 200 给出，这里只用百分比位移把它从左侧揭开（不量像素，resize 安全）。
+  const rows = Array.from(section.querySelectorAll<HTMLElement>('.energy-row')).map((row) => ({
+    joules: Number(row.dataset.joules),
+    // 条与读数的「骑手」等宽，一起做同一个百分比位移：读数始终贴着条尾
+    moving: row.querySelectorAll<HTMLElement>('.energy-fill, .energy-rider'),
+    num: row.querySelector<HTMLElement>('.energy-num')!,
+  }));
+  for (const { moving, num } of rows) {
+    gsap.set(moving, { x: 0, xPercent: -100 });
+    num.textContent = '0 J';
   }
-
-  // ① 尺寸阶梯弹入
-  gsap.from(section.querySelectorAll('.size-item'), {
-    scale: 0,
-    transformOrigin: '50% 100%',
-    stagger: 0.18,
-    ease: 'back.out(2)',
-    scrollTrigger: { trigger: section.querySelector('.size-ladder'), start: 'top 72%', once: true },
+  ScrollTrigger.create({
+    trigger: section.querySelector('.energy'),
+    start: 'top 72%',
+    once: true,
+    onEnter() {
+      rows.forEach(({ joules, moving, num }, i) => {
+        // 条越长涨得越久，三根条的「涨速」看起来接近
+        const duration = 0.7 + joules / 140;
+        const delay = i * 0.3;
+        gsap.to(moving, { xPercent: 0, duration, delay, ease: 'power2.out' });
+        gsap.delayedCall(delay, () => rollNumber(num, joules, { duration, suffix: ' J' }));
+      });
+    },
   });
 
-  // ② 危险色带指针随滚动右移（绿→红）
-  gsap.fromTo(
-    section.querySelector('.danger-pointer'),
-    { left: '4%' },
-    {
-      left: '94%',
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section.querySelector('.size-ladder'),
-        start: 'top 72%',
-        end: 'bottom 30%',
-        scrub: true,
-      },
-    },
-  );
-
-  // ③ 能量条增长 + 焦耳数滚动
-  const energyTargets: Array<{ sel: string; joules: number; width: string }> = [
-    { sel: '.energy-20', joules: 20, width: '12%' },
-    { sel: '.energy-170', joules: 170, width: '92%' },
-  ];
-  for (const { sel, joules, width } of energyTargets) {
-    const bar = section.querySelector<HTMLElement>(sel)!;
-    const fill = bar.querySelector<HTMLElement>('.energy-fill')!;
-    const num = bar.querySelector<HTMLElement>('.energy-num')!;
-    ScrollTrigger.create({
-      trigger: bar,
-      start: 'top 80%',
-      once: true,
-      onEnter() {
-        gsap.to(fill, { width, duration: 1.4, ease: 'power2.out' });
-        rollNumber(num, joules, { duration: 1.4, suffix: ' J' });
-      },
-    });
-  }
-
-  // ④ 历史卡片：进入时整章压暗、雹宝默哀；往回滚恢复
+  // 历史卡：进入时雹宝默哀，卡片在场期间把上方的图形（不含文字）压淡；往回滚恢复
   ScrollTrigger.create({
     trigger: section.querySelector('.history-card'),
-    start: 'top 70%',
-    onEnter() {
-      historyMascot.setExpression('solemn');
-      section.classList.add('dimmed');
-    },
-    onLeaveBack() {
-      historyMascot.setExpression('happy');
-      section.classList.remove('dimmed');
-    },
-  });
-
-  // ⑤ 安全卡滑入
-  gsap.from(section.querySelectorAll('.safety-card'), {
-    y: 60,
-    opacity: 0,
-    stagger: 0.18,
-    scrollTrigger: { trigger: section.querySelector('.safety-cards'), start: 'top 80%', once: true },
+    start: 'top 72%',
+    end: 'bottom 12%',
+    onToggle: (self) => section.classList.toggle('dimmed', self.isActive),
+    onEnter: () => historyMascot.setExpression('solemn'),
+    onLeaveBack: () => historyMascot.setExpression('happy'),
   });
 }
