@@ -172,9 +172,6 @@ export function initCh2(section: HTMLElement): void {
     });
   }
 
-  // 开跑前：球停在赛道顶、读数归零（CSS 的 .is-waiting）
-  race.classList.add('is-waiting');
-  for (const { read } of lanes) read.textContent = '0';
   ScrollTrigger.create({ trigger: race, start: 'top 65%', once: true, onEnter: run });
   section.querySelector<HTMLButtonElement>('.race-replay')!.addEventListener('click', run);
 
@@ -198,4 +195,9 @@ export function initCh2(section: HTMLElement): void {
       at + 0.4,
     );
   });
+
+  // 开跑前：球停在赛道顶、读数归零（CSS 的 .is-waiting）。
+  // 放在 init 的最后：这两步不归 gsap.context 管，前面任何一步抛错时不能已经把赛道留在「开跑前」
+  race.classList.add('is-waiting');
+  for (const { read } of lanes) read.textContent = '0';
 }

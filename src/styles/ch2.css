@@ -162,8 +162,9 @@
 }
 
 /* 开跑前（JS 加的状态类）：球停在落区顶、速度条归零 */
-.race.is-waiting .race-ball { top: 0; bottom: auto; }
-.race.is-waiting .lane-gauge-fill { transform: scaleX(0); }
+/* 排除 init 失败的章：失败时退回静态终态（球在地面、速度条满格） */
+#ch2:not([data-init-failed]) .race.is-waiting .race-ball { top: 0; bottom: auto; }
+#ch2:not([data-init-failed]) .race.is-waiting .lane-gauge-fill { transform: scaleX(0); }
 
 .lane-speed { padding-top: 10px; }
 
