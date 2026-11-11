@@ -43,37 +43,105 @@
 
     <!-- ========== 第一章 生成高度 ========== -->
     <section id="ch1" class="scene on-dark">
-      <div class="scene-inner">
-        <h2><span class="ch-no">第一章</span>生成高度：5–10 公里</h2>
-        <p class="lead">冰雹诞生在发展旺盛的积雨云里。云底可能只有 1–2 公里高，但真正的"孕育区"在云的中上部——温度 −10℃ 到 −30℃ 的层面，夏季大约对应离地 5–10 公里。</p>
-        <div class="ch1-stage">
-          <svg viewBox="0 0 660 520" class="cloud-svg" role="img" aria-label="积雨云剖面示意图：雹胚在孕育区被上升气流反复托起，每翻滚一次裹一层冰">
-            <g class="cloud-body">
-              <ellipse cx="320" cy="300" rx="240" ry="150" fill="#3d5578" />
-              <ellipse cx="180" cy="360" rx="120" ry="80" fill="#46618a" />
-              <ellipse cx="470" cy="350" rx="130" ry="90" fill="#46618a" />
-              <ellipse cx="320" cy="170" rx="150" ry="80" fill="#54719c" />
+      <div class="scene-inner ch1-inner">
+        <div class="ch1-text">
+          <h2><span class="ch-no">第一章</span>生成高度：5–10 公里</h2>
+          <ol class="ch1-steps">
+            <li class="ch1-step">
+              <span class="ch1-step-no">1 / 4</span>
+              <h3>孕育区在云的中上部</h3>
+              <p>冰雹诞生在发展旺盛的积雨云里。云底可能只有 1–2 公里高，但真正的"孕育区"在云的中上部——温度 −10℃ 到 −30℃ 的层面，夏季大约对应离地 5–10 公里。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">2 / 4</span>
+              <h3>翻滚一次，裹一层冰</h3>
+              <p>雹胚被上升气流反复托起、下落，每翻滚一次就裹上一层冰。切开来看像洋葱：一圈就是一次翻滚。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">3 / 4</span>
+              <h3>气流越强，冰雹越大</h3>
+              <p>上升气流越强，能托住的冰雹就越大。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">4 / 4</span>
+              <h3>太小的，半路化成雨</h3>
+              <p>太小的雹子下落途中经过 0℃ 层（约 4–5 km）就化成了雨——能落到地面的，通常已有一定个头。</p>
+            </li>
+          </ol>
+        </div>
+        <figure class="ch1-fig">
+          <!-- 纵轴等比：y = 572 − 43.5 × km（0–12 km）；气温 = (4.5 − km) × 6.5 ℃，与旅程层 temperatureAt 一致 -->
+          <svg class="ch1-svg" viewBox="0 0 600 600" role="img" aria-label="积雨云剖面图。纵轴 0 到 12 公里并标出对应气温；云底约 1.5 公里，砧状云顶约 11.5 公里；0℃ 线在 4.5 公里；孕育区约 5 到 10 公里。雹胚在孕育区被上升气流托着沿环形轨迹翻滚四圈，每圈裹一层冰，切开后是透明冰与不透明冰交替的四环洋葱剖面。一颗太小的雹子落过 0℃ 线后化成水滴。">
+            <rect class="ch1-ground" x="124" y="572" width="476" height="28" rx="8" />
+
+            <g class="ch1-cloud">
+              <path d="M172 158C146 156 134 136 142 116C150 90 178 73 214 72H532C566 72 592 84 598 102C584 118 556 130 524 138C496 150 462 158 430 158Z" />
+              <circle cx="198" cy="150" r="17" /><circle cx="414" cy="152" r="15" /><circle cx="452" cy="148" r="13" /><circle cx="490" cy="141" r="12" /><circle cx="526" cy="132" r="10" />
+              <rect x="222" y="110" width="156" height="397" />
+              <circle cx="212" cy="176" r="26" /><circle cx="240" cy="204" r="34" /><circle cx="222" cy="258" r="38" /><circle cx="240" cy="322" r="36" /><circle cx="218" cy="376" r="30" /><circle cx="234" cy="424" r="32" /><circle cx="228" cy="468" r="34" />
+              <circle cx="390" cy="174" r="24" /><circle cx="362" cy="206" r="36" /><circle cx="376" cy="270" r="32" /><circle cx="362" cy="330" r="40" /><circle cx="378" cy="392" r="28" /><circle cx="366" cy="436" r="34" /><circle cx="372" cy="470" r="32" />
+              <rect x="196" y="455" width="210" height="52" rx="14" />
             </g>
-            <g class="growth-zone">
-              <rect x="120" y="140" width="400" height="130" fill="rgba(191,227,255,.14)" stroke="#bfe3ff" stroke-width="2" stroke-dasharray="8 6" rx="10" />
-              <text x="135" y="165" fill="#bfe3ff" font-size="16">孕育区 −10℃ ～ −30℃ · 约 5–10 km</text>
+            <path class="ch1-cloud-shade" d="M196 480a14 14 0 0 1 4-10q14-11 31 0q17-11 35 0q17-11 35 0q17-11 35 0q17-11 35 0q17-11 31 0a14 14 0 0 1 4 10v13a14 14 0 0 1-14 14H210a14 14 0 0 1-14-14Z" />
+            <g class="ch1-cloud-light">
+              <circle cx="300" cy="84" r="30" />
+              <path d="M214 72H532C566 72 592 84 598 102C586 96 572 93 556 96q-20-12-40 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-20-10-40 2C176 100 154 104 142 116C150 90 178 73 214 72Z" />
             </g>
-            <g class="updraft-arrows">
-              <path d="M200 430 v-60 m0 0 l-10 14 m10 -14 l10 14" stroke="#8fd3ff" stroke-width="4" fill="none" stroke-linecap="round" />
-              <path d="M440 440 v-70 m0 0 l-10 14 m10 -14 l10 14" stroke="#8fd3ff" stroke-width="4" fill="none" stroke-linecap="round" />
+
+            <g class="ch1-zone">
+              <rect x="124" y="137" width="288" height="217.5" />
+              <path d="M124 137H412M124 354.5H412" />
+              <path class="ch1-zone-bracket" d="M412 137h8v217.5h-8M420 230h6" />
             </g>
-            <circle class="embryo" cx="320" cy="260" r="14" fill="#eef8ff" stroke="#9fcbe8" stroke-width="3" />
-            <g class="onion" transform="translate(560 120)">
-              <circle r="12" fill="#eef8ff" stroke="#9fcbe8" stroke-width="2" />
-              <circle class="onion-ring" r="20" fill="none" stroke="#cfe9fa" stroke-width="3" />
-              <circle class="onion-ring" r="28" fill="none" stroke="#bfe3ff" stroke-width="3" />
-              <circle class="onion-ring" r="36" fill="none" stroke="#cfe9fa" stroke-width="3" />
-              <circle class="onion-ring" r="44" fill="none" stroke="#bfe3ff" stroke-width="3" />
-              <text y="68" text-anchor="middle" fill="#bfe3ff" font-size="13">切开像洋葱：一圈 = 翻滚一次</text>
+            <text class="ch1-label ch1-label-strong" x="432" y="208">孕育区</text>
+            <text class="ch1-label" x="432" y="238">−10 ～ −30℃</text>
+            <text class="ch1-label" x="432" y="268">约 5–10 km</text>
+
+            <path class="ch1-zero" d="M124 376.25H414" />
+
+            <g class="ch1-updraft">
+              <path d="M270 472C262 452 278 432 270 398" /><path d="M262 408l8-12 9 11" />
+              <path d="M310 472C302 452 318 432 310 398" /><path d="M302 408l8-12 9 11" />
+              <path d="M350 472C342 452 358 432 350 398" /><path d="M342 408l8-12 9 11" />
+            </g>
+            <text class="ch1-label" x="310" y="498" text-anchor="middle">上升气流</text>
+            <text class="ch1-label" x="300" y="546" text-anchor="middle">云底 1–2 km</text>
+
+            <g class="ch1-melt">
+              <path class="ch1-melt-trail" d="M222 346V424" />
+              <circle class="ch1-melt-hail" cx="222" cy="335" r="6" />
+              <path class="ch1-melt-drop" d="M222 426C228 436 232 441 232 446A10 10 0 0 1 212 446C212 441 216 436 222 426Z" />
+            </g>
+
+            <path class="ch1-orbit" d="M300 340A70 90 0 1 0 300 160A70 90 0 1 0 300 340" />
+            <circle class="ch1-embryo" cx="300" cy="340" r="19" />
+
+            <g class="ch1-onion">
+              <circle class="ch1-lens" cx="505" cy="405" r="88" />
+              <circle class="ch1-ring ch1-ice-opaque" cx="505" cy="405" r="70" />
+              <circle class="ch1-ring ch1-ice-clear" cx="505" cy="405" r="56" />
+              <circle class="ch1-ring ch1-ice-opaque" cx="505" cy="405" r="42" />
+              <circle class="ch1-ring ch1-ice-clear" cx="505" cy="405" r="28" />
+              <circle class="ch1-core ch1-ice-opaque" cx="505" cy="405" r="14" />
+            </g>
+            <text class="ch1-label" x="505" y="524" text-anchor="middle">切开像洋葱</text>
+            <text class="ch1-label" x="505" y="552" text-anchor="middle">一圈 = 翻滚一次</text>
+
+            <g class="ch1-axis">
+              <path d="M44 50V572" />
+              <path d="M36 50h8M36 137h8M36 224h8M36 311h8M36 398h8M36 485h8M36 572h8" />
+              <path class="ch1-axis-minor" d="M40 93.5h4M40 180.5h4M40 267.5h4M40 354.5h4M40 441.5h4M40 528.5h4" />
+              <text class="ch1-axis-head" x="32" y="26" text-anchor="end">km</text>
+              <text class="ch1-axis-head" x="52" y="26">气温</text>
+              <g class="ch1-axis-km" text-anchor="end">
+                <text x="32" y="50" dy=".35em">12</text><text x="32" y="137" dy=".35em">10</text><text x="32" y="224" dy=".35em">8</text><text x="32" y="311" dy=".35em">6</text><text x="32" y="398" dy=".35em">4</text><text x="32" y="485" dy=".35em">2</text><text x="32" y="572" dy=".35em">0</text>
+              </g>
+              <g class="ch1-axis-temp">
+                <text x="52" y="50" dy=".35em" data-km="12">−49℃</text><text x="52" y="137" dy=".35em" data-km="10">−36℃</text><text x="52" y="224" dy=".35em" data-km="8">−23℃</text><text x="52" y="311" dy=".35em" data-km="6">−10℃</text><text class="ch1-axis-zero" x="52" y="376.25" dy=".35em" data-km="4.5">0℃</text><text x="52" y="485" dy=".35em" data-km="2">16℃</text><text x="52" y="572" dy=".35em" data-km="0">29℃</text>
+              </g>
             </g>
           </svg>
-        </div>
-        <p class="melt-note">雹胚被上升气流反复托起、下落，每翻滚一次就裹上一层冰。上升气流越强，能托住的冰雹就越大。<br />太小的雹子下落途中经过 0℃ 层（约 4–5 km）就化成了雨——能落到地面的，通常已有一定个头。<span class="melt-demo">🧊→💧</span></p>
+        </figure>
       </div>
     </section>
 

@@ -1,14 +1,197 @@
-/* ===== 第一章（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
-/* pin 的舞台要整屏：整屏高 + 垂直居中；SVG 限高，避免 pin 时内容超出视口 */
-#ch1 {
-  min-height: 100vh;
+/* ===== 第一章 · 生成高度（规格 §4）：全站唯一的 pin 场景 ===== */
+/* 默认是静态布局（无 JS / reduced-motion 直接用它）：四步文字依次排开 + 完整的剖面图。
+   pin 布局只在「有 JS 且允许动效」时生效，见文件末尾。 */
+
+.ch1-inner {
   display: flex;
-  align-items: center;
-  padding-top: 5vh;
-  padding-bottom: 5vh;
+  flex-direction: column;
+  gap: clamp(12px, 2.4vh, 28px);
 }
 
-.ch1-stage { margin: 0 auto; max-width: 720px; }
-.cloud-svg { width: 100%; height: auto; max-height: 46vh; display: block; }
-.melt-note { max-width: 46em; }
-.melt-demo { font-size: 1.4em; margin-left: 0.5em; }
+#ch1 h2 { margin-bottom: 0.4em; }
+
+.ch1-steps { list-style: none; }
+.ch1-step + .ch1-step { margin-top: 1.4em; }
+
+.ch1-step-no {
+  display: block;
+  font-family: var(--font-title);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch1-step h3 { margin-bottom: 0.3em; }
+.ch1-step p { max-width: var(--measure); line-height: 1.65; }
+
+/* ---------- 剖面图 ---------- */
+.ch1-fig { min-height: 0; }
+
+.ch1-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 46vh;
+  max-height: 46svh;
+}
+
+/* 图内文字：字号是 viewBox 单位。窄屏图只有约 300px 宽（缩放约 0.5），所以用大单位字号 */
+.ch1-svg text {
+  font-family: var(--font);
+  font-size: 23px;
+  fill: var(--c-ice);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch1-svg .ch1-label-strong { font-weight: 600; }
+.ch1-svg .ch1-axis-km text,
+.ch1-svg .ch1-axis-temp text,
+.ch1-svg .ch1-axis-head { fill: var(--c-ice-line); }
+.ch1-svg .ch1-axis-temp .ch1-axis-zero { fill: var(--c-ice); font-weight: 600; }
+
+.ch1-axis path {
+  fill: none;
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ch1-ground { fill: var(--c-grass); }
+
+/* 云体用云底色（比 pin 期间背后的天空 #152849 → #214677 都亮），不用风暴蓝：风暴蓝在 pin 结束处会和天空融在一起 */
+.ch1-cloud { fill: var(--c-sky-cloud); }
+.ch1-cloud-shade { fill: #356299; }
+.ch1-cloud-light { fill: #5484bb; }
+
+.ch1-zone rect { fill: rgba(238, 248, 255, 0.07); }
+
+.ch1-zone path {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 8;
+}
+
+.ch1-zone .ch1-zone-bracket { stroke-dasharray: none; }
+
+.ch1-zero {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 10 8;
+}
+
+.ch1-updraft path {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ch1-updraft path:nth-child(odd) { stroke-dasharray: 12 9; }
+
+.ch1-orbit {
+  fill: none;
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 9;
+}
+
+.ch1-embryo,
+.ch1-melt-hail,
+.ch1-ice-opaque {
+  fill: var(--c-ice);
+  stroke: var(--c-ice-line);
+  stroke-width: 3;
+}
+
+.ch1-ice-clear {
+  fill: #b9dcf2;
+  stroke: var(--c-ice-line);
+  stroke-width: 3;
+}
+
+.ch1-melt-trail {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 7;
+}
+
+.ch1-melt-drop {
+  fill: var(--c-ice-line);
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.ch1-lens {
+  fill: var(--c-night);
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+}
+
+/* ---------- 桌面：两栏（左文字，右图） ---------- */
+@media (min-width: 900px) {
+  .ch1-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+  }
+
+  .ch1-svg { max-height: 80vh; }
+  .ch1-svg text { font-size: 16px; }
+}
+
+/* ---------- pin 布局：章节高度 = 视口高度，图吃掉剩余高度，四步文字叠在同一格里一次只显示一步 ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  html.js #ch1 {
+    height: 100vh;
+    height: 100svh;
+    padding-top: clamp(12px, 3vh, 36px);
+    padding-bottom: clamp(12px, 3vh, 36px);
+  }
+
+  html.js .ch1-inner { height: 100%; }
+  html.js .ch1-text { flex: none; }
+
+  html.js .ch1-steps { display: grid; }
+
+  html.js .ch1-step {
+    grid-area: 1 / 1;
+    margin-top: 0;
+  }
+
+  /* 预隐藏（时间线接管前不闪）；只用 opacity，读屏仍能读到全部四步 */
+  html.js .ch1-step + .ch1-step,
+  html.js .ch1-ring,
+  html.js .ch1-melt { opacity: 0; }
+
+  /* 图是正方形：理想边长 = 内容列宽与 46svh 中较小者；放不下时（矮屏）跟着剩余高度缩小 */
+  html.js .ch1-inner { justify-content: center; }
+
+  html.js .ch1-fig {
+    flex: 0 1 min(46vh, 100vw - var(--rail) - var(--page-left));
+    flex-basis: min(46svh, 100vw - var(--rail) - var(--page-left));
+  }
+
+  html.js .ch1-svg {
+    height: 100%;
+    max-height: none;
+  }
+
+  @media (min-width: 900px) {
+    html.js .ch1-inner { grid-template-rows: minmax(0, 1fr); }
+
+    html.js .ch1-fig { height: 100%; }
+  }
+}
