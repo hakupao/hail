@@ -52,7 +52,8 @@ export function initEnding(section: HTMLElement): void {
   const sprout = ground.querySelector<SVGElement>('.sprout')!;
   const sproutParts = Array.from(sprout.querySelectorAll<SVGElement>('.sprout-stem, .sprout-leaf'));
   const tufts = Array.from(ground.querySelectorAll<SVGElement>('.tuft'));
-  const mascot = createMascot(0, 'happy');
+  // idle:false：交棒对齐阶段不能有待机浮动（相位随机，会和尺上主角画出来的脸错开一两个像素），落地站稳后再打开
+  const mascot = createMascot(0, 'happy', { idle: false });
   const hail = mascot.el;
   hail.style.width = hail.style.height = ''; // 尺寸交给 CSS（随断点变化）
   const slot = ground.querySelector<HTMLElement>('.ending-hail')!;
@@ -74,6 +75,7 @@ export function initEnding(section: HTMLElement): void {
     gsap.set([puddle, sprout], { opacity: 0 });
     gsap.set(tufts, { rotation: 0, scaleY: 1 });
     mascot.setExpression('happy');
+    mascot.setIdle(false);
     setStage('landed', 0);
   }
 
@@ -113,10 +115,10 @@ export function initEnding(section: HTMLElement): void {
       .to(hail, { scaleX: 1, scaleY: 1, duration: 0.6, ease: 'elastic.out(1.1, 0.4)' })
       .to(tufts, { rotation: (i) => (i ? 62 : -62), scaleY: 0.8, duration: 0.09, ease: EASE.soft }, 'land')
       .to(tufts, { rotation: 0, scaleY: 1, duration: 1.1, ease: 'elastic.out(1, 0.3)', stagger: 0.05 }, 'land+=0.2')
-      .call(() => mascot.setExpression('happy'), undefined, 'land+=0.8')
+      .call(() => { mascot.setExpression('happy'); mascot.setIdle(true); }, undefined, 'land+=0.8')
       // 慢慢融化成水洼（融化的起点按落地时刻定死：上面草丛的回弹比挤压长，不能让它把后面的时间往后推）
       .addLabel('melt', 'land+=1.39')
-      .call(() => mascot.setExpression('sleepy'), undefined, 'melt')
+      .call(() => { mascot.setExpression('sleepy'); mascot.setIdle(false); }, undefined, 'melt') // 融化时停下待机，化成水洼后不再空转
       .to(hail, { scaleX: 1.5, scaleY: 0.1, duration: 1.8, ease: EASE.inOut }, 'melt')
       .to(puddle, { opacity: 1, scale: 1, duration: 1.8, ease: EASE.inOut }, 'melt')
       .to(hail, { opacity: 0, duration: 0.7, ease: 'power1.in' }, 'melt+=1.1')
@@ -142,6 +144,7 @@ export function initEnding(section: HTMLElement): void {
     gsap.set(sprout, { opacity: 0 });
     gsap.set(tufts, { rotation: 0, scaleY: 1, transformOrigin: '50% 100%' });
     hail.classList.add('is-coarse'); // 对齐阶段和尺上的主角一个样（精简版）
+    mascot.setIdle(false);
     alignToRuler();
     setStage('landed', 1);
     // 起跳前先贴着尺上主角停一下（逐帧对齐，滚动还没停稳也不会错位），等它淡出完再起跳

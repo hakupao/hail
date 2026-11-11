@@ -33,6 +33,8 @@ const DROP_FOOT = 6.2; // 雨滴图形的底在它原点下方多少
 const PHASE_FACE: Record<StageFrame['phase'], Expression> = { grow: 'happy', hang: 'happy', fall: 'scared', rest: 'dizzy' };
 const REST_START = LOOP_SECONDS - TIMING.rest;
 // 结局变了，实验室雹宝的反应（表情保持 lab：护目镜只跟着这个表情出现）
+// 实验室雹宝随结局换表情（护目镜用 setGear 固定戴着）。只是表情，不是新的科学陈述
+const OUTCOME_FACE: Record<Outcome, Expression> = { rain: 'sleepy', 'small-hail': 'happy', hail: 'wow', 'giant-hail': 'scared' };
 const OUTCOME_REACTION: Record<Outcome, Reaction> = { rain: 'squash', 'small-hail': 'hop', hail: 'pop', 'giant-hail': 'shake' };
 const POP_FRAMES: Keyframe[] = [
   { transform: 'scale(1)', easing: 'cubic-bezier(0.33, 1, 0.68, 1)' },
@@ -88,6 +90,7 @@ export function initCh4(section: HTMLElement): void {
 
   // 实验室助手雹宝（护目镜）
   const helper = createMascot(112, 'lab');
+  helper.setGear('goggles');
   q<HTMLElement>('.lab-mascot-slot').appendChild(helper.el);
 
   // ---------- 结局地图：色块只在这里算一次，画进一张 46×41 的位图；之后拖动只移动圆点 ----------
@@ -274,6 +277,7 @@ export function initCh4(section: HTMLElement): void {
         label.animate(POP_FRAMES, { duration: 440, easing: 'linear' });
         helper.react(OUTCOME_REACTION[sim.outcome]);
       }
+      helper.setExpression(OUTCOME_FACE[sim.outcome]);
       shownOutcome = sim.outcome;
     }
     dmaxEl.textContent = `${sim.maxDiameterCm.toFixed(1)} cm`;
