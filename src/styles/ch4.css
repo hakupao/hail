@@ -132,6 +132,7 @@
 .lab-stage {
   grid-area: stage;
   align-self: start;
+  position: relative; /* 示范冰雹的小脸（.lab-face）按百分比对在它上面 */
   border-radius: var(--radius);
   overflow: hidden;
   line-height: 0;
@@ -143,6 +144,39 @@
   height: auto;
   font-family: var(--font);
   font-variant-numeric: tabular-nums;
+}
+
+/* 云团「呼吸」：每个云团绕自己的中心极慢地胀缩，相位错开（云体的两块大矩形不动） */
+.lab-puff {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: lab-breathe 5.2s ease-in-out infinite alternate;
+}
+
+.lab-puff:nth-child(3n) { animation-duration: 6.4s; animation-delay: -2.1s; }
+.lab-puff:nth-child(3n + 1) { animation-duration: 4.6s; animation-delay: -3.4s; }
+
+@keyframes lab-breathe {
+  from { transform: scale(0.97); }
+  to { transform: scale(1.06); }
+}
+
+/* 示范冰雹的小脸：盖在舞台 SVG 上的一层，left / top / width 由 JS 逐帧按舞台百分比写；
+   挤压回弹时以冰雹的触地点为支点（盒子边长 = 1.3 × 冰雹直径，触地点在盒子高度的 50% + 1/2.6 处） */
+.lab-face {
+  position: absolute;
+  left: 0;
+  top: 0;
+  aspect-ratio: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 88.46%;
+}
+
+.lab-face .mascot-wrap {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* ---------- 结局地图 ---------- */
@@ -269,6 +303,24 @@
 
 .lab-map-plot.is-dragging .lab-map-dot { transform: scale(1.25); }
 
+/* 当前点的脉冲：圆点里面的一层，一圈细环慢慢扩开淡出（圆点本身的位置、大小不变）。拖动时收起 */
+.lab-map-pulse {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--c-ink);
+  opacity: 0;
+  animation: lab-pulse 2.6s var(--ease-soft) infinite;
+}
+
+.lab-map-plot.is-dragging .lab-map-pulse { visibility: hidden; }
+
+@keyframes lab-pulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  18% { opacity: 0.55; }
+  70%, 100% { transform: scale(1.9); opacity: 0; }
+}
+
 .lab-map-legend {
   list-style: none;
   display: flex;
@@ -284,6 +336,54 @@
   width: 12px;
   height: 12px;
   border-radius: 3px;
+}
+
+/* ---------- 公式块 + 「代入当前参数」（v3 规格 §1.3）：一行数字贴在公式块下沿，随滑杆更新 ---------- */
+.ch4-math-wrap {
+  width: fit-content;
+  max-width: 100%;
+  margin: 20px 0 2em;
+}
+
+.ch4-math-wrap .ch4-math {
+  width: auto;
+  margin: 0;
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.ch4-live {
+  padding: 12px 24px 14px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--c-card-light);
+  border: 1px solid rgba(16, 35, 63, 0.12);
+  border-top: 1.5px dashed rgba(16, 35, 63, 0.28);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.live-head { font-weight: 600; color: var(--c-ink-muted); white-space: nowrap; }
+.live-head span { display: inline-block; margin-left: 0.6em; font-weight: 500; color: var(--c-ink); }
+.ch4-live sub { font-size: 0.72em; line-height: 0; }
+
+/* 四个量各占一格、格宽固定：数字位数变了也不会把后面的挤走或换行 */
+.live-items {
+  display: grid;
+  grid-template-columns: repeat(4, 9.2em);
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+
+.live-items div { display: flex; flex-direction: column; white-space: nowrap; }
+.live-items dt { color: var(--c-ink-muted); }
+
+.live-items dd {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 3px; /* 上面的名称带下标（d_max、d_落地），留一点空，下标不碰到数字 */
 }
 
 /* 无 JS 或本章 init 抛错：地图和预设按钮都是 JS 生成的交互件，空壳不显示；滑杆、读数、舞台静态图照常可读 */
@@ -339,6 +439,10 @@ html:not(.js) .lab-presets,
   .lab-mascot-slot .mascot-wrap { width: 46px !important; height: 46px !important; }
 
   .lab-map { padding: 12px 14px 14px; }
+
+  .ch4-live { padding: 10px 12px 12px; }
+  .live-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .live-items dd { font-size: 18px; }
   .lab-map-legend { display: grid; grid-template-columns: repeat(2, max-content); gap: 2px 22px; }
   .lab-map-body { min-height: 0; height: 210px; flex: none; }
 }

@@ -1,3 +1,4 @@
+import { K } from './model';
 import type { SimResult } from './model';
 
 // 剖面舞台的纯函数（不依赖 DOM）：坐标换算 + 「第 t 秒示范冰雹在哪、多大、是冰还是水」。
@@ -93,4 +94,54 @@ export function stageFrame(t: number, sim: SimResult, h0: number): StageFrame {
 export function updraftArrows(w: number): { count: number; unitsPerSec: number } {
   const k = Math.min(1, Math.max(0, (w - 5) / 45));
   return { count: 2 + Math.round(k * 4), unitsPerSec: 30 + k * 170 };
+}
+
+// ---------- v3：落地回弹（只是画面上的挤压与小跳，不进 stageFrame——模型量与循环时序不变） ----------
+
+/** 落地静止段开头这么多秒内有回弹；之后是恒等。必须小于 REST_TIME 距静止段开头的时间（静态终态不带形变） */
+export const BOUNCE_SECONDS = 0.5;
+const BIG_HAIL_UNITS = 70; // 模型里最大的冰雹（W = 50）在舞台上的直径
+
+export interface Bounce {
+  /** 离地高度（舞台单位，≥ 0：只会跳起，不会陷进地面） */
+  lift: number;
+  /** 以触地点为支点的横 / 纵缩放 */
+  sx: number;
+  sy: number;
+  /** 0–1，尘团散开的进度；1 = 已散尽 */
+  dust: number;
+  /** 0（最小的雹）– 1（最大的雹）：越大越沉——压得更扁、跳得更低、扬的尘更多 */
+  heavy: number;
+}
+
+/**
+ * 落地后第 restT 秒的回弹：先压扁、再拉长并跳起一点、最后轻压一下停住。
+ * @param restT 进入落地静止段后的秒数（不在静止段传负数）
+ * @param size 冰雹的屏幕直径（舞台单位）
+ */
+export function landingBounce(restT: number, size: number): Bounce {
+  const heavy = Math.min(1, Math.max(0, (size - MIN_HAIL_UNITS) / (BIG_HAIL_UNITS - MIN_HAIL_UNITS)));
+  if (!(restT >= 0 && restT < BOUNCE_SECONDS)) return { lift: 0, sx: 1, sy: 1, dust: 1, heavy };
+  const p = restT / BOUNCE_SECONDS;
+  const wave = Math.sin(p * 3 * Math.PI) * (1 - p) ** 1.5; // 压 → 拉 → 轻压，逐次衰减
+  const squash = (0.14 + 0.08 * heavy) * wave;
+  return {
+    lift: Math.max(0, -wave) * (7 - 5 * heavy),
+    sx: 1 + squash,
+    sy: 1 - squash,
+    dust: 1 - (1 - p) ** 2,
+    heavy,
+  };
+}
+
+// ---------- v3：公式块下「代入当前参数」那一行的派生量（全部来自同一次 simulate 的结果） ----------
+
+/** 第三条式子里的下落用时（秒）：1000·H₀ / (k·√d_max)——按云中最大雹径的落速算 */
+export function fallSeconds(sim: SimResult, h0: number): number {
+  return (1000 * h0) / (K * Math.sqrt(sim.maxDiameterCm));
+}
+
+/** 落地前化掉的直径（cm）：d_max − d_落地（全化了就等于 d_max） */
+export function meltedCm(sim: SimResult): number {
+  return sim.maxDiameterCm - sim.finalDiameterCm;
 }

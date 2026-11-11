@@ -484,9 +484,9 @@
               <g fill="#6d92bf">
                 <rect x="52" y="-40" width="320" height="118" rx="46"/>
                 <rect x="88" y="40" width="208" height="330" rx="40"/>
-                <circle cx="90" cy="150" r="30"/><circle cx="88" cy="235" r="34"/><circle cx="92" cy="315" r="32"/>
-                <circle cx="298" cy="140" r="28"/><circle cx="300" cy="222" r="34"/><circle cx="294" cy="306" r="36"/>
-                <circle cx="116" cy="360" r="28"/><circle cx="164" cy="364" r="24"/><circle cx="212" cy="362" r="26"/><circle cx="262" cy="360" r="28"/>
+                <circle class="lab-puff anim-loop" cx="90" cy="150" r="30"/><circle class="lab-puff anim-loop" cx="88" cy="235" r="34"/><circle class="lab-puff anim-loop" cx="92" cy="315" r="32"/>
+                <circle class="lab-puff anim-loop" cx="298" cy="140" r="28"/><circle class="lab-puff anim-loop" cx="300" cy="222" r="34"/><circle class="lab-puff anim-loop" cx="294" cy="306" r="36"/>
+                <circle class="lab-puff anim-loop" cx="116" cy="360" r="28"/><circle class="lab-puff anim-loop" cx="164" cy="364" r="24"/><circle class="lab-puff anim-loop" cx="212" cy="362" r="26"/><circle class="lab-puff anim-loop" cx="262" cy="360" r="28"/>
               </g>
               <rect x="70" y="-40" width="150" height="100" rx="40" fill="#7fa3cd"/>
               <!-- 0℃ 线以下的融化区 + 0℃ 线（整组随 H₀ 平移） -->
@@ -512,11 +512,21 @@
               <!-- 示范冰雹 / 雨滴 / 落地痕迹 -->
               <ellipse id="lab-puddle" cx="186" cy="471" rx="14" ry="3" fill="#3f86d6" display="none"/>
               <path id="lab-impact" d="M174.3 466l-6 -6M197.7 466l6 -6" fill="none" stroke="#10233f" stroke-width="2" stroke-linecap="round"/>
+              <!-- 落地扬起的小尘团（JS 逐帧摆位；静态终态里已经散尽） -->
+              <g id="lab-dust" fill="#ffffff" display="none"><circle r="2"/><circle r="2"/><circle r="2"/><circle r="2"/></g>
               <g id="lab-hail" transform="translate(186 462.30)">
                 <circle id="lab-hail-body" r="6.2" fill="#eef8ff" stroke="#9fcbe8" stroke-width="3"/>
                 <path id="lab-hail-shine" d="M-5.4 -1.2A5.6 5.6 0 0 1 -1.2 -5.4" transform="scale(0.77)" fill="none" stroke="#cfe9fa" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                <!-- 冰雹太小、放不下一张脸时只留两个点（大一些时由 JS 贴上雹宝的小脸） -->
+                <g id="lab-hail-dots" fill="#222" display="none"><circle cx="-3.3" cy="-0.4" r="1.35"/><circle cx="3.3" cy="-0.4" r="1.35"/></g>
               </g>
               <path id="lab-drop" d="M0 -8C3.6 -3 5 -0.6 5 1.2A5 5 0 0 1 -5 1.2C-5 -0.6 -3.6 -3 0 -8Z" fill="#3f86d6" transform="translate(186 463)" display="none"/>
+              <!-- 雨滴的小脸：下落时张着嘴，落地后笑 -->
+              <g id="lab-drop-face" transform="translate(186 463)" display="none">
+                <circle cx="-1.9" cy="0.5" r="0.8" fill="#222"/><circle cx="1.9" cy="0.5" r="0.8" fill="#222"/>
+                <circle id="lab-drop-o" cx="0" cy="3.1" r="0.95" fill="#222"/>
+                <path id="lab-drop-smile" d="M-1.7 2.6Q0 4.4 1.7 2.6" fill="none" stroke="#222" stroke-width="0.85" stroke-linecap="round" display="none"/>
+              </g>
               <!-- 高度轴（0–8 km 等比） -->
               <g stroke="#10233f" stroke-width="1.5" stroke-linecap="round" fill="none">
                 <path d="M44 30V470"/>
@@ -544,6 +554,7 @@
           <div class="lab-map" id="lab-map" aria-hidden="true"><!-- 结局地图由 JS 生成（逐格调用 simulate）；键盘操作走上面的两个滑杆 --></div>
         </div>
         <!-- 模型的三条式子：必须与 src/lab/model.ts 一致，tests/formula.test.ts 会核对其中的常数 -->
+        <div class="ch4-math-wrap">
         <figure class="math-block ch4-math">
           <figcaption class="math-title">模型的三条式子</figcaption>
           <div class="math-rows">
@@ -553,6 +564,17 @@
           </div>
           <p class="math-note">单位：<span class="tex" data-tex="d"></span> 厘米、<span class="tex" data-tex="v"></span> 与 <span class="tex" data-tex="W"></span> 米每秒、<span class="tex" data-tex="H_0"></span> 千米；<span class="tex" data-tex="W"></span> 上升气流强度、<span class="tex" data-tex="H_0"></span> 0℃ 层高度、<span class="tex" data-tex="\eta"></span> 生长效率、<span class="tex" data-tex="r"></span> 融化速率。<br /><span class="tex" data-tex="k"></span> 是按 2–3 厘米的冰雹校准的；直径超过 4 厘米后，典型速度比这条式子高 15–25%——第二章曲线图里高出曲线的圆点就是这个差距。</p>
         </figure>
+          <!-- 代入当前参数：数字全部来自同一次 simulate()（JS 随滑杆更新）；下面写死的是初始参数（25 m/s, 4.0 km）的结果，无 JS 时也可读 -->
+          <div class="ch4-live">
+            <p class="live-head">代入当前参数 <span id="lab-live-params">W = 25 m/s，H<sub>0</sub> = 4.0 km</span></p>
+            <dl class="live-items">
+              <div><dt><i>d</i><sub>max</sub></dt><dd id="lab-live-dmax">3.36 cm</dd></div>
+              <div><dt>下落用时</dt><dd id="lab-live-fall">198 s</dd></div>
+              <div><dt>融化量</dt><dd id="lab-live-melt">0.40 cm</dd></div>
+              <div><dt><i>d</i><sub>落地</sub></dt><dd id="lab-live-dfinal">2.96 cm</dd></div>
+            </dl>
+          </div>
+        </div>
         <p class="note">简化教学模型：<span class="tex" data-tex="v = k\sqrt{d}"></span> 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
       </div>
     </section>
@@ -577,16 +599,25 @@
         </div>
       </div>
 
+      <!-- 文案与草地之间的空天：两朵极慢漂移的小云（纯装饰）。盒子只吃掉本来就空着的高度，太矮时云不显示 -->
+      <div class="ending-sky" aria-hidden="true">
+        <div class="sky-cloud sky-cloud-a"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
+        <div class="sky-cloud sky-cloud-b"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
+      </div>
+
       <!-- 地面：通栏草地贴在页面最底。参照物站在草丛后面，落点在前景草地上。静态内容就是终态（水洼） -->
-      <div class="ground" role="img" aria-label="草地上有一座小房子和两棵树，落地的冰雹融化成了一个带着微笑的小水洼">
+      <div class="ground" role="img" aria-label="草地上有一座小房子和两棵树，落地的冰雹融化成了一个带着微笑的小水洼，水洼边长出一株小芽">
+        <div class="sky-cloud sky-cloud-c"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
         <div class="ground-props">
           <svg class="prop-tree" viewBox="0 0 80 176" focusable="false">
+            <g class="tree-sway anim-loop">
             <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
             <path d="M40 92 l13 -13" stroke="#7a5c44" stroke-width="7" stroke-linecap="round" />
             <circle cx="21" cy="60" r="19" fill="#3f8a57" />
             <circle cx="59" cy="62" r="19" fill="#3f8a57" />
             <circle cx="40" cy="40" r="33" fill="#3f8a57" />
             <circle cx="30" cy="30" r="15" fill="#57a866" />
+            </g>
           </svg>
           <svg class="prop-house" viewBox="0 0 120 156" focusable="false">
             <rect x="82" y="12" width="13" height="30" rx="3" fill="#234a7d" />
@@ -598,11 +629,13 @@
           </svg>
         </div>
         <svg class="prop-tree prop-tree-small" viewBox="0 0 80 176" focusable="false">
+          <g class="tree-sway anim-loop">
           <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
           <circle cx="24" cy="58" r="18" fill="#3f8a57" />
           <circle cx="56" cy="58" r="18" fill="#3f8a57" />
           <circle cx="40" cy="38" r="30" fill="#3f8a57" />
           <circle cx="31" cy="29" r="13" fill="#57a866" />
+          </g>
         </svg>
         <!-- 草地：720px 一格的平铺图案，不随视口缩放，草缘的像素位置固定 -->
         <svg class="ground-grass" width="100%" height="110" focusable="false">
@@ -647,6 +680,7 @@
         <div class="landing">
           <svg class="puddle" viewBox="0 0 120 36" focusable="false">
             <ellipse cx="60" cy="18" rx="56" ry="14" fill="#cfe9fa" stroke="#9fcbe8" stroke-width="3" />
+            <ellipse class="puddle-ripple anim-loop" cx="60" cy="18" rx="50" ry="11.5" fill="none" stroke="#9fcbe8" stroke-width="1.5" />
             <path d="M22 14 q10 -6 24 -7" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
             <g class="puddle-face">
               <ellipse cx="50" cy="15.5" rx="3.2" ry="2.4" fill="#222" />
@@ -654,7 +688,18 @@
               <path d="M52 21.5 Q60 26.5 68 21.5" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" />
             </g>
           </svg>
+          <!-- 水洼边的小芽：融化完成后长出来（纯装饰）。静态内容里它已经长好 -->
+          <svg class="sprout" viewBox="0 0 28 34" focusable="false">
+            <g class="sprout-sway anim-loop">
+              <path class="sprout-stem" d="M14 34 Q12.5 24 14 15" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" />
+              <path class="sprout-leaf" d="M14 16 C8 16 3 12 2 5 C9 4 14 9 14 16 Z" fill="#3f8a57" />
+              <path class="sprout-leaf" d="M14 16 C14 9 19 4 26 5 C25 12 20 16 14 16 Z" fill="#57a866" />
+            </g>
+          </svg>
           <div class="ending-hail"></div>
+          <!-- 落点前的两丛草：雹宝砸下来时被压弯、再弹回 -->
+          <svg class="tuft tuft-l" viewBox="0 0 20 18" focusable="false"><path d="M10 17 l-6 -10 M10 17 v-14 M10 17 l6 -10" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" /></svg>
+          <svg class="tuft tuft-r" viewBox="0 0 20 18" focusable="false"><path d="M10 17 l-6 -10 M10 17 v-14 M10 17 l6 -10" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" /></svg>
         </div>
       </div>
     </section>

@@ -2,7 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getHailRect, setStage } from '../journey/journey';
 import { createMascot } from '../mascot/mascot';
-import { reducedMotion } from '../utils/motion';
+import { EASE, observeInView, reducedMotion } from '../utils/motion';
 
 const HOP_LIFT = 150; // 跳离高度尺时比起点再高出多少（px）；上方有文字时会收小
 const HOP_MIN_LIFT = 40;
@@ -49,12 +49,17 @@ export function initEnding(section: HTMLElement): void {
   const text = section.querySelector<HTMLElement>('.sources')!;
   const puddle = ground.querySelector<SVGElement>('.puddle')!;
   const face = puddle.querySelector<SVGElement>('.puddle-face')!;
+  const sprout = ground.querySelector<SVGElement>('.sprout')!;
+  const sproutParts = Array.from(sprout.querySelectorAll<SVGElement>('.sprout-stem, .sprout-leaf'));
+  const tufts = Array.from(ground.querySelectorAll<SVGElement>('.tuft'));
   const mascot = createMascot(0, 'happy');
   const hail = mascot.el;
   hail.style.width = hail.style.height = ''; // 尺寸交给 CSS（随断点变化）
   const slot = ground.querySelector<HTMLElement>('.ending-hail')!;
   slot.appendChild(hail);
   gsap.set(hail, { autoAlpha: 0 });
+
+  observeInView(section); // 小云、树、涟漪、小芽的循环：结尾在场才动
 
   // 任一时刻只有一方持有雹宝：handed 为 true 时在结尾这边，false 时在高度尺上
   let handed = false;
@@ -66,7 +71,8 @@ export function initEnding(section: HTMLElement): void {
     anim?.kill();
     anim = null;
     gsap.set(hail, { autoAlpha: 0 });
-    gsap.set(puddle, { opacity: 0 });
+    gsap.set([puddle, sprout], { opacity: 0 });
+    gsap.set(tufts, { rotation: 0, scaleY: 1 });
     mascot.setExpression('happy');
     setStage('landed', 0);
   }
@@ -83,6 +89,7 @@ export function initEnding(section: HTMLElement): void {
   }
 
   function hop(): void {
+    hail.classList.remove('is-coarse'); // 尺上的主角已经淡出：腮红、高光随着长大淡入
     const { dy, top } = alignToRuler();
     // 抛物线：水平匀速，竖直方向先减速上升到顶点、再加速落下，两段时长按 √高度 分配。
     // 顶点不越过上方的文字（移动端文字离地面很近）
@@ -98,17 +105,31 @@ export function initEnding(section: HTMLElement): void {
       .to(hail, { x: 0, scale: 1, rotation: -360, duration: HOP_TIME, ease: 'none' }, 0)
       .to(hail, { y: apex, duration: tUp, ease: 'power1.out' }, 0)
       .to(hail, { y: 0, duration: HOP_TIME - tUp, ease: 'power1.in' }, tUp)
-      // 触地：以底边为支点挤压回弹
+      // 触地：以底边为支点挤压回弹；被砸得有点晕，落点前的草丛被压弯再弹回
       .set(hail, { rotation: 0, transformOrigin: '50% 100%' })
-      .call(() => mascot.setExpression('happy'))
-      .to(hail, { scaleX: 1.2, scaleY: 0.78, duration: 0.09, ease: 'power2.out' })
+      .call(() => mascot.setExpression('dizzy'))
+      .addLabel('land')
+      .to(hail, { scaleX: 1.2, scaleY: 0.78, duration: 0.09, ease: EASE.soft })
       .to(hail, { scaleX: 1, scaleY: 1, duration: 0.6, ease: 'elastic.out(1.1, 0.4)' })
-      // 慢慢融化成水洼
-      .addLabel('melt', '+=0.7')
-      .to(hail, { scaleX: 1.5, scaleY: 0.1, duration: 1.8, ease: 'power2.inOut' }, 'melt')
-      .to(puddle, { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.inOut' }, 'melt')
+      .to(tufts, { rotation: (i) => (i ? 62 : -62), scaleY: 0.8, duration: 0.09, ease: EASE.soft }, 'land')
+      .to(tufts, { rotation: 0, scaleY: 1, duration: 1.1, ease: 'elastic.out(1, 0.3)', stagger: 0.05 }, 'land+=0.2')
+      .call(() => mascot.setExpression('happy'), undefined, 'land+=0.8')
+      // 慢慢融化成水洼（融化的起点按落地时刻定死：上面草丛的回弹比挤压长，不能让它把后面的时间往后推）
+      .addLabel('melt', 'land+=1.39')
+      .call(() => mascot.setExpression('sleepy'), undefined, 'melt')
+      .to(hail, { scaleX: 1.5, scaleY: 0.1, duration: 1.8, ease: EASE.inOut }, 'melt')
+      .to(puddle, { opacity: 1, scale: 1, duration: 1.8, ease: EASE.inOut }, 'melt')
       .to(hail, { opacity: 0, duration: 0.7, ease: 'power1.in' }, 'melt+=1.1')
-      .to(face, { opacity: 1, duration: 0.5 }, 'melt+=1.5');
+      .to(face, { opacity: 1, duration: 0.5 }, 'melt+=1.5')
+      // 收尾：水洼边长出一株小芽——茎先抽出来，两片叶子一先一后弹开
+      .set(sprout, { opacity: 1 }, 'melt+=2.2')
+      .fromTo(sproutParts[0], { scaleY: 0 }, { scaleY: 1, duration: 0.5, ease: EASE.soft, svgOrigin: '14 34' }, 'melt+=2.2')
+      .fromTo(
+        sproutParts.slice(1),
+        { scale: 0 },
+        { scale: 1, duration: 0.45, ease: EASE.spring, svgOrigin: '14 16', stagger: 0.14 },
+        'melt+=2.55',
+      );
   }
 
   function play(): void {
@@ -118,6 +139,9 @@ export function initEnding(section: HTMLElement): void {
     gsap.set(hail, { rotation: 0, opacity: 1, transformOrigin: '50% 50%', autoAlpha: 1 });
     gsap.set(puddle, { opacity: 0, scale: 0.2, transformOrigin: '50% 50%' });
     gsap.set(face, { opacity: 0 });
+    gsap.set(sprout, { opacity: 0 });
+    gsap.set(tufts, { rotation: 0, scaleY: 1, transformOrigin: '50% 100%' });
+    hail.classList.add('is-coarse'); // 对齐阶段和尺上的主角一个样（精简版）
     alignToRuler();
     setStage('landed', 1);
     // 起跳前先贴着尺上主角停一下（逐帧对齐，滚动还没停稳也不会错位），等它淡出完再起跳
