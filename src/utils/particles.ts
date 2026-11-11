@@ -7,9 +7,6 @@ interface P {
   z: number;
   vy: number;
   r: number;
-  /** 近处几颗的高光弧朝向与转速（弧度 / 帧） */
-  a: number;
-  spin: number;
 }
 
 const MODES: Record<
@@ -19,9 +16,6 @@ const MODES: Record<
   // 近大远小、近快远慢：r 与 vy 都按景深在两端之间取值
   'hail-light': { count: 45, rMin: 1.2, rMax: 6, vMin: 1.6, vMax: 7 },
 };
-
-/** 景深超过这个值的算「近处」：画高光弧并缓慢自转（约占总数的八分之一） */
-const NEAR = 0.82;
 
 export class ParticleField {
   private ps: P[] = [];
@@ -84,17 +78,12 @@ export class ParticleField {
           z,
           vy: cfg.vMin + z * (cfg.vMax - cfg.vMin),
           r: cfg.rMin + z * (cfg.rMax - cfg.rMin),
-          a: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 0.05,
         });
       }
       this.ps.sort((p, q) => p.z - q.z); // 远的先画，近的压在上面
     }
     if (this.ps.length > target) this.ps.length = target;
 
-    ctx.lineWidth = 1.5;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#9fcbe8';
     for (const p of this.ps) {
       p.y += p.vy * k;
       if (p.y - p.r > h) {
@@ -105,13 +94,6 @@ export class ParticleField {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
-      if (p.z > NEAR) {
-        // 和雹宝身上那道高光弧是同一个画法：四分之一圈的内弧，跟着自转
-        p.a += p.spin * k;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 0.62, p.a, p.a + Math.PI / 2);
-        ctx.stroke();
-      }
     }
   };
 }
