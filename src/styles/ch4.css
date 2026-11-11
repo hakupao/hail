@@ -1,118 +1,346 @@
-/* ===== 第四章 实验室（v1 规则原样迁入，仅做适配 v2 地基的最小修改；本章将在后续步骤重做） ===== */
+/* ===== 第四章 · 冰雹实验室（v2 规格 §4）=====
+   桌面：左列控件（滑杆 + 预设 + 结局地图），中间剖面舞台，右列结果读数——调参数时三处同屏。
+   移动端单列：滑杆 → 结果读数 → 舞台 → 结局地图。 */
+#ch4 .lead { margin-bottom: 1.2em; }
+
 .lab {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 26px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) 320px 216px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'controls stage result'
+    'map      stage result';
+  gap: 20px;
 }
 
-.lab-controls {
+.lab-controls,
+.lab-result,
+.lab-map {
   background: var(--c-card-light);
   border: 1px solid rgba(16, 35, 63, 0.12);
   border-radius: var(--radius);
-  padding: 24px;
+}
+
+/* ---------- 滑杆 + 预设 ---------- */
+.lab-controls {
+  grid-area: controls;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 22px;
+}
+
+.lab-controls label {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.5;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.lab-controls output {
+  font-weight: 600;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-controls input[type='range'] {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 28px;
+  accent-color: var(--c-storm);
+  cursor: pointer;
+}
+
+.lab-presets {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lab-presets button {
+  border: 1.5px solid rgba(16, 35, 63, 0.3);
+  background: #fff;
+  color: var(--c-ink);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.lab-presets button:hover { background: var(--c-ice); border-color: var(--c-ink); }
+.lab-presets button:active { background: var(--c-ice-line); }
+
+.lab-presets button:focus-visible,
+.lab-controls input[type='range']:focus-visible {
+  outline: 2.5px solid var(--c-storm);
+  outline-offset: 2px;
+}
+
+/* ---------- 结果读数 ---------- */
+.lab-result {
+  grid-area: result;
+  position: relative;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.lab-controls label {
-  font-weight: 700;
-  font-size: 0.9em;
-  display: grid;
-  grid-template-columns: 1fr auto;
+.lab-outcome-head {
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.lab-controls label input[type='range'] { grid-column: 1 / -1; }
+/* 结局色只做图标的底；文字一律墨蓝（结局色当文字对比度不够） */
+.lab-chip {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--c-warn);
+  color: var(--c-ink);
+}
 
-.lab-controls output {
-  font-weight: 700;
-  color: #1f5fa8;
+.lab-outcome-text { display: flex; flex-direction: column; line-height: 1.3; }
+.lab-outcome-kicker { font-size: 13px; color: var(--c-ink-muted); }
+.lab-outcome-label { font-size: 22px; font-weight: 700; }
+
+.lab-result dl { display: flex; flex-direction: column; gap: 12px; }
+.lab-result dt { font-size: var(--fs-small); line-height: 1.4; color: var(--c-ink-muted); }
+
+.lab-result dd {
+  font-family: var(--font-title);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-.lab-controls input[type='range'] { width: 100%; accent-color: #1f5fa8; }
+.lab-mascot-slot { margin: auto; line-height: 0; }
 
-.lab-presets { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.lab-presets button {
-  border: 1px solid rgba(16, 35, 63, 0.25);
-  background: #fff;
-  color: var(--c-ink);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 13px;
-}
-
-.lab-presets button:hover { background: var(--c-ice); }
-
-.lab-mascot-slot { margin-top: auto; align-self: center; }
-
+/* ---------- 剖面舞台 ---------- */
 .lab-stage {
-  position: relative;
+  grid-area: stage;
+  align-self: start;
   border-radius: var(--radius);
-  background: linear-gradient(180deg, #9cc3e4, #dceaf6);
   overflow: hidden;
-  min-height: 420px;
+  line-height: 0;
 }
 
-.lab-cloud {
+#lab-stage-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 结局地图 ---------- */
+.lab-map {
+  grid-area: map;
+  padding: 12px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: hidden; /* 圆点的定位层是整块平移的，裁在卡片内，不撑出横向滚动 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lab-map-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 12px;
+  line-height: 1.5;
+}
+
+.lab-map-title { font-weight: 700; font-size: 15px; }
+.lab-map-hint,
+.lab-map-axes { font-size: 13px; color: var(--c-ink-muted); }
+.lab-map-axes { line-height: 1.4; }
+
+.lab-map-body {
+  flex: 1;
+  min-height: 190px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 20px;
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-map-yaxis,
+.lab-map-xaxis { position: relative; }
+.lab-map-xaxis { grid-column: 2; }
+
+.lab-map-yaxis span {
   position: absolute;
-  top: 18px;
-  left: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+}
+
+.lab-map-xaxis span {
+  position: absolute;
+  top: 6px;
   transform: translateX(-50%);
-  width: 70%;
-  height: 84px;
-  border-radius: 999px;
-  background: #e8f2fb;
-  box-shadow: -60px 16px 0 -10px #e8f2fb, 70px 18px 0 -14px #e8f2fb;
 }
 
-.lab-cloud-shade {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: #2d3c52;
-  opacity: 0.2; /* JS 随上升气流强度调整 */
+.lab-map-plot {
+  position: relative;
+  border-radius: 8px;
+  cursor: crosshair;
+  touch-action: none; /* 触摸拖动归地图，不滚页面 */
 }
 
-#lab-canvas {
+.lab-map-cells {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  border-radius: 8px;
+  image-rendering: pixelated; /* 46×41 的位图放大成清晰色块 */
 }
 
-.lab-outcome {
+.lab-map-preset {
   position: absolute;
-  left: 18px;
-  bottom: 18px;
-  background: rgba(255, 255, 255, 0.88);
-  border-radius: 12px;
-  padding: 14px 18px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
-.lab-outcome-emoji { font-size: 40px; line-height: 1; }
-.lab-outcome-label { font-weight: 700; font-size: 1.1em; margin: 4px 0 10px; }
+.lab-map-preset i {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--c-ink);
+}
 
-.lab-outcome dl div {
+/* 预设名垫白底：墨蓝字直接压在红色格子上只有约 4:1 */
+.lab-map-preset b {
+  position: absolute;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.lab-map-preset[data-side='right'] b { left: 9px; top: -9px; }
+.lab-map-preset[data-side='right-up'] b { left: 7px; bottom: 5px; }
+.lab-map-preset[data-side='left-down'] b { right: 7px; top: 5px; }
+
+/* 当前参数的圆点：外层铺满地图，用百分比 transform 定位（跟随地图缩放，不用重新量尺寸） */
+.lab-map-dot-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.lab-map-dot {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-ink);
+  border: 3px solid #fff;
+  outline: 2px solid var(--c-ink);
+  transition: transform 0.15s;
+}
+
+.lab-map-plot.is-dragging .lab-map-dot { transform: scale(1.25); }
+
+.lab-map-legend {
+  list-style: none;
   display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  font-size: 12.5px;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.lab-outcome dt { color: var(--c-ink-muted); }
-.lab-outcome dd { font-weight: 700; font-variant-numeric: tabular-nums; }
+.lab-map-legend li { display: flex; align-items: center; gap: 5px; }
+
+.lab-map-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* 无 JS：地图和预设按钮都是 JS 生成的交互件，空壳不显示；滑杆、读数、舞台静态图照常可读 */
+html:not(.js) .lab-map,
+html:not(.js) .lab-presets { display: none; }
+
+/* 内容列放不下三列时（平板到小桌面）：舞台靠右，结果读数排到左列 */
+@media (max-width: 1100px) {
+  .lab {
+    grid-template-columns: minmax(0, 1fr) min(320px, 42%);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'controls stage'
+      'result   stage'
+      'map      map';
+  }
+
+  .lab-result { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .lab-result dl { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; gap: 8px 22px; }
+  /* 窄布局里雹宝缩小，站到结果卡右上角 */
+  .lab-mascot-slot { position: absolute; top: 12px; right: 14px; margin: 0; }
+  .lab-mascot-slot .mascot-wrap { width: 52px !important; height: 52px !important; }
+  .lab-map-body { min-height: 220px; }
+}
 
 @media (max-width: 768px) {
-  /* 实验室滑杆竖排堆叠 */
-  .lab { grid-template-columns: 1fr; }
-  .lab-stage { min-height: 340px; }
+  .lab {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      'controls'
+      'result'
+      'stage'
+      'map';
+    gap: 14px;
+  }
+
+  .lab-controls { grid-template-columns: 1fr; padding: 14px; gap: 8px; }
+  .lab-presets { gap: 6px; margin-top: 4px; }
+  .lab-presets button { padding: 5px 10px; font-size: 13px; }
+
+  /* 结果读数紧跟滑杆：一行一个读数，名称在左、数值在右 */
+  .lab-result { padding: 12px 14px; gap: 8px; flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .lab-chip { width: 40px; height: 40px; border-radius: 12px; }
+  .lab-outcome-label { font-size: 20px; }
+  .lab-result dl { flex: none; flex-direction: column; flex-wrap: nowrap; gap: 0; }
+  .lab-result dl div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .lab-result dd { font-size: 20px; line-height: 1.45; }
+
+  .lab-mascot-slot { top: 8px; }
+  .lab-mascot-slot .mascot-wrap { width: 46px !important; height: 46px !important; }
+
+  .lab-map { padding: 12px 14px 14px; }
+  .lab-map-legend { display: grid; grid-template-columns: repeat(2, max-content); gap: 2px 22px; }
+  .lab-map-body { min-height: 0; height: 210px; flex: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #lab-canvas { display: none; }
+  .lab-presets button,
+  .lab-map-dot { transition: none; }
 }
