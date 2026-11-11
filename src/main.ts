@@ -17,9 +17,12 @@ import { initCh4 } from './scenes/ch4-lab';
 import { initEnding } from './scenes/ending';
 import { initHero } from './scenes/hero';
 
+// 告诉 index.html 里的失效保护：模块已经跑起来了
+(window as Window & { __hailBooted?: boolean }).__hailBooted = true;
+
 gsap.registerPlugin(ScrollTrigger);
 
-// 六个章节场景：各自独立，缺一个不影响其他
+// 六个章节场景：各自独立，缺一个或某一个 init 抛错都不影响其他
 const scenes: Array<[string, (el: HTMLElement) => void]> = [
   ['#hero', initHero],
   ['#ch1', initCh1],
@@ -31,12 +34,20 @@ const scenes: Array<[string, (el: HTMLElement) => void]> = [
 
 for (const [sel, init] of scenes) {
   const el = document.querySelector<HTMLElement>(sel);
-  if (el) init(el);
+  if (!el) continue;
+  try {
+    init(el);
+  } catch (e) {
+    console.error(`[hail] 场景 ${sel} 初始化失败`, e);
+  }
 }
 
-// 旅程层必须在各章之后创建：ScrollTrigger 按创建顺序刷新，
-// 量锚点的探针要排在 ch1 的 pin 之后，才能把它撑高文档的那段算进去
-initJourney();
+// 旅程层在各章之后创建（它的探针另有 refreshPriority:-1 兜底，保证排在所有 pin 之后测量）
+try {
+  initJourney();
+} catch (e) {
+  console.error('[hail] 旅程层初始化失败', e);
+}
 
 ScrollTrigger.refresh();
 

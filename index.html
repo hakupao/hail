@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>一颗冰雹的诞生与坠落</title>
   <meta name="description" content="用动画看懂冰雹：生成高度 5–10 km、落地速度 v ∝ √d、危险阈值 ⌀2 cm，外加一个可以自己调参数的冰雹实验室。" />
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    // html.js 门控预隐藏（防入场闪现）。失效保护：模块脚本 3 秒内没跑起来（不支持 module、加载失败、顶层抛错）就撤掉 js 类，内容照常可读
+    document.documentElement.classList.add('js');
+    setTimeout(function () {
+      if (!window.__hailBooted) document.documentElement.classList.remove('js');
+    }, 3000);
+  </script>
 </head>
 <body>
   <main id="app">

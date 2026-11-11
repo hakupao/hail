@@ -14,7 +14,8 @@ import type { Anchor, Stage } from './anchors';
 const HAIL_BOX = 36; // 主角满尺寸（px）；雹胚是它的一半
 const GROW_STEPS = 4; // 第一章翻滚四圈，每圈长大一级
 const MOBILE_SCALE = 0.7;
-const CH1_PIN_ID = 'ch1-pin'; // 第一章 pin 的 ScrollTrigger id（ch1-height.ts 里设置）
+/** 第一章 pin 的 ScrollTrigger id。第一章场景必须用这个常量给它的 pin 命名，旅程层靠它读 pin 的起止位置 */
+export const CH1_PIN_ID = 'ch1-pin';
 
 const EXPRESSION: Record<Stage, Expression> = {
   embryo: 'happy',
@@ -40,6 +41,7 @@ let hailEl: HTMLElement | null = null;
  * 可在 initJourney 之前调用。
  */
 export function setStage(stage: PublishedStage, progress: number): void {
+  if (!Number.isFinite(progress)) return; // 时间线时长为 0 时会算出 0/0，别让 NaN 进到 --hail-scale
   const p = Math.min(1, Math.max(0, progress));
   if (published[stage] === p) return;
   published[stage] = p;
@@ -56,7 +58,7 @@ function formatTemp(celsius: number): string {
   return `${t < 0 ? '−' : ''}${Math.abs(t)}℃`;
 }
 
-/** 必须在所有场景 init 之后调用：ScrollTrigger 按创建顺序刷新，量锚点的探针要排在第一章 pin 之后 */
+/** 在所有场景 init 之后调用。探针用 refreshPriority:-1 排到最后刷新，所以之后再新增 pin 也不需要关心创建顺序 */
 export function initJourney(): void {
   const app = document.querySelector<HTMLElement>('#app')!;
 
@@ -99,7 +101,7 @@ export function initJourney(): void {
   // 每章一个 start:'top top' 的 ScrollTrigger，读它的 .start：它在第一章 pin 之后刷新，已含 pin spacer。
   const probe = (sel: string): ScrollTrigger | null => {
     const el = document.querySelector<HTMLElement>(sel);
-    return el ? ScrollTrigger.create({ trigger: el, start: 'top top' }) : null;
+    return el ? ScrollTrigger.create({ trigger: el, start: 'top top', refreshPriority: -1 }) : null;
   };
   const probes = {
     ch1: probe('#ch1'),
@@ -110,13 +112,14 @@ export function initJourney(): void {
     ending: probe('#ending'),
   };
 
+  let measured: Anchor[] = [];
   let anchors: Anchor[] = normalizeAnchors([], 1);
   let trackH = 0;
   let mobile = false;
   let lastStage: Stage | null = null;
 
   function measure(): void {
-    const measured: Anchor[] = [];
+    measured = [];
     const add = (st: ScrollTrigger | null | undefined, km: number, edge: 'start' | 'end' = 'start'): void => {
       if (st) measured.push({ y: st[edge], km });
     };
@@ -126,20 +129,30 @@ export function initJourney(): void {
       add(pin, 5.5, 'end');
     } else {
       add(probes.ch1, 9.5); // 无 pin（reduced-motion）：第一章顶 9.5，直接线性落到第二章顶 5.0
+      if (!reducedMotion && probes.ch1) console.warn(`[journey] 没找到 id 为 ${CH1_PIN_ID} 的 pin，高度读数将与第一章翻滚对不上`);
     }
     add(probes.ch2, 5);
-    add(probes.ch3, 1.5);
-    add(probes.ch4, 0.4);
-    add(probes.ending, 0.1);
-    anchors = normalizeAnchors(measured, ScrollTrigger.maxScroll(window));
-
     // 没有云底分界元素时退化为第三章顶
     const cloudBase = probes.cloudBase ?? probes.ch3;
     // +2px：急转藏在分界 SVG 顶部的实色云体之下，避免亚像素取整在分界上缘露出一条亮缝
-    if (cloudBase) app.style.setProperty('--sky', skyGradient(anchors, cloudBase.start + 2));
+    const cloudBaseY = cloudBase ? cloudBase.start + 2 : null;
+    // 1.5 km 与天空急转钉在同一个 y：天空转亮、读数 1.5、戴上安全帽是同一刻
+    if (cloudBaseY !== null) measured.push({ y: cloudBaseY, km: 1.5 });
+    add(probes.ch4, 0.4);
+    add(probes.ending, 0.1);
+    anchors = normalizeAnchors(measured, ScrollTrigger.maxScroll(window));
+    if (cloudBaseY !== null) app.style.setProperty('--sky', skyGradient(anchors, cloudBaseY));
 
     trackH = track.clientHeight;
     mobile = window.matchMedia('(max-width: 768px)').matches;
+    render();
+  }
+
+  // 触屏设备上 ScrollTrigger 默认忽略「只改高度」的 resize（地址栏伸缩），不会触发 refresh。
+  // 但 maxScroll 和轨道高度都变了：不跟着更新的话，滚到页底读数会停在 0.1 km、主角与刻度错位。
+  function relayout(): void {
+    anchors = normalizeAnchors(measured, ScrollTrigger.maxScroll(window));
+    trackH = track.clientHeight;
     render();
   }
 
@@ -168,7 +181,9 @@ export function initJourney(): void {
     }
 
     // 尺寸：雹胚 18px → 第一章每翻滚一圈长一级 → 36px；过了第一章一定是满尺寸
-    const grown = stage === 'embryo' ? 0 : stage === 'grow' ? published.grow : 1;
+    // reduced-motion 下第一章没有时间线发布进度，按高度在 9.5 → 5.5 km 之间推算
+    const growNow = reducedMotion ? Math.min(1, Math.max(0, (9.5 - alt) / 4)) : published.grow;
+    const grown = stage === 'embryo' ? 0 : stage === 'grow' ? growNow : 1;
     const level = Math.floor(grown * GROW_STEPS + 1e-6) / GROW_STEPS;
     body.style.setProperty('--hail-scale', String((0.5 + 0.5 * level) * (mobile ? MOBILE_SCALE : 1)));
 
@@ -177,6 +192,8 @@ export function initJourney(): void {
 
   rerender = render;
   window.addEventListener('scroll', render, { passive: true });
+  window.addEventListener('resize', relayout, { passive: true });
+  window.visualViewport?.addEventListener('resize', relayout);
   // refresh 事件在所有 ScrollTrigger（含探针）重新测量之后触发：resize、字体加载、总装后的手动 refresh 都会走到这里
   ScrollTrigger.addEventListener('refresh', measure);
   measure();

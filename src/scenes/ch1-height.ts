@@ -1,5 +1,5 @@
 import { gsap } from 'gsap';
-import { setStage } from '../journey/journey';
+import { CH1_PIN_ID, setStage } from '../journey/journey';
 import { reducedMotion } from '../utils/motion';
 
 export function initCh1(section: HTMLElement): void {
@@ -20,7 +20,7 @@ export function initCh1(section: HTMLElement): void {
     // 从时间线当前时间算进度（而不是一次性回调），scrub 反向时主角能缩回去
     onUpdate: () => setStage('grow', (tl.time() - lapsStart) / (lapsEnd - lapsStart)),
     scrollTrigger: {
-      id: 'ch1-pin', // 旅程层按这个 id 读 pin 的 start/end
+      id: CH1_PIN_ID, // 旅程层按这个 id 读 pin 的 start/end
       trigger: section,
       start: 'top top',
       end: '+=2400',

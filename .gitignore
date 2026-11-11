@@ -4,3 +4,4 @@ dist/
 .omc/
 .playwright-mcp/
 .DS_Store
+.claude/
