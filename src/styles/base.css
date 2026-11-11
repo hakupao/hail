@@ -31,7 +31,9 @@ html:not(.js) #ending { background: linear-gradient(180deg, var(--c-sky-below), 
 h1, h2, h3 {
   font-family: var(--font-title);
   line-height: 1.25;
-  font-weight: 700;
+  /* 500 而非 700：圆体（Yuanti SC）没有被浏览器匹配到粗体字面，≥600 会触发合成加粗，「雹」「颗」这类密笔画字会糊成一团 */
+  font-weight: 500;
+  font-synthesis: none;
 }
 
 h2 { font-size: var(--fs-h2); margin-bottom: 0.5em; }
