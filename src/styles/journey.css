@@ -1,0 +1,229 @@
+/* ===== 旅程层：高度尺 + 主角雹宝 + 云底分界（规格 §2） ===== */
+
+/* 高度尺是一块实色夜云底的仪表条：它固定在视口里，背后的天空会从暗变亮，
+   自带深底才能让刻度、图标、读数的对比度在整个旅程里都确定。 */
+#journey-ruler {
+  position: fixed;
+  top: 5vh;
+  bottom: 5vh;
+  right: 4px;
+  width: 88px;
+  z-index: 10;
+  padding: 34px 0 78px; /* 上：给 10 km 处的主角留半个身位；下：给 0 km 处的读数留位置 */
+  border-radius: 28px;
+  background: var(--c-night);
+  border: 1.5px solid rgba(159, 203, 232, 0.4);
+  color: var(--c-ice-line);
+  pointer-events: none;
+}
+
+.jr-track {
+  position: relative;
+  height: 100%;
+}
+
+.jr-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 29px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--c-ice-line);
+}
+
+.jr-tick {
+  position: absolute;
+  right: 31px;
+  width: 5px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--c-ice-line);
+}
+
+.jr-mark {
+  position: absolute;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  transition: color 0.3s;
+}
+
+.jr-mark .icon { display: block; }
+.jr-mark.active { color: var(--c-accent); }
+
+/* 主角：JS 只写 transform（translateY 到当前高度）。top:-18px 让 36px 的盒子中心落在刻度上。 */
+.journey-hail {
+  position: absolute;
+  top: -18px;
+  right: 36px;
+  width: 36px;
+  will-change: transform;
+}
+
+.jr-hail-drop { position: relative; transition: opacity 0.3s; }
+#journey-ruler.is-handed-off .jr-hail-drop { opacity: 0; }
+/* 交棒：尺上的主角把浮动和眨眼归零（不是停在某个相位上）。这样它画出来的位置就是 getHailRect() 量到的盒子，
+   结尾的雹宝叠上来接棒时两个严丝合缝；淡出之后它看不见了，本来也该停。收回（landed 回到 0）时重新开始浮动 */
+#journey-ruler.is-handed-off .jr-hail-body .mascot-bob,
+#journey-ruler.is-handed-off .jr-hail-body .m-eyes { animation: none; }
+
+/* 主角的待机浮动：加在雹宝内层的 .mascot-bob 上（.jr-hail-body 是 getHailRect() 量的盒子，不能动）。
+   尺上的主角只有 18–36px，按百分比浮动不到 1px，这里用 px 幅度；不摇头，免得小脸发虚 */
+.jr-hail-body .mascot-bob { animation: jr-float 2.8s ease-in-out var(--bob-delay, 0s) infinite alternate; }
+
+@keyframes jr-float {
+  from { translate: 0 1.5px; }
+  to { translate: 0 -1.5px; }
+}
+
+/* 速度线：往下滚得快时在主角身后（上方）亮起三道短线，停下后收起。
+   它在 .jr-hail-drop 里、.jr-hail-body 之外：跟着主角走、交棒时一起淡出，但不影响被测量的盒子。 */
+.jr-speed {
+  position: absolute;
+  left: 50%;
+  bottom: calc(18px + 18px * var(--hail-scale, 0.5) + 2px); /* 主角缩放后的上缘再往上 2px */
+  width: 18px;
+  height: 16px;
+  margin-left: -9px;
+  background:
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 2px 100% / 2px 9px,
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 8px 100% / 2px 16px,
+    linear-gradient(var(--c-ice-line), var(--c-ice-line)) 14px 100% / 2px 9px;
+  background-repeat: no-repeat;
+  border-radius: 1px;
+  opacity: 0;
+  transform: scaleY(0.3);
+  transform-origin: 50% 100%;
+  /* bottom 跟着 --hail-scale 变：用和主角本体（.jr-hail-body）长大时一样的过渡，不抢在它前面跳过去 */
+  transition:
+    opacity var(--dur-instant) linear,
+    transform var(--dur-instant) var(--ease-soft),
+    bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#journey-ruler.is-fast .jr-speed {
+  opacity: 0.9;
+  transform: none;
+}
+
+.jr-hail-body {
+  width: 36px;
+  height: 36px;
+  transform: scale(var(--hail-scale, 0.5));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 读数：主角的兄弟节点，靠 JS 写在 .jr-track 上的 --hail-y 跟着主角走（位置 = 主角盒子下方 2px） */
+.jr-readout {
+  position: absolute;
+  top: 20px;
+  right: 34px;
+  width: 52px;
+  transform: translate3d(0, var(--hail-y, 0px), 0);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.jr-alt-line { color: var(--c-accent); }
+.jr-alt { font-size: 15px; font-weight: 600; }
+.jr-unit { font-size: 10px; font-weight: 500; margin-left: 2px; }
+.jr-temp { font-size: 12px; font-weight: 500; color: var(--c-ice); }
+.jr-ref { font-size: 10px; margin-top: 2px; color: var(--c-ice-line); }
+
+/* ===== 云底分界（规格 §2.3）：第二、三章之间的 1.5 km 云底 ===== */
+/* 云体填色 = 天空在分界上缘的颜色（#3f6ea6），所以与上方天空无缝；下缘之外露出亮天空。 */
+.cloudbase {
+  margin-top: var(--space-section);
+  line-height: 0;
+}
+
+.cloudbase svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+}
+
+.cloudbase + .scene { padding-top: calc(var(--space-section) * 0.5); }
+
+/* 视差：JS 把分界在视口里的位置换算成 --cb-shift（SVG 用户单位）。后层跟着走、前层的云团反向走 1/3，
+   两层错开。前层顶上那条实色 rect 不动——它是与上方天空的接缝。无 JS / reduced-motion 下 --cb-shift 不存在，静止。 */
+.cb-back { transform: translateY(calc(var(--cb-shift, 0) * 1px)); }
+.cb-front { transform: translateY(calc(var(--cb-shift, 0) * -0.33px)); }
+
+/* 极慢的左右漂移：循环动画加在视差层里面的一层 <g> 上（铁律：循环不加在被 JS 驱动位移的元素上） */
+.cb-drift { animation: cb-drift 31s ease-in-out infinite alternate; }
+.cb-front .cb-drift { animation-duration: 43s; animation-direction: alternate-reverse; }
+
+@keyframes cb-drift {
+  from { transform: translateX(-9px); }
+  to { transform: translateX(9px); }
+}
+
+@media (max-width: 768px) {
+  /* 窄屏：高度尺收成贴右边缘的一根细轨，读数拿出来做右上角的角标。
+     细轨仍然自带深底（理由同上：背后的天空会从暗变亮），但只有 18px 宽，正文右侧只让出 --rail = 30px（与细轨之间留 6px）。 */
+  #journey-ruler {
+    top: calc(54px + env(safe-area-inset-top, 0px));
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: 6px; /* 主角比细轨宽 4px：留出这点边距它才不会贴到屏幕边 */
+    width: 18px;
+    padding: 18px 0; /* 上下各留半个主角的身位 */
+    border: 0;
+    border-radius: 9px;
+    box-shadow: 0 0 0 1px rgba(159, 203, 232, 0.4);
+  }
+
+  .jr-line { right: 8px; }
+  .jr-tick { right: 10px; width: 3px; }
+
+  /* 窄屏没有位置放参照物图标：只留刻度，参照高度处的刻度加长加亮 */
+  .jr-mark {
+    right: 2px;
+    width: 6px;
+    height: 2px;
+    margin-top: -1px;
+    border-radius: 1px;
+    background: var(--c-ice);
+  }
+
+  .jr-mark .icon { display: none; }
+  .jr-mark.active { background: var(--c-accent); }
+
+  /* 主角 36px 的盒子居中压在轨道中线上（缩放后约 25px，比细轨宽一圈，像串在轨上的珠子） */
+  .journey-hail { right: -9px; }
+
+  /* 角标：固定在视口右上角，不跟主角走 */
+  .jr-readout {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    right: 6px;
+    width: auto;
+    min-width: 50px;
+    padding: 4px 7px 5px;
+    border-radius: 12px;
+    background: var(--c-night);
+    box-shadow: 0 0 0 1px rgba(159, 203, 232, 0.4);
+    transform: none;
+    will-change: auto;
+  }
+
+  .jr-alt { font-size: 13px; }
+  .jr-unit { font-size: 9px; margin-left: 1px; }
+  .jr-temp { font-size: 11px; }
+  .jr-ref { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jr-hail-body, .jr-hail-drop, .jr-mark, .jr-speed { transition: none; }
+  .jr-speed { display: none; }
+  .jr-hail-body .mascot-bob { animation: none; }
+}

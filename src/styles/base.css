@@ -4,42 +4,54 @@
   box-sizing: border-box;
 }
 
+html { background: var(--c-night); }
+
 body {
   font-family: var(--font);
   font-size: var(--fs-body);
-  line-height: 1.8;
-  /* 无 JS 时的兜底背景（JS 会注入 #sky 固定层盖住它） */
-  background: linear-gradient(180deg, var(--c-sky-top), var(--c-sky-low) 70%, var(--c-sky-ground));
+  line-height: 1.75;
   overflow-x: hidden;
 }
 
-/* JS 注入的固定背景层 */
-#sky {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
+/* 天空（规格 §2.2）：#app 上一条与文档等高的纵向渐变。
+   有 JS 时 journey.ts 在每次 refresh 后把按锚点算出的像素色标写进 --sky；
+   无 JS 时用下面的百分比兜底——暗段最浅只到云底色，亮色章节自带浅底（见下），
+   所以可读性不依赖百分比和云底分界对齐。 */
+#app {
+  background: var(
+    --sky,
+    linear-gradient(180deg, var(--c-sky-10) 0%, var(--c-sky-5) 55%, var(--c-sky-cloud) 100%)
+  );
 }
 
+html:not(.js) .on-light,
+html:not(.js) .cloudbase { background: var(--c-sky-below); }
+html:not(.js) #ending { background: linear-gradient(180deg, var(--c-sky-below), var(--c-sky-0)); }
+
 h1, h2, h3 {
+  font-family: var(--font-title);
   line-height: 1.25;
-  font-weight: 800;
+  /* 500 而非 700：圆体（Yuanti SC）没有被浏览器匹配到粗体字面，≥600 会触发合成加粗，「雹」「颗」这类密笔画字会糊成一团 */
+  font-weight: 500;
+  font-synthesis: none;
 }
+
+h2 { font-size: var(--fs-h2); margin-bottom: 0.5em; }
+h3 { font-size: var(--fs-h3); }
 
 button {
   font-family: inherit;
   cursor: pointer;
 }
 
-.on-dark { color: var(--c-ink-light); }
-.on-light { color: var(--c-ink-dark); }
+.on-dark { color: var(--c-ice); }
+.on-light { color: var(--c-ink); }
 
+/* 布局（规格 §3.5）：内容列左对齐、最大 1080px，右侧 --rail 留给高度尺；
+   章与章之间只有一段 --space-section 留白。整屏的只有 Hero、第一章（pin）、结尾。 */
 .scene {
   position: relative;
-  min-height: 100vh;
-  padding: 12vh 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: var(--space-section) var(--rail) 0 var(--page-left);
 }
 
 .scene-inner {
@@ -61,30 +73,93 @@ button {
   pointer-events: none;
 }
 
-h2 { font-size: var(--fs-h2); margin-bottom: 0.6em; }
-
+/* 章节标记：内容确实是序列，所以保留；实色小字，不用宽字距和半透明 */
 .ch-no {
   display: block;
-  font-size: 0.4em;
+  font-size: max(15px, 0.42em);
   font-weight: 600;
-  letter-spacing: 0.4em;
-  opacity: 0.65;
-  margin-bottom: 0.4em;
+  margin-bottom: 0.3em;
+  color: var(--c-accent);
 }
 
-.lead { max-width: 46em; margin-bottom: 2em; }
+.on-light .ch-no { color: var(--c-ink-muted); }
 
+.lead { max-width: var(--measure); margin-bottom: 2em; }
+
+/* 次级文字一律用实色，不用 opacity 降调（暗底上冰白对云底色只有 4.9:1，没有余量） */
 .note {
-  font-size: 0.82em;
-  opacity: 0.6;
+  font-size: var(--fs-small);
   margin-top: 1.5em;
+  max-width: var(--measure);
 }
 
-.kicker {
-  font-size: 13px;
-  letter-spacing: 0.5em;
-  opacity: 0.7;
-  margin-bottom: 1.2em;
+.on-light .note { color: var(--c-ink-muted); }
+
+/* 三个结论：一行三栏、无卡片、细竖线分隔（Hero 与结尾回顾共用） */
+.num-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 900px;
 }
 
-.on-dark .note { opacity: 0.75; }
+.num-card {
+  padding: 2px 0 2px clamp(16px, 2.4vw, 32px);
+  margin-left: clamp(16px, 2.4vw, 32px);
+  border-left: 1.5px solid rgba(159, 203, 232, 0.5);
+}
+
+.num-card:first-child {
+  padding-left: 0;
+  margin-left: 0;
+  border-left: 0;
+}
+
+.num {
+  font-family: var(--font-title);
+  font-size: var(--fs-num);
+  font-weight: 600;
+  line-height: 1.05;
+  white-space: nowrap;
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.num small { font-size: 0.42em; font-weight: 500; color: var(--c-ice); }
+.num-label { font-weight: 700; margin-top: 10px; }
+.num-card p { font-size: var(--fs-small); line-height: 1.6; margin-top: 2px; }
+
+.on-light .num-card { border-color: rgba(16, 35, 63, 0.28); }
+.on-light .num { color: var(--c-ink); }
+.on-light .num small { color: var(--c-ink-muted); }
+
+/* 「在场才动」（v3 规格 §3.1）：所有无限循环的 CSS 动画都给元素加 .anim-loop。
+   它默认暂停，只有自己或某个祖先带 .in-view（utils/motion.ts 的 observeInView 切换）时才运行。
+   用 !important：章节 CSS 里后写的 animation 简写会把 play-state 重置成 running，不能让它赢。
+   两条约定：
+   1. 每个 .anim-loop 都要有自己或某个祖先被 observeInView 观察，否则它永远暂停（开发模式下 motion.ts 会在控制台报出来）。
+   2. 一次性动画（入场、揭示、带 forwards 的）不要加在带 .anim-loop 的元素上：这里的暂停和文件末尾 reduced-motion 下的
+      animation: none 都带 !important，作用到这个元素上的全部 CSS 动画——离屏时一次性动画会被冻住；reduced-motion 下它根本不播、
+      animationend 不触发，靠 forwards 才显示的内容永远看不见。需要两种动画就分给两层元素。 */
+.anim-loop:not(.in-view, .in-view *) { animation-play-state: paused !important; }
+
+@media (max-width: 768px) {
+  .num-cards { grid-template-columns: 1fr; }
+
+  .num-card,
+  .num-card:first-child {
+    padding: 14px 0;
+    margin-left: 0;
+    border-left: 0;
+    border-top: 1.5px solid rgba(159, 203, 232, 0.5);
+  }
+
+  .num-card:first-child { border-top: 0; padding-top: 0; }
+  .on-light .num-card { border-color: rgba(16, 35, 63, 0.28); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scene-canvas { display: none; }
+  /* 连同这个元素上的一次性动画一起关掉——所以一次性动画不能加在 .anim-loop 上（见上面的约定 2） */
+  .anim-loop { animation: none !important; }
+}

@@ -1,0 +1,282 @@
+/* ===== 第一章 · 生成高度（规格 §4）：全站唯一的 pin 场景 ===== */
+/* 默认是静态布局（无 JS / reduced-motion 直接用它）：四步文字依次排开 + 完整的剖面图。
+   pin 布局只在「有 JS 且允许动效」时生效，见文件末尾。 */
+
+.ch1-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2.4vh, 28px);
+}
+
+#ch1 h2 { margin-bottom: 0.4em; }
+
+.ch1-steps { list-style: none; }
+.ch1-step + .ch1-step { margin-top: 1.4em; }
+
+.ch1-step-no {
+  display: block;
+  font-family: var(--font-title);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch1-step h3 { margin-bottom: 0.3em; }
+.ch1-step p { max-width: var(--measure); line-height: 1.65; }
+
+/* ---------- 剖面图 ---------- */
+.ch1-fig { min-height: 0; }
+
+.ch1-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 46vh;
+  max-height: 46svh;
+}
+
+/* 图内文字：字号是 viewBox 单位。窄屏图只有约 300px 宽（缩放约 0.5），所以用大单位字号 */
+.ch1-svg text {
+  font-family: var(--font);
+  font-size: 23px;
+  fill: var(--c-ice);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch1-svg .ch1-label-strong { font-weight: 600; }
+.ch1-svg .ch1-axis-km text,
+.ch1-svg .ch1-axis-temp text,
+.ch1-svg .ch1-axis-head { fill: var(--c-ice-line); }
+.ch1-svg .ch1-axis-temp .ch1-axis-zero { fill: var(--c-ice); font-weight: 600; }
+
+.ch1-axis path {
+  fill: none;
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ch1-ground { fill: var(--c-grass); }
+
+/* 云体用云底色（比 pin 期间背后的天空 #152849 → #214677 都亮），不用风暴蓝：风暴蓝在 pin 结束处会和天空融在一起 */
+.ch1-cloud { fill: var(--c-sky-cloud); }
+.ch1-cloud-shade { fill: #356299; }
+.ch1-cloud-light { fill: #5484bb; }
+
+.ch1-zone rect { fill: rgba(238, 248, 255, 0.07); }
+
+.ch1-zone path {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 8;
+}
+
+.ch1-zone .ch1-zone-bracket { stroke-dasharray: none; }
+
+.ch1-zero {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 10 8;
+}
+
+.ch1-updraft path {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ch1-updraft path:nth-child(odd) { stroke-dasharray: 12 9; }
+
+.ch1-orbit {
+  fill: none;
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 9;
+}
+
+.ch1-embryo,
+.ch1-melt-hail,
+.ch1-ice-opaque {
+  fill: var(--c-ice);
+  stroke: var(--c-ice-line);
+  stroke-width: 3;
+}
+
+.ch1-ice-clear {
+  fill: #b9dcf2;
+  stroke: var(--c-ice-line);
+  stroke-width: 3;
+}
+
+.ch1-melt-trail {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 7;
+}
+
+.ch1-melt-drop {
+  fill: var(--c-ice-line);
+  stroke: var(--c-ice);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.ch1-lens {
+  fill: var(--c-night);
+  stroke: var(--c-ice-line);
+  stroke-width: 2;
+}
+
+/* ---------- v3 细节动画 ----------
+   下面这些类都由场景 JS 在 init 成功后才加上 / 才创建：无 JS、reduced-motion、init 抛错时不存在，图就是静止的原图。 */
+
+/* 云团极慢地呼吸：只放大不缩小，云团之间不会露缝；三组错开周期与相位 */
+.ch1-puff {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ch1-breathe 7s var(--ease-in-out) infinite alternate;
+}
+
+.ch1-puff:nth-child(3n) { animation-duration: 9s; animation-delay: -3s; }
+.ch1-puff:nth-child(3n + 1) { animation-duration: 8s; animation-delay: -5.5s; }
+
+@keyframes ch1-breathe {
+  from { scale: 1; }
+  to { scale: 1.07; }
+}
+
+/* 上升气流：虚线一直往上流（一个周期正好挪一组虚线 12 + 9，首尾无缝） */
+.ch1-flow { animation: ch1-flow 1.5s linear infinite; }
+
+@keyframes ch1-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -21; }
+}
+
+.ch1-melt-plop {
+  fill: none;
+  stroke: var(--c-ice);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke; /* 圈荡开时线不跟着变粗 */
+  opacity: 0; /* 只在时间线里亮一下 */
+}
+
+/* init 中途抛错：已经加上的类和已经创建的图形不留痕迹 */
+#ch1[data-init-failed] .anim-loop { animation: none; }
+
+/* 小脸的叠加层：图上方的零尺寸锚点，场景 JS 把它对到雹胚 / 小雹子 / 水滴的圆心上，--d 是那个图形此刻的直径（px）。
+   脸和冰晶都挂在锚点里面，不碰 SVG 里被 MotionPath 驱动、被测量的那个圆。 */
+.ch1-fig { position: relative; }
+
+.ch1-rider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+#ch1[data-init-failed] .ch1-rider { display: none; }
+
+/* 身体直径占雹宝盒子的 73%：盒子取直径的 1.3 倍，五官落在圆内 */
+.ch1-rider .mascot-wrap {
+  position: absolute;
+  left: calc(var(--d) * -0.65);
+  top: calc(var(--d) * -0.65);
+  width: calc(var(--d) * 1.3);
+  height: calc(var(--d) * 1.3);
+}
+
+/* 雹胚在翻滚，脸自己不再另外浮动（眨眼保留） */
+.ch1-rider .mascot-bob { animation: none; }
+
+/* 长大一级时闪的一圈冰晶：四角星，沿半径方向摆在雹胚外缘 */
+.ch1-burst {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.ch1-burst i {
+  --s: max(5px, var(--d) * 0.3);
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  background: var(--c-ice);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  transform: rotate(var(--a)) translateY(calc(var(--d) * -0.8));
+}
+
+/* ---------- 桌面：两栏（左文字，右图） ---------- */
+@media (min-width: 900px) {
+  .ch1-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+  }
+
+  .ch1-svg { max-height: 80vh; }
+  .ch1-svg text { font-size: 16px; }
+}
+
+/* ---------- pin 布局：章节高度 = 视口高度，图吃掉剩余高度，四步文字叠在同一格里一次只显示一步 ----------
+   整段只在本章 init 成功时生效：init 抛错（main.ts 给章节打 data-init-failed）就退回上面的静态排版，
+   与无 JS / reduced-motion 相同——四步文字顺排、完整的图，不会有文字叠在一格里或永远透明。 */
+@media (prefers-reduced-motion: no-preference) {
+  html.js #ch1:not([data-init-failed]) {
+    height: 100vh;
+    height: 100svh;
+    padding-top: clamp(12px, 3vh, 36px);
+    padding-bottom: clamp(12px, 3vh, 36px);
+  }
+
+  html.js #ch1:not([data-init-failed]) .ch1-inner { height: 100%; }
+  html.js #ch1:not([data-init-failed]) .ch1-text { flex: none; }
+
+  html.js #ch1:not([data-init-failed]) .ch1-steps { display: grid; }
+
+  html.js #ch1:not([data-init-failed]) .ch1-step {
+    grid-area: 1 / 1;
+    margin-top: 0;
+  }
+
+  /* 预隐藏（时间线接管前不闪）；只用 opacity，读屏仍能读到全部四步 */
+  html.js #ch1:not([data-init-failed]) .ch1-step + .ch1-step,
+  html.js #ch1:not([data-init-failed]) .ch1-ring,
+  html.js #ch1:not([data-init-failed]) .ch1-melt { opacity: 0; }
+
+  /* 图是正方形：理想边长 = 内容列宽与 46svh 中较小者；放不下时（矮屏）跟着剩余高度缩小 */
+  html.js #ch1:not([data-init-failed]) .ch1-inner { justify-content: center; }
+
+  html.js #ch1:not([data-init-failed]) .ch1-fig {
+    flex: 0 1 min(46vh, 100vw - var(--rail) - var(--page-left));
+    flex-basis: min(46svh, 100vw - var(--rail) - var(--page-left));
+  }
+
+  html.js #ch1:not([data-init-failed]) .ch1-svg {
+    height: 100%;
+    max-height: none;
+  }
+
+  @media (min-width: 900px) {
+    html.js #ch1:not([data-init-failed]) .ch1-inner { grid-template-rows: minmax(0, 1fr); }
+
+    html.js #ch1:not([data-init-failed]) .ch1-fig { height: 100%; }
+  }
+}

@@ -1,0 +1,56 @@
+/* ===== HERO（规格 §4）：标题左对齐占满内容列，三个结论一行三栏 ===== */
+#hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: 10vh;
+  padding-bottom: 10vh;
+}
+
+.hero-title {
+  font-size: var(--fs-hero);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+/* 桌面标题一行排开、占满内容列；窄屏在「的」后折行 */
+.hero-br { display: none; }
+
+/* 粒子压在内容层之下并调淡，不和标题抢 */
+#hero .scene-canvas { opacity: 0.4; }
+
+#hero .num-cards { margin-top: clamp(36px, 8vh, 80px); }
+
+/* Hero 背后是天空最暗的一段（#132544 一带），冰线色在这里对比度足够 */
+.scroll-hint {
+  margin-top: clamp(32px, 7vh, 72px);
+  font-size: var(--fs-small);
+  color: var(--c-ice-line);
+}
+
+/* 箭头有呼吸感地上下浮动，往下的那一程走得更远一点（指着要去的方向）。
+   0% 是原位：不在场 / 无 JS 时 .anim-loop 停在第 0 帧，箭头就在原来的位置 */
+.scroll-hint-arrow {
+  display: inline-block;
+  animation: hero-hint 2.4s var(--ease-in-out) infinite;
+}
+
+@keyframes hero-hint {
+  0%, 100% { translate: 0 0; }
+  30% { translate: 0 -2px; }
+  65% { translate: 0 4px; }
+}
+
+/* JS 可用且允许动效时预隐藏入场元素，避免 GSAP 首 tick 前闪现。
+   无 JS、prefers-reduced-motion、或本章 init 抛错（data-init-failed）时不隐藏，内容直接可见。 */
+@media (prefers-reduced-motion: no-preference) {
+  html.js #hero:not([data-init-failed]) .hero-title,
+  html.js #hero:not([data-init-failed]) .num-card,
+  html.js #hero:not([data-init-failed]) .scroll-hint { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .hero-br { display: inline; }
+  #hero { padding-top: 8vh; padding-bottom: 8vh; }
+}

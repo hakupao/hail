@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>一颗冰雹的诞生与坠落</title>
   <meta name="description" content="用动画看懂冰雹：生成高度 5–10 km、落地速度 v ∝ √d、危险阈值 ⌀2 cm，外加一个可以自己调参数的冰雹实验室。" />
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    // html.js 门控预隐藏（防入场闪现）。失效保护：模块脚本 3 秒内没跑起来（不支持 module、加载失败、顶层抛错）就撤掉 js 类，内容照常可读
+    document.documentElement.classList.add('js');
+    setTimeout(function () {
+      if (!window.__hailBooted) document.documentElement.classList.remove('js');
+    }, 3000);
+  </script>
 </head>
 <body>
   <main id="app">
@@ -13,9 +19,7 @@
     <!-- ========== HERO ========== -->
     <section id="hero" class="scene on-dark">
       <div class="scene-inner hero-inner">
-        <p class="kicker">HAIL · 一份会动的科普</p>
-        <h1 class="hero-title">一颗冰雹的<br />诞生与坠落</h1>
-        <div class="hero-mascot-slot"></div>
+        <h1 class="hero-title">一颗冰雹的<br class="hero-br" />诞生与坠落</h1>
         <div class="num-cards">
           <div class="num-card">
             <div class="num">5–10 <small>km</small></div>
@@ -25,7 +29,7 @@
           <div class="num-card">
             <div class="num">10–40+ <small>m/s</small></div>
             <div class="num-label">落地速度</div>
-            <p>个头越大砸得越快：v ∝ √d</p>
+            <p>个头越大砸得越快：<span class="tex" data-tex="v \propto \sqrt{d}"></span></p>
           </div>
           <div class="num-card">
             <div class="num">⌀2 <small>cm</small></div>
@@ -33,187 +37,698 @@
             <p>硬币大小就开始具备伤人能力</p>
           </div>
         </div>
-        <p class="scroll-hint">↓ 往下滚，跟着它落一次地</p>
+        <p class="scroll-hint"><span class="scroll-hint-arrow anim-loop">↓</span> 往下滚，跟着它落一次地</p>
       </div>
     </section>
 
     <!-- ========== 第一章 生成高度 ========== -->
     <section id="ch1" class="scene on-dark">
-      <div class="scene-inner">
-        <h2><span class="ch-no">第一章</span>生成高度：5–10 公里</h2>
-        <p class="lead">冰雹诞生在发展旺盛的积雨云里。云底可能只有 1–2 公里高，但真正的"孕育区"在云的中上部——温度 −10℃ 到 −30℃ 的层面，夏季大约对应离地 5–10 公里。</p>
-        <div class="ch1-stage">
-          <svg viewBox="0 0 660 520" class="cloud-svg" role="img" aria-label="积雨云剖面示意图：雹胚在孕育区被上升气流反复托起，每翻滚一次裹一层冰">
-            <g class="cloud-body">
-              <ellipse cx="320" cy="300" rx="240" ry="150" fill="#3d5578" />
-              <ellipse cx="180" cy="360" rx="120" ry="80" fill="#46618a" />
-              <ellipse cx="470" cy="350" rx="130" ry="90" fill="#46618a" />
-              <ellipse cx="320" cy="170" rx="150" ry="80" fill="#54719c" />
+      <div class="scene-inner ch1-inner">
+        <div class="ch1-text">
+          <h2><span class="ch-no">第一章</span>生成高度：5–10 公里</h2>
+          <ol class="ch1-steps">
+            <li class="ch1-step">
+              <span class="ch1-step-no">1 / 4</span>
+              <h3>孕育区在云的中上部</h3>
+              <p>冰雹诞生在发展旺盛的积雨云里。云底可能只有 1–2 公里高，但真正的"孕育区"在云的中上部——温度 −10℃ 到 −30℃ 的层面，夏季大约对应离地 5–10 公里。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">2 / 4</span>
+              <h3>翻滚一次，裹一层冰</h3>
+              <p>雹胚被上升气流反复托起、下落，每翻滚一次就裹上一层冰。切开来看像洋葱：一圈就是一次翻滚。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">3 / 4</span>
+              <h3>气流越强，冰雹越大</h3>
+              <p>上升气流越强，能托住的冰雹就越大。</p>
+            </li>
+            <li class="ch1-step">
+              <span class="ch1-step-no">4 / 4</span>
+              <h3>太小的，半路化成雨</h3>
+              <p>太小的雹子下落途中经过 0℃ 层（约 4–5 km）就化成了雨——能落到地面的，通常已有一定个头。</p>
+            </li>
+          </ol>
+        </div>
+        <figure class="ch1-fig">
+          <!-- 纵轴等比：y = 572 − 43.5 × km（0–12 km）；气温 = (4.5 − km) × 6.5 ℃，与旅程层 temperatureAt 一致 -->
+          <svg class="ch1-svg" viewBox="0 0 600 600" role="img" aria-label="积雨云剖面图。纵轴 0 到 12 公里并标出对应气温；云底约 1.5 公里，砧状云顶约 11.5 公里；0℃ 线在 4.5 公里；孕育区约 5 到 10 公里。雹胚在孕育区被上升气流托着沿环形轨迹翻滚四圈，每圈裹一层冰，切开后是透明冰与不透明冰交替的四环洋葱剖面。一颗太小的雹子落过 0℃ 线后化成水滴。">
+            <rect class="ch1-ground" x="124" y="572" width="476" height="28" rx="8" />
+
+            <g class="ch1-cloud">
+              <path d="M172 158C146 156 134 136 142 116C150 90 178 73 214 72H532C566 72 592 84 598 102C584 118 556 130 524 138C496 150 462 158 430 158Z" />
+              <circle cx="198" cy="150" r="17" /><circle cx="414" cy="152" r="15" /><circle cx="452" cy="148" r="13" /><circle cx="490" cy="141" r="12" /><circle cx="526" cy="132" r="10" />
+              <rect x="222" y="110" width="156" height="397" />
+              <circle cx="212" cy="176" r="26" /><circle cx="240" cy="204" r="34" /><circle cx="222" cy="258" r="38" /><circle cx="240" cy="322" r="36" /><circle cx="218" cy="376" r="30" /><circle cx="234" cy="424" r="32" /><circle cx="228" cy="468" r="34" />
+              <circle cx="390" cy="174" r="24" /><circle cx="362" cy="206" r="36" /><circle cx="376" cy="270" r="32" /><circle cx="362" cy="330" r="40" /><circle cx="378" cy="392" r="28" /><circle cx="366" cy="436" r="34" /><circle cx="372" cy="470" r="32" />
+              <rect x="196" y="455" width="210" height="52" rx="14" />
             </g>
-            <g class="growth-zone">
-              <rect x="120" y="140" width="400" height="130" fill="rgba(191,227,255,.14)" stroke="#bfe3ff" stroke-width="2" stroke-dasharray="8 6" rx="10" />
-              <text x="135" y="165" fill="#bfe3ff" font-size="16">孕育区 −10℃ ～ −30℃ · 约 5–10 km</text>
+            <path class="ch1-cloud-shade" d="M196 480a14 14 0 0 1 4-10q14-11 31 0q17-11 35 0q17-11 35 0q17-11 35 0q17-11 35 0q17-11 31 0a14 14 0 0 1 4 10v13a14 14 0 0 1-14 14H210a14 14 0 0 1-14-14Z" />
+            <g class="ch1-cloud-light">
+              <circle cx="300" cy="84" r="30" />
+              <path d="M214 72H532C566 72 592 84 598 102C586 96 572 93 556 96q-20-12-40 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-22-12-44 0q-20-10-40 2C176 100 154 104 142 116C150 90 178 73 214 72Z" />
             </g>
-            <g class="updraft-arrows">
-              <path d="M200 430 v-60 m0 0 l-10 14 m10 -14 l10 14" stroke="#8fd3ff" stroke-width="4" fill="none" stroke-linecap="round" />
-              <path d="M440 440 v-70 m0 0 l-10 14 m10 -14 l10 14" stroke="#8fd3ff" stroke-width="4" fill="none" stroke-linecap="round" />
+
+            <g class="ch1-zone">
+              <rect x="124" y="137" width="288" height="217.5" />
+              <path d="M124 137H412M124 354.5H412" />
+              <path class="ch1-zone-bracket" d="M412 137h8v217.5h-8M420 230h6" />
             </g>
-            <circle class="embryo" cx="320" cy="260" r="14" fill="#eef8ff" stroke="#9fcbe8" stroke-width="3" />
-            <g class="onion" transform="translate(560 120)">
-              <circle r="12" fill="#eef8ff" stroke="#9fcbe8" stroke-width="2" />
-              <circle class="onion-ring" r="20" fill="none" stroke="#cfe9fa" stroke-width="3" />
-              <circle class="onion-ring" r="28" fill="none" stroke="#bfe3ff" stroke-width="3" />
-              <circle class="onion-ring" r="36" fill="none" stroke="#cfe9fa" stroke-width="3" />
-              <circle class="onion-ring" r="44" fill="none" stroke="#bfe3ff" stroke-width="3" />
-              <text y="68" text-anchor="middle" fill="#bfe3ff" font-size="13">切开像洋葱：一圈 = 翻滚一次</text>
+            <text class="ch1-label ch1-label-strong" x="432" y="208">孕育区</text>
+            <text class="ch1-label" x="432" y="238">−10 ～ −30℃</text>
+            <text class="ch1-label" x="432" y="268">约 5–10 km</text>
+
+            <path class="ch1-zero" d="M124 376.25H414" />
+
+            <g class="ch1-updraft">
+              <path d="M270 472C262 452 278 432 270 398" /><path d="M262 408l8-12 9 11" />
+              <path d="M310 472C302 452 318 432 310 398" /><path d="M302 408l8-12 9 11" />
+              <path d="M350 472C342 452 358 432 350 398" /><path d="M342 408l8-12 9 11" />
+            </g>
+            <text class="ch1-label" x="310" y="498" text-anchor="middle">上升气流</text>
+            <text class="ch1-label" x="300" y="546" text-anchor="middle">云底 1–2 km</text>
+
+            <g class="ch1-melt">
+              <path class="ch1-melt-trail" d="M222 346V424" />
+              <circle class="ch1-melt-hail" cx="222" cy="335" r="6" />
+              <path class="ch1-melt-drop" d="M222 426C228 436 232 441 232 446A10 10 0 0 1 212 446C212 441 216 436 222 426Z" />
+            </g>
+
+            <path class="ch1-orbit" d="M300 340A70 90 0 1 0 300 160A70 90 0 1 0 300 340" />
+            <circle class="ch1-embryo" cx="300" cy="340" r="19" />
+
+            <g class="ch1-onion">
+              <circle class="ch1-lens" cx="505" cy="405" r="88" />
+              <circle class="ch1-ring ch1-ice-opaque" cx="505" cy="405" r="70" />
+              <circle class="ch1-ring ch1-ice-clear" cx="505" cy="405" r="56" />
+              <circle class="ch1-ring ch1-ice-opaque" cx="505" cy="405" r="42" />
+              <circle class="ch1-ring ch1-ice-clear" cx="505" cy="405" r="28" />
+              <circle class="ch1-core ch1-ice-opaque" cx="505" cy="405" r="14" />
+            </g>
+            <text class="ch1-label" x="505" y="524" text-anchor="middle">切开像洋葱</text>
+            <text class="ch1-label" x="505" y="552" text-anchor="middle">一圈 = 翻滚一次</text>
+
+            <g class="ch1-axis">
+              <path d="M44 50V572" />
+              <path d="M36 50h8M36 137h8M36 224h8M36 311h8M36 398h8M36 485h8M36 572h8" />
+              <path class="ch1-axis-minor" d="M40 93.5h4M40 180.5h4M40 267.5h4M40 354.5h4M40 441.5h4M40 528.5h4" />
+              <text class="ch1-axis-head" x="32" y="26" text-anchor="end">km</text>
+              <text class="ch1-axis-head" x="52" y="26">气温</text>
+              <g class="ch1-axis-km" text-anchor="end">
+                <text x="32" y="50" dy=".35em">12</text><text x="32" y="137" dy=".35em">10</text><text x="32" y="224" dy=".35em">8</text><text x="32" y="311" dy=".35em">6</text><text x="32" y="398" dy=".35em">4</text><text x="32" y="485" dy=".35em">2</text><text x="32" y="572" dy=".35em">0</text>
+              </g>
+              <g class="ch1-axis-temp">
+                <text x="52" y="50" dy=".35em" data-km="12">−49℃</text><text x="52" y="137" dy=".35em" data-km="10">−36℃</text><text x="52" y="224" dy=".35em" data-km="8">−23℃</text><text x="52" y="311" dy=".35em" data-km="6">−10℃</text><text class="ch1-axis-zero" x="52" y="376.25" dy=".35em" data-km="4.5">0℃</text><text x="52" y="485" dy=".35em" data-km="2">16℃</text><text x="52" y="572" dy=".35em" data-km="0">29℃</text>
+              </g>
             </g>
           </svg>
-        </div>
-        <p class="melt-note">雹胚被上升气流反复托起、下落，每翻滚一次就裹上一层冰。上升气流越强，能托住的冰雹就越大。<br />太小的雹子下落途中经过 0℃ 层（约 4–5 km）就化成了雨——能落到地面的，通常已有一定个头。<span class="melt-demo">🧊→💧</span></p>
+        </figure>
       </div>
     </section>
 
     <!-- ========== 第二章 坠落速度 ========== -->
     <section id="ch2" class="scene on-dark">
       <div class="scene-inner">
-        <h2><span class="ch-no">第二章</span>落地速度：v ∝ √d</h2>
-        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长，迎风面积只随平方增长——所以 <span class="formula">v ∝ √d：个头越大，落得越快</span>。</p>
+        <h2><span class="ch-no">第二章</span>落地速度：<span class="tex" data-tex="v \propto \sqrt{d}"></span></h2>
+        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长，迎风面积只随平方增长——所以 <span class="formula"><span class="formula-eq"><span class="tex" data-tex="v \propto \sqrt{d}"></span></span>：个头越大，落得越快</span>。</p>
+
+        <!-- 推导：把上面这句话写成式子（v3 规格 §1.3，TeX 原样） -->
+        <figure class="math-block ch2-math">
+          <figcaption class="math-title">推导一下</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="\underbrace{\rho_{\text{冰}}\,\tfrac{\pi}{6}\,d^{3}\,g}_{\text{重力}} \;=\; \underbrace{\tfrac{1}{2}\,\rho_{\text{气}}\,C_d\,\tfrac{\pi}{4}\,d^{2}\,v^{2}}_{\text{空气阻力}}" data-display></div>
+            <div class="tex-display" data-tex="v \;=\; \sqrt{\frac{4\,\rho_{\text{冰}}\,g}{3\,\rho_{\text{气}}\,C_d}}\;\cdot\sqrt{d}\;\;\propto\;\;\sqrt{d}" data-display></div>
+          </div>
+          <dl class="math-legend">
+            <div><dt><span class="tex" data-tex="\rho_{\text{冰}}"></span></dt><dd>冰的密度</dd></div>
+            <div><dt><span class="tex" data-tex="\rho_{\text{气}}"></span></dt><dd>空气密度</dd></div>
+            <div><dt><span class="tex" data-tex="C_d"></span></dt><dd>阻力系数</dd></div>
+            <div><dt><span class="tex" data-tex="g"></span></dt><dd>重力加速度</dd></div>
+            <div><dt><span class="tex" data-tex="d"></span></dt><dd>直径</dd></div>
+          </dl>
+          <p class="math-note">推比例时把前三个量当作常数；实际阻力系数随大小和形状变化，速度并不严格按这条式子增长。</p>
+        </figure>
+
+        <!-- 坠落竞速：球落在 .lane-drop 里（终点就是它的静态布局位置），标签在上、读数在下，互不重叠 -->
         <div class="race">
           <div class="race-track">
-            <div class="lane">
-              <div class="race-dial">35 km/h</div>
-              <div class="race-ball" style="--d: 10px"></div>
-              <div class="lane-label">黄豆 1 cm</div>
+            <div class="lane" style="--d: 1; --f: 0.21875">
+              <div class="lane-head"><span class="lane-icon" data-ref="bean" aria-hidden="true"></span><span class="lane-name">黄豆</span><span class="lane-size">1 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">35</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">63 km/h</div>
-              <div class="race-ball" style="--d: 25px"></div>
-              <div class="lane-label">乒乓球 2.5 cm</div>
+            <div class="lane" style="--d: 2.5; --f: 0.39375">
+              <div class="lane-head"><span class="lane-icon" data-ref="pingpong" aria-hidden="true"></span><span class="lane-name">乒乓球</span><span class="lane-size">2.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">63</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">99 km/h</div>
-              <div class="race-ball" style="--d: 45px"></div>
-              <div class="lane-label">高尔夫 4.5 cm</div>
+            <div class="lane" style="--d: 4.5; --f: 0.61875">
+              <div class="lane-head"><span class="lane-icon" data-ref="golf" aria-hidden="true"></span><span class="lane-name">高尔夫</span><span class="lane-size">4.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">99</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">144 km/h</div>
-              <div class="race-ball" style="--d: 75px"></div>
-              <div class="lane-label">垒球 7.5 cm</div>
+            <div class="lane" style="--d: 7.5; --f: 0.9">
+              <div class="lane-head"><span class="lane-icon" data-ref="softball" aria-hidden="true"></span><span class="lane-name">垒球</span><span class="lane-size">7.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">144</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
           </div>
-          <button class="race-replay" type="button">↻ 再比一次</button>
+          <div class="race-foot">
+            <button class="race-replay" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4.2h-4.2"/></svg>
+              再比一次
+            </button>
+            <p class="race-legend">四颗冰雹从同一高度同时落下。读数下的速度条满格是 160 km/h，两道刻线是 <b>60</b> 城市行车、<b>120</b> 高速公路。</p>
+          </div>
         </div>
-        <table class="speed-table">
-          <thead>
-            <tr><th scope="col">直径</th><th scope="col">参照物</th><th scope="col">落地速度</th><th scope="col">危险程度</th></tr>
-          </thead>
-          <tbody>
-            <tr class="speed-row"><td>1 cm</td><td>黄豆～指甲</td><td>~10 m/s（35 km/h）</td><td>砸着疼，基本无害</td></tr>
-            <tr class="speed-row"><td>2–3 cm</td><td>硬币～乒乓球</td><td>15–20 m/s（50–70 km/h）</td><td>可致淤青、砸伤眼睛</td></tr>
-            <tr class="speed-row"><td>4–5 cm</td><td>高尔夫球</td><td>25–30 m/s（约 100 km/h）</td><td>头部裂伤、脑震荡风险</td></tr>
-            <tr class="speed-row"><td>7–8 cm</td><td>棒球～垒球</td><td>35–45 m/s（130–160 km/h）</td><td>可能致命</td></tr>
-          </tbody>
-        </table>
-        <p class="note">数值受形状、密度、风的影响，为典型范围。</p>
+
+        <div class="ch2-data">
+          <!-- 曲线图：横轴 0–8 cm，纵轴 0–45 m/s。SVG 的 viewBox 就是数据坐标（y 朝下，所以 y = 45 − v）；
+               曲线与圆点的静态值供无 JS 时使用，有 JS 时由 ch2-speed.ts 按 terminalVelocity / raceLanes 重算覆盖 -->
+          <figure class="vchart ch2-panel">
+            <h3>直径越大，落得越快</h3>
+            <div class="vchart-plot" role="img" aria-label="冰雹直径与落地速度的曲线图。横轴直径 0 到 8 厘米，纵轴速度 0 到 45 米每秒。曲线是简化规律 v ∝ √d；四个圆点是各尺寸的典型值：黄豆 1 厘米、乒乓球 2.5 厘米、高尔夫 4.5 厘米、垒球 7.5 厘米，速度依次升高。两条虚线是参照：城市行车 60 km/h、高速公路 120 km/h。">
+              <svg class="vchart-svg" viewBox="0 0 8 45" preserveAspectRatio="none" aria-hidden="true">
+                <defs><clipPath id="vchart-clip"><rect x="-0.5" y="-5" width="9" height="55" /></clipPath></defs>
+                <path class="vchart-grid" d="M0 35H8M0 25H8M0 15H8M0 5H8M2 0V45M4 0V45M6 0V45M8 0V45" />
+                <path class="vchart-ref" d="M0 28.333H8M0 11.667H8" />
+                <path class="vchart-axis" d="M0 0V45H8" />
+                <path class="vchart-curve" clip-path="url(#vchart-clip)" d="M0 45L0.0125 43.77L0.025 43.261L0.05 42.54L0.1 41.521L0.2 40.081L0.3 38.975L0.4 38.043L0.5 37.222L0.6 36.479L0.7 35.797L0.8 35.161L0.9 34.564L1 34L1.1 33.463L1.2 32.95L1.3 32.458L1.4 31.985L1.5 31.528L1.6 31.086L1.7 30.658L1.8 30.242L1.9 29.838L2 29.444L2.1 29.059L2.2 28.684L2.3 28.318L2.4 27.959L2.5 27.607L2.6 27.263L2.7 26.925L2.8 26.593L2.9 26.268L3 25.947L3.1 25.633L3.2 25.323L3.3 25.018L3.4 24.717L3.5 24.421L3.6 24.129L3.7 23.841L3.8 23.557L3.9 23.277L4 23L4.1 22.727L4.2 22.457L4.3 22.19L4.4 21.926L4.5 21.665L4.6 21.408L4.7 21.153L4.8 20.9L4.9 20.65L5 20.403L5.1 20.159L5.2 19.916L5.3 19.676L5.4 19.438L5.5 19.203L5.6 18.969L5.7 18.738L5.8 18.508L5.9 18.281L6 18.056L6.1 17.832L6.2 17.61L6.3 17.39L6.4 17.172L6.5 16.955L6.6 16.74L6.7 16.527L6.8 16.316L6.9 16.105L7 15.897L7.1 15.69L7.2 15.484L7.3 15.28L7.4 15.077L7.5 14.875L7.6 14.675L7.7 14.476L7.8 14.279L7.9 14.082L8 13.887" />
+              </svg>
+              <span class="vaxis-title vaxis-y">速度（m/s）</span>
+              <span class="vtick vtick-y" style="bottom: 22.222%">10</span>
+              <span class="vtick vtick-y" style="bottom: 44.444%">20</span>
+              <span class="vtick vtick-y" style="bottom: 66.667%">30</span>
+              <span class="vtick vtick-y" style="bottom: 88.889%">40</span>
+              <span class="vtick vtick-x" style="left: 0%">0</span>
+              <span class="vtick vtick-x" style="left: 25%">2</span>
+              <span class="vtick vtick-x" style="left: 50%">4</span>
+              <span class="vtick vtick-x" style="left: 75%">6</span>
+              <span class="vtick vtick-x" style="left: 100%">8</span>
+              <span class="vaxis-title vaxis-x">直径（cm）</span>
+              <span class="vref-label" style="bottom: 37.037%">城市行车 60 km/h</span>
+              <span class="vref-label" style="bottom: 74.074%">高速公路 120 km/h</span>
+              <div class="vdot lbl-br" style="left: 12.5%; bottom: 22.222%; --r: 9px"><i class="vdot-mark"></i><span class="vdot-label">黄豆</span></div>
+              <div class="vdot lbl-br" style="left: 31.25%; bottom: 38.889%; --r: 12px"><i class="vdot-mark"></i><span class="vdot-label">乒乓球</span></div>
+              <div class="vdot lbl-tl" style="left: 56.25%; bottom: 61.111%; --r: 15px"><i class="vdot-mark"></i><span class="vdot-label">高尔夫</span></div>
+              <div class="vdot lbl-tl" style="left: 93.75%; bottom: 88.889%; --r: 19px"><i class="vdot-mark"></i><span class="vdot-label">垒球</span></div>
+            </div>
+            <figcaption>曲线是简化规律（按 2–3 厘米的冰雹校准），圆点是各尺寸的典型值——大冰雹的实际速度比曲线高，点不完全落在线上是对的。虚线是两个参照速度。</figcaption>
+          </figure>
+
+          <div class="speed-panel ch2-panel">
+            <table class="speed-table" role="table">
+              <thead role="rowgroup">
+                <tr role="row"><th scope="col" role="columnheader">直径</th><th scope="col" role="columnheader">参照物</th><th scope="col" role="columnheader">落地速度</th><th scope="col" role="columnheader" class="sp-danger-h">危险程度</th></tr>
+              </thead>
+              <tbody role="rowgroup">
+                <tr role="row" class="sp-tier-1"><td role="cell">1 cm</td><td role="cell">黄豆～指甲</td><td role="cell"><span class="sp-ms">~10 m/s</span><span class="sp-kmh">（35 km/h）</span></td><td class="sp-danger" role="cell">砸着疼，基本无害</td></tr>
+                <tr role="row" class="sp-tier-2"><td role="cell">2–3 cm</td><td role="cell">硬币～乒乓球</td><td role="cell"><span class="sp-ms">15–20 m/s</span><span class="sp-kmh">（50–70 km/h）</span></td><td class="sp-danger" role="cell">可致淤青、砸伤眼睛</td></tr>
+                <tr role="row" class="sp-tier-3"><td role="cell">4–5 cm</td><td role="cell">高尔夫球</td><td role="cell"><span class="sp-ms">25–30 m/s</span><span class="sp-kmh">（约 100 km/h）</span></td><td class="sp-danger" role="cell">头部裂伤、脑震荡风险</td></tr>
+                <tr role="row" class="sp-tier-4"><td role="cell">7–8 cm</td><td role="cell">棒球～垒球</td><td role="cell"><span class="sp-ms">35–45 m/s</span><span class="sp-kmh">（130–160 km/h）</span></td><td class="sp-danger" role="cell">可能致命</td></tr>
+              </tbody>
+            </table>
+            <p class="note">数值受形状、密度、风的影响，为典型范围。</p>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- ========== 云底分界（1.5 km）：上方深色云体的下缘，下方露出亮天空 ========== -->
+    <div class="cloudbase" aria-hidden="true">
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="xMidYMin slice" focusable="false">
+        <!-- 后层：更暗的云腹，从前层的缝隙里探出来 -->
+        <g class="cb-back"><g class="cb-drift anim-loop" fill="#234a7d">
+          <ellipse cx="128" cy="60" rx="74" ry="52" />
+          <ellipse cx="292" cy="58" rx="70" ry="44" />
+          <ellipse cx="442" cy="60" rx="64" ry="50" />
+          <ellipse cx="604" cy="62" rx="76" ry="58" />
+          <ellipse cx="756" cy="60" rx="66" ry="50" />
+          <ellipse cx="908" cy="62" rx="70" ry="54" />
+          <ellipse cx="1050" cy="58" rx="64" ry="46" />
+          <ellipse cx="1196" cy="62" rx="74" ry="56" />
+          <ellipse cx="1340" cy="58" rx="62" ry="46" />
+        </g></g>
+        <!-- 前层：填色与分界上缘的天空色相同，和上方天空无缝 -->
+        <rect width="1440" height="46" fill="#3f6ea6" />
+        <g class="cb-front"><g class="cb-drift anim-loop" fill="#3f6ea6">
+          <ellipse cx="50" cy="48" rx="96" ry="52" />
+          <ellipse cx="205" cy="52" rx="112" ry="72" />
+          <ellipse cx="372" cy="46" rx="84" ry="44" />
+          <ellipse cx="506" cy="50" rx="122" ry="86" />
+          <ellipse cx="684" cy="46" rx="96" ry="54" />
+          <ellipse cx="826" cy="52" rx="106" ry="76" />
+          <ellipse cx="984" cy="46" rx="88" ry="46" />
+          <ellipse cx="1114" cy="52" rx="116" ry="82" />
+          <ellipse cx="1272" cy="48" rx="92" ry="54" />
+          <ellipse cx="1404" cy="50" rx="100" ry="70" />
+        </g></g>
+      </svg>
+    </div>
 
     <!-- ========== 第三章 危险阈值 ========== -->
     <section id="ch3" class="scene on-light">
       <div class="scene-inner">
         <h2><span class="ch-no">第三章</span>危险阈值：⌀2 cm 起步</h2>
-        <p class="lead">很多国家把 2–2.5 厘米定为强对流灾害预警的门槛——这不是随便定的。用动能感受一下。</p>
-        <div class="size-ladder">
-          <div class="size-item" style="--d: 10px"><span class="size-dot"></span><span class="size-name">黄豆 1 cm</span></div>
-          <div class="size-item" style="--d: 25px"><span class="size-dot"></span><span class="size-name">乒乓球 2.5 cm</span></div>
-          <div class="size-item" style="--d: 45px"><span class="size-dot"></span><span class="size-name">高尔夫 4.5 cm</span></div>
-          <div class="size-item" style="--d: 75px"><span class="size-dot"></span><span class="size-name">垒球 7.5 cm</span></div>
+        <p class="lead">很多国家把 2–2.5 厘米定为强对流灾害预警的门槛——这不是随便定的。</p>
+
+        <!-- 尺寸阶梯：四个实物共用同一个长度单位 --u（1 cm），直径比 1 : 2.5 : 4.5 : 7.5；门槛线画在同一把尺上（离地 2 cm） -->
+        <div class="ladder">
+          <p class="ladder-line"><span>2 cm 预警门槛</span></p>
+          <ol class="ladder-rungs">
+            <li class="rung rung-1">
+              <span class="rung-obj">
+                <svg style="--d: 1" viewBox="0 0 20 20" role="img" aria-label="黄豆" focusable="false">
+                  <ellipse cx="10" cy="11" rx="9" ry="8" fill="#edc967" stroke="#c39a36" stroke-width="2" />
+                  <path d="M13.2 8.6c1 1.4 1 3.4 0 4.8" fill="none" stroke="#8a6420" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M5 9.4c.5-1.6 1.7-2.7 3.2-3.1" fill="none" stroke="#fbe9ae" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="rung-band"></span>
+              <span class="rung-name">黄豆</span>
+              <span class="rung-size">1 cm</span>
+              <span class="rung-harm">基本无害</span>
+            </li>
+            <li class="rung rung-2">
+              <span class="rung-obj">
+                <svg style="--d: 2.5" viewBox="0 0 50 50" role="img" aria-label="乒乓球" focusable="false">
+                  <circle cx="25" cy="25" r="24" fill="#ffa64a" stroke="#d97a1c" stroke-width="2" />
+                  <path d="M25 8.5a16.5 16.5 0 0 1 16.5 16.5" fill="none" stroke="#ffd9a8" stroke-width="2.4" stroke-linecap="round" />
+                  <path d="M2.4 28.5Q25 36 47.6 28.5" fill="none" stroke="#d97a1c" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="rung-band"></span>
+              <span class="rung-name">乒乓球</span>
+              <span class="rung-size">2.5 cm</span>
+              <span class="rung-harm">可致淤青</span>
+            </li>
+            <li class="rung rung-3">
+              <span class="rung-obj">
+                <svg style="--d: 4.5" viewBox="0 0 90 90" role="img" aria-label="高尔夫球" focusable="false">
+                  <defs>
+                    <pattern id="ch3-dimples" width="12" height="20" patternUnits="userSpaceOnUse">
+                      <circle cx="3" cy="5" r="2.9" fill="#cfd9e6" /><circle cx="9" cy="15" r="2.9" fill="#cfd9e6" />
+                    </pattern>
+                  </defs>
+                  <circle cx="45" cy="45" r="44" fill="#fff" stroke="#9fb0c4" stroke-width="2" />
+                  <circle cx="45" cy="45" r="40" fill="url(#ch3-dimples)" />
+                </svg>
+              </span>
+              <span class="rung-band"></span>
+              <span class="rung-name">高尔夫球</span>
+              <span class="rung-size">4.5 cm</span>
+              <span class="rung-harm">脑震荡风险</span>
+            </li>
+            <li class="rung rung-4">
+              <span class="rung-obj">
+                <svg style="--d: 7.5" viewBox="0 0 150 150" role="img" aria-label="垒球" focusable="false">
+                  <defs><clipPath id="ch3-ball-clip"><circle cx="75" cy="75" r="73" /></clipPath></defs>
+                  <circle cx="75" cy="75" r="74" fill="#e2ec57" stroke="#aab52a" stroke-width="2" />
+                  <g clip-path="url(#ch3-ball-clip)" fill="none" stroke="#d6363b">
+                    <path d="M36 4Q76 75 36 146M114 4Q74 75 114 146" stroke-width="2.4" />
+                    <path d="M36 4Q76 75 36 146M114 4Q74 75 114 146" stroke-width="13" stroke-dasharray="2.6 7.4" />
+                  </g>
+                </svg>
+              </span>
+              <span class="rung-band"></span>
+              <span class="rung-name">垒球</span>
+              <span class="rung-size">7.5 cm</span>
+              <span class="rung-harm">可能致命</span>
+            </li>
+          </ol>
         </div>
-        <div class="danger-band"><div class="danger-pointer"></div></div>
-        <div class="energy-bars">
-          <div class="energy-bar energy-20">
-            <div class="energy-head">⌀5 cm · 约 50 多克</div>
-            <div class="energy-track"><div class="energy-fill"></div></div>
-            <div class="energy-num">20 J</div>
-            <p>≈ 一个棒球以 60 km/h 砸中你 ⚾</p>
+
+        <!-- 动能条：三根条共用一把 0–200 J 的线性刻度，宽度 = 焦耳数 / 200 -->
+        <h3 class="energy-title">用动能感受一下</h3>
+        <figure class="math-block ch3-math">
+          <figcaption class="math-title">动能怎么算</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="E=\tfrac{1}{2}\,m\,v^{2},\qquad m=\rho_{\text{冰}}\cdot\tfrac{\pi}{6}\,d^{3}" data-display></div>
+            <div class="tex-display" data-tex="d=5\,\text{cm}:\quad m\approx 0.059\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.059\times 26^{2}\approx 20\,\text{J}" data-display></div>
+            <div class="tex-display" data-tex="d=8\,\text{cm}:\quad m\approx 0.24\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.24\times 37.5^{2}\approx 170\,\text{J}" data-display></div>
           </div>
-          <div class="energy-bar energy-170">
-            <div class="energy-head">⌀8 cm</div>
-            <div class="energy-track"><div class="energy-fill"></div></div>
-            <div class="energy-num">170 J</div>
-            <p>超过职业投手快速球的能量——直接命中头部足以致命</p>
+          <p class="math-note">冰的密度取 0.9 g/cm³。速度取第二章速度表对应档位范围内的值，不是用第四章的简化式算的。</p>
+        </figure>
+        <div class="energy">
+          <div class="energy-row energy-hail5" style="--j: 20" data-joules="20">
+            <div class="energy-label">
+              <strong>⌀5 cm 冰雹 · 约 50 多克</strong>
+              <span>≈ 一个棒球以 60 km/h 砸中你</span>
+            </div>
+            <div class="energy-plot">
+              <div class="energy-track"><div class="energy-clip"><div class="energy-fill"></div></div></div>
+              <div class="energy-rider"><span class="energy-num">20 J</span></div>
+            </div>
+          </div>
+          <div class="energy-row energy-pitch" style="--j: 125" data-joules="125">
+            <div class="energy-label">
+              <strong>职业投手快速球</strong>
+              <span>约 150 km/h 的棒球</span>
+            </div>
+            <div class="energy-plot">
+              <div class="energy-track">
+                <div class="energy-clip"><div class="energy-fill"></div></div>
+                <!-- 条尾的小棒球：红色缝线，和上面的垒球同一种画法 -->
+                <span class="energy-ball" aria-hidden="true">
+                  <svg viewBox="0 0 26 26" focusable="false">
+                    <defs><clipPath id="ch3-bb-clip"><circle cx="13" cy="13" r="12" /></clipPath></defs>
+                    <circle cx="13" cy="13" r="12.2" fill="#fff" stroke="#9fb0c4" stroke-width="1.6" />
+                    <g clip-path="url(#ch3-bb-clip)" fill="none" stroke="#d6363b">
+                      <path d="M6.4 0Q13.6 13 6.4 26M19.6 0Q12.4 13 19.6 26" stroke-width="1" />
+                      <path d="M6.4 0Q13.6 13 6.4 26M19.6 0Q12.4 13 19.6 26" stroke-width="3.6" stroke-dasharray="0.8 2" />
+                    </g>
+                  </svg>
+                </span>
+              </div>
+              <div class="energy-rider"><span class="energy-num">125 J</span></div>
+            </div>
+          </div>
+          <div class="energy-row energy-hail8" style="--j: 170" data-joules="170">
+            <div class="energy-label">
+              <strong>⌀8 cm 冰雹</strong>
+              <span>超过职业投手快速球——直接命中头部足以致命</span>
+            </div>
+            <div class="energy-plot">
+              <div class="energy-track"><div class="energy-clip"><div class="energy-fill"></div></div></div>
+              <div class="energy-rider"><span class="energy-num">170 J</span></div>
+            </div>
+          </div>
+          <div class="energy-axis" aria-hidden="true">
+            <div class="energy-ticks"><span>0</span><span>50</span><span>100</span><span>150</span><span>200 J</span></div>
           </div>
         </div>
+
         <aside class="history-card">
           <div class="history-mascot-slot"></div>
-          <h3>1986 · 孟加拉国</h3>
-          <p>有记录以来最惨重的雹灾之一：单颗冰雹重近 1 公斤，近百人遇难。</p>
+          <div class="history-text">
+            <h3>1986 · 孟加拉国</h3>
+            <p>有记录以来最惨重的雹灾之一：单颗冰雹重近 1 公斤，近百人遇难。</p>
+          </div>
         </aside>
-        <div class="safety-cards">
-          <div class="safety-card">
-            <h3>🪙 硬币大小</h3>
+
+        <div class="safety">
+          <div class="safety-card safety-coin">
+            <h3>
+              <svg class="safety-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.6" stroke-width="1.4" /><path d="M11 10.6l1.3-.9v4.8" stroke-width="1.6" />
+              </svg>
+              <span>硬币大小</span>
+            </h3>
             <p>就别在外面晃了，找地方避一避。</p>
           </div>
-          <div class="safety-card">
-            <h3>⛳ 高尔夫球大小</h3>
+          <div class="safety-card safety-golf">
+            <h3>
+              <svg class="safety-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="8.6" r="5.8" /><path d="M8.4 16.6h7.2M12 16.6v4.6" />
+                <g fill="currentColor" stroke="none"><circle cx="10" cy="7.4" r=".9" /><circle cx="13.6" cy="7" r=".9" /><circle cx="12" cy="10.4" r=".9" /></g>
+              </svg>
+              <span>高尔夫球大小</span>
+            </h3>
             <p>立刻进入坚固掩体，并离窗户远一点——大冰雹砸碎玻璃的二次伤害很常见。</p>
-            <div class="safety-mascot-slot"></div>
           </div>
+          <div class="safety-mascot-slot"></div>
         </div>
-        <p class="season-tip">☂️ 应季提醒：六月正是关东地区冰雹高发季——强对流多发于初夏午后。</p>
+
+        <p class="season-tip">关东地区的冰雹高发在初夏，六月前后尤其要留意——强对流多发于初夏午后。</p>
       </div>
     </section>
 
     <!-- ========== 第四章 冰雹实验室 ========== -->
     <section id="ch4" class="scene on-light">
       <div class="scene-inner">
-        <h2><span class="ch-no">第四章</span>冰雹实验室 🧪</h2>
+        <h2><span class="ch-no">第四章</span>冰雹实验室</h2>
         <p class="lead">为什么有的雷暴下冰雹、有的只下暴雨？气象台盯着两个参数：<b>上升气流强度</b>（决定托得住多大的雹）和 <b>0℃ 层高度</b>（决定落地前化掉多少）。自己调调看。</p>
         <div class="lab">
           <div class="lab-controls">
-            <label>上升气流强度 <output id="lab-w-out">25 m/s</output>
+            <label>上升气流强度 <output id="lab-w-out" for="lab-w">25 m/s</output>
               <input type="range" id="lab-w" min="5" max="50" value="25" step="1" />
             </label>
-            <label>0℃ 层高度 <output id="lab-h0-out">4.0 km</output>
+            <label>0℃ 层高度 <output id="lab-h0-out" for="lab-h0">4.0 km</output>
               <input type="range" id="lab-h0" min="2" max="6" value="4" step="0.1" />
             </label>
             <div class="lab-presets"><!-- 预设按钮由 JS 从 content.ts 的 labPresets 生成（无 JS 时按钮无意义） --></div>
+          </div>
+
+          <!-- 结果读数：下面写死的是初始参数（25 m/s, 4.0 km）的 simulate 输出，无 JS 时也可读 -->
+          <div class="lab-result">
+            <div class="lab-outcome-head">
+              <span class="lab-chip" id="lab-outcome-icon" data-outcome="hail"><svg class="icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14.5" r="6"/><path d="M8.8 13.2a3.4 3.4 0 0 1 2.4-2.3"/><path d="M6.5 3v3M12 2v3.5M17.5 3v3"/></svg></span>
+              <div class="lab-outcome-text">
+                <span class="lab-outcome-kicker">这场雷暴的结局</span>
+                <strong class="lab-outcome-label" id="lab-outcome-label" role="status">危险冰雹</strong>
+              </div>
+            </div>
+            <dl>
+              <div><dt>云中最大雹径</dt><dd id="lab-dmax">3.4 cm</dd></div>
+              <div><dt>落地直径</dt><dd id="lab-dfinal">3.0 cm</dd></div>
+              <div><dt>落地速度</dt><dd id="lab-vland">19 m/s</dd></div>
+            </dl>
             <div class="lab-mascot-slot"></div>
           </div>
+
           <div class="lab-stage">
-            <div class="lab-cloud"><div class="lab-cloud-shade"></div></div>
-            <canvas id="lab-canvas"></canvas>
-            <div class="lab-outcome">
-              <div class="lab-outcome-emoji" id="lab-outcome-emoji">🧊</div>
-              <div class="lab-outcome-label" id="lab-outcome-label">危险冰雹</div>
-              <dl>
-                <div><dt>云中最大雹径</dt><dd id="lab-dmax">—</dd></div>
-                <div><dt>落地直径</dt><dd id="lab-dfinal">—</dd></div>
-                <div><dt>落地速度</dt><dd id="lab-vland">—</dd></div>
-              </dl>
-            </div>
+            <svg id="lab-stage-svg" viewBox="0 0 320 520" role="img" aria-label="雷暴云剖面示意：纵轴 0 到 8 千米。上升气流把冰雹托在云里长大，然后下落，过 0℃ 线后一路融化缩小，落地时的大小就是落地直径。">
+              <rect width="320" height="520" fill="#b4d4ef"/>
+              <!-- 积雨云：砧状云顶 + 云塔，云底在 1.5 km -->
+              <g fill="#6d92bf">
+                <rect x="52" y="-40" width="320" height="118" rx="46"/>
+                <rect x="88" y="40" width="208" height="330" rx="40"/>
+                <circle class="lab-puff anim-loop" cx="90" cy="150" r="30"/><circle class="lab-puff anim-loop" cx="88" cy="235" r="34"/><circle class="lab-puff anim-loop" cx="92" cy="315" r="32"/>
+                <circle class="lab-puff anim-loop" cx="298" cy="140" r="28"/><circle class="lab-puff anim-loop" cx="300" cy="222" r="34"/><circle class="lab-puff anim-loop" cx="294" cy="306" r="36"/>
+                <circle class="lab-puff anim-loop" cx="116" cy="360" r="28"/><circle class="lab-puff anim-loop" cx="164" cy="364" r="24"/><circle class="lab-puff anim-loop" cx="212" cy="362" r="26"/><circle class="lab-puff anim-loop" cx="262" cy="360" r="28"/>
+              </g>
+              <rect x="70" y="-40" width="150" height="100" rx="40" fill="#7fa3cd"/>
+              <!-- 0℃ 线以下的融化区 + 0℃ 线（整组随 H₀ 平移） -->
+              <g id="lab-zero" transform="translate(0 250)">
+                <rect x="44" y="0" width="276" height="520" fill="#ffffff" opacity="0.22"/>
+                <line x1="46" y1="0" x2="318" y2="0" stroke="#10233f" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="7 7"/>
+              </g>
+              <!-- 上升气流箭头：数量与速度随 W 变化 -->
+              <g id="lab-arrows" fill="none" stroke="#eef8ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <g class="lab-arrow" transform="translate(226 300)"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+                <g class="lab-arrow" transform="translate(146 330)"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+                <g class="lab-arrow" transform="translate(254 240)"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+                <g class="lab-arrow" transform="translate(118 200)"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+                <g class="lab-arrow" transform="translate(282 330)" display="none"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+                <g class="lab-arrow" transform="translate(90 290)" display="none"><path d="M0 15V-13M-7 -6L0 -14L7 -6"/></g>
+              </g>
+              <!-- 地面 -->
+              <rect x="0" y="470" width="320" height="50" fill="#6fbf73"/>
+              <g fill="#6fbf73">
+                <circle cx="66" cy="471" r="6"/><circle cx="78" cy="470" r="8"/><circle cx="92" cy="471" r="6"/>
+                <circle cx="262" cy="471" r="6"/><circle cx="275" cy="470" r="9"/><circle cx="290" cy="471" r="7"/><circle cx="304" cy="472" r="5"/>
+              </g>
+              <!-- 示范冰雹 / 雨滴 / 落地痕迹 -->
+              <ellipse id="lab-puddle" cx="186" cy="471" rx="14" ry="3" fill="#3f86d6" display="none"/>
+              <path id="lab-impact" d="M174.3 466l-6 -6M197.7 466l6 -6" fill="none" stroke="#10233f" stroke-width="2" stroke-linecap="round"/>
+              <!-- 落地扬起的小尘团（JS 逐帧摆位；静态终态里已经散尽） -->
+              <g id="lab-dust" fill="#ffffff" display="none"><circle r="2"/><circle r="2"/><circle r="2"/><circle r="2"/></g>
+              <g id="lab-hail" transform="translate(186 462.30)">
+                <circle id="lab-hail-body" r="6.2" fill="#eef8ff" stroke="#9fcbe8" stroke-width="3"/>
+                <path id="lab-hail-shine" d="M-5.4 -1.2A5.6 5.6 0 0 1 -1.2 -5.4" transform="scale(0.77)" fill="none" stroke="#cfe9fa" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                <!-- 冰雹太小、放不下一张脸时只留两个点（大一些时由 JS 贴上雹宝的小脸） -->
+                <g id="lab-hail-dots" fill="#222" display="none"><circle cx="-3.3" cy="-0.4" r="1.35"/><circle cx="3.3" cy="-0.4" r="1.35"/></g>
+              </g>
+              <path id="lab-drop" d="M0 -8C3.6 -3 5 -0.6 5 1.2A5 5 0 0 1 -5 1.2C-5 -0.6 -3.6 -3 0 -8Z" fill="#3f86d6" transform="translate(186 463)" display="none"/>
+              <!-- 雨滴的小脸：下落时张着嘴，落地后笑 -->
+              <g id="lab-drop-face" transform="translate(186 463)" display="none">
+                <circle cx="-1.9" cy="0.5" r="0.8" fill="#222"/><circle cx="1.9" cy="0.5" r="0.8" fill="#222"/>
+                <circle id="lab-drop-o" cx="0" cy="3.1" r="0.95" fill="#222"/>
+                <path id="lab-drop-smile" d="M-1.7 2.6Q0 4.4 1.7 2.6" fill="none" stroke="#222" stroke-width="0.85" stroke-linecap="round" display="none"/>
+              </g>
+              <!-- 高度轴（0–8 km 等比） -->
+              <g stroke="#10233f" stroke-width="1.5" stroke-linecap="round" fill="none">
+                <path d="M44 30V470"/>
+                <path d="M44 30h-6M44 85h-4M44 140h-6M44 195h-4M44 250h-6M44 305h-4M44 360h-6M44 415h-4M44 470h-6"/>
+              </g>
+              <g class="lab-axis-text" font-size="12" text-anchor="end" fill="#10233f">
+                <text x="34" y="34.5">8 km</text><text x="34" y="144.5">6</text><text x="34" y="254.5">4</text><text x="34" y="364.5">2</text><text x="34" y="486">0 km</text>
+              </g>
+              <!-- 冰雹比例尺：冰雹按厘米放大画，和高度轴不是同一把尺 -->
+              <g class="lab-scale-text" fill="#10233f" font-size="12">
+                <text x="56" y="505">冰雹比例尺</text>
+                <path d="M124 496v9M150 496v9M124 500.5h26" fill="none" stroke="#10233f" stroke-width="1.5" stroke-linecap="round"/>
+                <text x="157" y="505">5 cm</text>
+              </g>
+              <!-- 0℃ 线的标注（与线同步平移，压在箭头之上） -->
+              <g id="lab-zero-label" transform="translate(0 250)">
+                <rect x="52" y="-28" width="96" height="22" rx="11" fill="#ffffff"/>
+                <text x="100" y="-12.5" text-anchor="middle" font-size="13" font-weight="600" fill="#10233f">0℃ 层 <tspan id="lab-zero-km">4.0</tspan> km</text>
+                <rect x="52" y="7" width="58" height="20" rx="10" fill="#ffffff"/>
+                <text x="81" y="21.2" text-anchor="middle" font-size="12" fill="#10233f">融化区</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="lab-map" id="lab-map" aria-hidden="true"><!-- 结局地图由 JS 生成（逐格调用 simulate）；键盘操作走上面的两个滑杆 --></div>
+        </div>
+        <!-- 模型的三条式子：必须与 src/lab/model.ts 一致，tests/formula.test.ts 会核对其中的常数 -->
+        <div class="ch4-math-wrap">
+        <figure class="math-block ch4-math">
+          <figcaption class="math-title">模型的三条式子</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="v = k\sqrt{d},\qquad k = 11" data-display></div>
+            <div class="tex-display" data-tex="d_{\max} = \eta\left(\frac{W}{k}\right)^{2},\qquad \eta = 0.65" data-display></div>
+            <div class="tex-display" data-tex="d_{\text{落地}} = \max\!\left(0,\; d_{\max} - r\cdot\frac{1000\,H_0}{k\sqrt{d_{\max}}}\right),\qquad r = 0.002\ \text{cm/s}" data-display></div>
+          </div>
+          <dl class="math-legend">
+            <div><dt><span class="tex" data-tex="d"></span></dt><dd>直径，厘米</dd></div>
+            <div><dt><span class="tex" data-tex="v"></span></dt><dd>落速，米每秒</dd></div>
+            <div><dt><span class="tex" data-tex="W"></span></dt><dd>上升气流强度，米每秒</dd></div>
+            <div><dt><span class="tex" data-tex="H_0"></span></dt><dd>0℃ 层高度，千米</dd></div>
+            <div><dt><span class="tex" data-tex="\eta"></span></dt><dd>生长效率</dd></div>
+            <div><dt><span class="tex" data-tex="r"></span></dt><dd>融化速率</dd></div>
+          </dl>
+          <p class="math-note"><span class="tex" data-tex="k"></span> 是按 2–3 厘米的冰雹校准的；直径超过 4 厘米后，典型速度比这条式子高 <span class="nobr">15–25%</span>——第二章曲线图里高出曲线的圆点就是这个差距。</p>
+        </figure>
+          <!-- 代入当前参数：数字全部来自同一次 simulate()（JS 随滑杆更新）；下面写死的是初始参数（25 m/s, 4.0 km）的结果，无 JS 时也可读 -->
+          <div class="ch4-live">
+            <p class="live-head">代入当前参数 <span id="lab-live-params">W = 25 m/s，H<sub>0</sub> = 4.0 km</span></p>
+            <dl class="live-items">
+              <div><dt><i>d</i><sub>max</sub></dt><dd id="lab-live-dmax">3.36 cm</dd></div>
+              <div><dt>下落用时</dt><dd id="lab-live-fall">198 s</dd></div>
+              <div><dt>融化量</dt><dd id="lab-live-melt">0.40 cm</dd></div>
+              <div><dt><i>d</i><sub>落地</sub></dt><dd id="lab-live-dfinal">2.96 cm</dd></div>
+            </dl>
           </div>
         </div>
-        <p class="note">简化教学模型：v = k·√d 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
+        <p class="note">简化教学模型：<span class="tex" data-tex="v = k\sqrt{d}"></span> 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
       </div>
     </section>
 
     <!-- ========== 结尾 ========== -->
     <section id="ending" class="scene on-light">
-      <div class="scene-inner center">
+      <div class="scene-inner ending-inner">
         <h2>落地。</h2>
-        <div class="ending-stage">
-          <div class="ending-mascot-slot"></div>
-          <div class="puddle"></div>
-          <div class="grass"></div>
-        </div>
-        <p class="lead">一颗冰雹的一生：在 5–10 公里的高空翻滚长大，以与 √直径 成正比的速度坠落，超过 2 厘米就值得你警惕。</p>
+        <p class="lead">一颗冰雹的一生：在 5–10 公里的高空翻滚长大，以与 <span class="tex" data-tex="\sqrt{d}"></span>（直径的平方根）成正比的速度坠落，超过 2 厘米就值得你警惕。</p>
         <div class="num-cards recap">
           <div class="num-card"><div class="num">5–10 <small>km</small></div><div class="num-label">生成高度</div></div>
           <div class="num-card"><div class="num">10–40+ <small>m/s</small></div><div class="num-label">落地速度</div></div>
           <div class="num-card"><div class="num">⌀2 <small>cm</small></div><div class="num-label">危险起点</div></div>
         </div>
-        <p class="credits">数据为典型范围，详见正文 · Vite + GSAP 手工打造</p>
+        <div class="sources">
+          <h3>数据来源</h3>
+          <ul>
+            <li><a href="https://www.nssl.noaa.gov/education/svrwx101/hail/" target="_blank" rel="noopener">NOAA NSSL《Severe Weather 101: Hail》</a></li>
+            <li>WMO 天气与气候极端事件档案：最重冰雹，1.02 kg，孟加拉国戈帕尔甘尼，<span class="nowrap">1986-04-14</span></li>
+          </ul>
+          <p class="credits">文中数值为典型范围，详见正文。本页用 Vite 与 GSAP 手工制作。</p>
+        </div>
+      </div>
+
+      <!-- 文案与草地之间的空天：两朵极慢漂移的小云（纯装饰）。盒子只吃掉本来就空着的高度，太矮时云不显示 -->
+      <div class="ending-sky" aria-hidden="true">
+        <div class="sky-cloud sky-cloud-a"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
+        <div class="sky-cloud sky-cloud-b"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
+      </div>
+
+      <!-- 地面：通栏草地贴在页面最底。参照物站在草丛后面，落点在前景草地上。静态内容就是终态（水洼） -->
+      <div class="ground" role="img" aria-label="草地上有一座小房子和两棵树，落地的冰雹融化成了一个带着微笑的小水洼，水洼边长出一株小芽">
+        <div class="sky-cloud sky-cloud-c"><svg class="cloud-drift anim-loop" viewBox="0 0 96 46" focusable="false"><path d="M24 42 a13 13 0 0 1 -3 -25.6 a18 18 0 0 1 33.5 -5.6 a13.5 13.5 0 0 1 21.5 10.2 a10.6 10.6 0 0 1 -2 21 z" fill="#ffffff" stroke="#cfe9fa" stroke-width="2.5" stroke-linejoin="round" /></svg></div>
+        <div class="ground-props">
+          <svg class="prop-tree" viewBox="0 0 80 176" focusable="false">
+            <g class="tree-sway anim-loop">
+            <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
+            <path d="M40 92 l13 -13" stroke="#7a5c44" stroke-width="7" stroke-linecap="round" />
+            <circle cx="21" cy="60" r="19" fill="#3f8a57" />
+            <circle cx="59" cy="62" r="19" fill="#3f8a57" />
+            <circle cx="40" cy="40" r="33" fill="#3f8a57" />
+            <circle cx="30" cy="30" r="15" fill="#57a866" />
+            </g>
+          </svg>
+          <svg class="prop-house" viewBox="0 0 120 156" focusable="false">
+            <rect x="82" y="12" width="13" height="30" rx="3" fill="#234a7d" />
+            <rect x="18" y="50" width="84" height="106" fill="#ffffff" stroke="#9fcbe8" stroke-width="3" stroke-linejoin="round" />
+            <path d="M8 54 L60 12 L112 54 Z" fill="#234a7d" stroke="#234a7d" stroke-width="6" stroke-linejoin="round" />
+            <rect x="30" y="66" width="22" height="20" rx="4" fill="#9fcbe8" />
+            <path d="M41 68 v16 M32 76 h18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M64 156 V84 a11 11 0 0 1 22 0 V156 Z" fill="#234a7d" />
+          </svg>
+        </div>
+        <svg class="prop-tree prop-tree-small" viewBox="0 0 80 176" focusable="false">
+          <g class="tree-sway anim-loop">
+          <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
+          <circle cx="24" cy="58" r="18" fill="#3f8a57" />
+          <circle cx="56" cy="58" r="18" fill="#3f8a57" />
+          <circle cx="40" cy="38" r="30" fill="#3f8a57" />
+          <circle cx="31" cy="29" r="13" fill="#57a866" />
+          </g>
+        </svg>
+        <!-- 草地：720px 一格的平铺图案，不随视口缩放，草缘的像素位置固定 -->
+        <svg class="ground-grass" width="100%" height="110" focusable="false">
+          <defs>
+            <pattern id="grass-back" width="720" height="110" patternUnits="userSpaceOnUse">
+              <g fill="#57a866">
+                <rect y="40" width="720" height="70" />
+                <ellipse cx="60" cy="40" rx="58" ry="30" />
+                <ellipse cx="170" cy="40" rx="50" ry="22" />
+                <ellipse cx="265" cy="40" rx="62" ry="36" />
+                <ellipse cx="370" cy="40" rx="46" ry="20" />
+                <ellipse cx="455" cy="40" rx="60" ry="32" />
+                <ellipse cx="560" cy="40" rx="52" ry="24" />
+                <ellipse cx="652" cy="40" rx="64" ry="34" />
+              </g>
+            </pattern>
+            <pattern id="grass-front" width="720" height="110" patternUnits="userSpaceOnUse">
+              <g fill="#6fbf73">
+                <rect y="52" width="720" height="58" />
+                <ellipse cx="0" cy="54" rx="60" ry="22" />
+                <ellipse cx="720" cy="54" rx="60" ry="22" />
+                <ellipse cx="105" cy="54" rx="54" ry="14" />
+                <ellipse cx="200" cy="54" rx="64" ry="26" />
+                <ellipse cx="300" cy="54" rx="50" ry="16" />
+                <ellipse cx="395" cy="54" rx="66" ry="28" />
+                <ellipse cx="495" cy="54" rx="52" ry="15" />
+                <ellipse cx="585" cy="54" rx="62" ry="24" />
+                <ellipse cx="668" cy="54" rx="48" ry="17" />
+              </g>
+              <g fill="none" stroke="#57a866" stroke-width="3" stroke-linecap="round">
+                <path d="M64 92 l-5 -9 M64 92 v-12 M64 92 l5 -9" />
+                <path d="M236 76 l-5 -9 M236 76 v-12 M236 76 l5 -9" />
+                <path d="M352 98 l-5 -9 M352 98 v-12 M352 98 l5 -9" />
+                <path d="M520 84 l-5 -9 M520 84 v-12 M520 84 l5 -9" />
+                <path d="M660 96 l-5 -9 M660 96 v-12 M660 96 l5 -9" />
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="110" fill="url(#grass-back)" />
+          <rect width="100%" height="110" fill="url(#grass-front)" />
+        </svg>
+        <div class="landing">
+          <svg class="puddle" viewBox="0 0 120 36" focusable="false">
+            <ellipse cx="60" cy="18" rx="56" ry="14" fill="#cfe9fa" stroke="#9fcbe8" stroke-width="3" />
+            <ellipse class="puddle-ripple anim-loop" cx="60" cy="18" rx="50" ry="11.5" fill="none" stroke="#9fcbe8" stroke-width="1.5" />
+            <path d="M22 14 q10 -6 24 -7" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+            <g class="puddle-face">
+              <ellipse cx="50" cy="15.5" rx="3.2" ry="2.4" fill="#222" />
+              <ellipse cx="70" cy="15.5" rx="3.2" ry="2.4" fill="#222" />
+              <path d="M52 21.5 Q60 26.5 68 21.5" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" />
+            </g>
+          </svg>
+          <!-- 水洼边的小芽：融化完成后长出来（纯装饰）。静态内容里它已经长好 -->
+          <svg class="sprout" viewBox="0 0 28 34" focusable="false">
+            <g class="sprout-sway anim-loop">
+              <path class="sprout-stem" d="M14 34 Q12.5 24 14 15" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" />
+              <path class="sprout-leaf" d="M14 16 C8 16 3 12 2 5 C9 4 14 9 14 16 Z" fill="#3f8a57" />
+              <path class="sprout-leaf" d="M14 16 C14 9 19 4 26 5 C25 12 20 16 14 16 Z" fill="#57a866" />
+            </g>
+          </svg>
+          <div class="ending-hail"></div>
+          <!-- 落点前的两丛草：雹宝砸下来时被压弯、再弹回 -->
+          <svg class="tuft tuft-l" viewBox="0 0 20 18" focusable="false"><path d="M10 17 l-6 -10 M10 17 v-14 M10 17 l6 -10" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" /></svg>
+          <svg class="tuft tuft-r" viewBox="0 0 20 18" focusable="false"><path d="M10 17 l-6 -10 M10 17 v-14 M10 17 l6 -10" fill="none" stroke="#3f8a57" stroke-width="3" stroke-linecap="round" /></svg>
+        </div>
       </div>
     </section>
 

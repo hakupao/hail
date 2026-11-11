@@ -1,0 +1,358 @@
+/* ===== 第三章 · 危险阈值（规格 §4）。破云之后的亮天空，文字墨蓝 ===== */
+
+/* ---------- 尺寸阶梯 ----------
+   --u 是图上的 1 cm。四个实物的宽度都是 --u × 直径，所以彼此严格等比例；
+   门槛线离「地面」（色带上沿）2 × --u，和实物在同一把尺上。 */
+.ladder {
+  --u: clamp(11.5px, 3.2vw, 22px);
+  position: relative;
+  max-width: 760px;
+  margin: 2.2em 0 0;
+}
+
+.ladder-rungs {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 2.2fr 1.9fr 2.3fr 3.6fr;
+}
+
+.rung {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.rung-obj {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: calc(var(--u) * 7.5);
+}
+
+.rung-obj svg {
+  display: block;
+  width: calc(var(--u) * var(--d));
+  height: calc(var(--u) * var(--d));
+}
+
+/* 危险色带：四档纯色（草地绿 → 警示黄 → 橙 → 危险红），每档就在它的实物脚下 */
+.rung-band {
+  align-self: stretch;
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.rung-1 .rung-band { background: var(--c-grass); border-radius: 6px 0 0 6px; }
+.rung-2 .rung-band { background: var(--c-accent); }
+.rung-3 .rung-band { background: var(--c-warn); }
+.rung-4 .rung-band { background: var(--c-danger); border-radius: 0 6px 6px 0; }
+
+.rung-name { font-weight: 700; font-size: 15px; }
+
+.rung-size {
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.rung-harm { font-size: 13px; color: var(--c-ink-muted); }
+
+/* 2 cm 门槛线：一条横贯阶梯的虚线，比它高的都在预警范围里。
+   --draw 是 JS 描线用的进度（0–1）：从左到右揭开，标签在线的上方、盒子之外，所以裁剪区向上多留 2em。
+   没有 --draw（无 JS / reduced-motion / 描完之后）就是完整的线。 */
+.ladder-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * 5.5);
+  border-top: 2px dashed var(--c-ink);
+  clip-path: inset(-2em calc((1 - var(--draw, 1)) * 100%) -2px 0);
+}
+
+.ladder-line span {
+  position: absolute;
+  left: 0;
+  bottom: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ---------- 动能条（本章主菜） ---------- */
+.energy-title { margin: 2.6em 0 0.9em; }
+
+.energy { max-width: 960px; }
+
+.energy-row,
+.energy-axis {
+  display: grid;
+  grid-template-columns: 15em minmax(0, 1fr);
+  column-gap: 20px;
+}
+
+.energy-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 0;
+  line-height: 1.4;
+}
+
+.energy-label span { font-size: var(--fs-small); color: var(--c-ink-muted); }
+
+/* 绘图区：三行的宽度完全相同，是同一把 0–200 J 的尺 */
+.energy-plot {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 职业投手快速球的 125 J 参照线，贯穿三行：8 cm 冰雹那根越过了它 */
+.energy-plot::after {
+  content: '';
+  position: absolute;
+  left: 62.5%;
+  top: 0;
+  bottom: 0;
+  margin-left: -1px;
+  border-left: 2px dashed var(--c-ink);
+  opacity: 0.55;
+}
+
+.energy-track {
+  --ball: 32px; /* 小棒球的直径：比条略高一点，看得出是个球 */
+  position: relative;
+  flex: 1;
+  height: 26px;
+  border-right: 1.5px solid rgba(16, 35, 63, 0.22);
+  /* 每 50 J 一条刻度线 */
+  background:
+    linear-gradient(90deg, rgba(16, 35, 63, 0.22) 1.5px, transparent 0) 0 0 / 25% 100%,
+    rgba(16, 35, 63, 0.07);
+}
+
+.energy-clip {
+  width: calc(var(--j) / 200 * 100%);
+  height: 100%;
+  overflow: hidden;
+}
+
+.energy-fill {
+  height: 100%;
+  border-radius: 0 13px 13px 0;
+  transition: opacity 0.5s;
+}
+
+/* 职业投手那根条的条尾：一个小棒球，右缘正好在 125 J。
+   外层是定位盒（被量 offsetLeft），飞行和旋转作用在里面的 svg 上。 */
+.energy-ball {
+  position: absolute;
+  left: calc(var(--j) / 200 * 100% - var(--ball));
+  top: calc(50% - var(--ball) / 2);
+  width: var(--ball);
+  height: var(--ball);
+  transition: opacity 0.5s;
+}
+
+.energy-ball svg { display: block; width: 100%; height: 100%; }
+
+/* 开投前（JS 加的状态类）：球等在轨道起点外侧，右缘贴着 0 刻度——之后它一直是条的「头」，不会压到跟在条尾的读数 */
+#ch3:not([data-init-failed]) .energy-row.is-waiting .energy-ball { left: calc(var(--ball) * -1); }
+
+.energy-hail5 .energy-fill { background: var(--c-warn); }
+.energy-pitch .energy-fill { background: var(--c-storm); }
+.energy-hail8 .energy-fill { background: var(--c-danger); }
+
+/* 读数挂在一个和条等宽的「骑手」上：骑手与条用同一个百分比位移，读数就一直贴着条尾走 */
+.energy-rider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--j) / 200 * 100%);
+}
+
+.energy-num {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-title);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transform-origin: 0 50%; /* 涨到头的 pop 从条尾那一侧长出来 */
+}
+
+/* 公式块里的两行代入式和下面的动能条是同一组数字：条涨到头时，对应的那行像被荧光笔划了一下 */
+.ch3-math .tex-display {
+  border-radius: 6px;
+  transition: background-color var(--dur-slow) var(--ease-soft), box-shadow var(--dur-slow) var(--ease-soft);
+}
+
+.ch3-math .tex-display.is-lit {
+  background-color: color-mix(in srgb, var(--c-accent) 55%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--c-accent) 55%, transparent);
+  transition-duration: var(--dur-instant);
+}
+
+.energy-ticks {
+  grid-column: 2;
+  position: relative;
+  height: 1.6em;
+  margin-top: 4px;
+  font-family: var(--font-title);
+  font-size: var(--fs-small);
+  color: var(--c-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.energy-ticks span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.energy-ticks span:nth-child(1) { left: 0; transform: none; }
+.energy-ticks span:nth-child(2) { left: 25%; }
+.energy-ticks span:nth-child(3) { left: 50%; }
+.energy-ticks span:nth-child(4) { left: 75%; }
+.energy-ticks span:nth-child(5) { left: 100%; transform: translateX(-100%); }
+
+/* JS 可用且允许动效时，条先收在左侧等主菜动画揭开；无 JS / reduced-motion / 本章 init 抛错 直接是终态 */
+@media (prefers-reduced-motion: no-preference) {
+  html.js #ch3:not([data-init-failed]) .energy-fill,
+  html.js #ch3:not([data-init-failed]) .energy-rider { transform: translateX(-100%); }
+}
+
+/* ---------- 1986 历史卡 ---------- */
+.history-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 760px;
+  margin: 3em 0;
+  padding: 26px 30px;
+  border-radius: var(--radius);
+  background: var(--c-night);
+  color: var(--c-ice);
+}
+
+.history-mascot-slot { flex: none; }
+.history-mascot-slot:empty { display: none; }
+
+.history-card h3 {
+  font-size: 26px;
+  margin-bottom: 0.25em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 历史卡在场时只把图形压淡（实物、色带、动能条的填充），文字一律不动，对比度不受影响 */
+.rung-obj,
+.rung-band { transition: opacity 0.5s; }
+
+#ch3.dimmed .rung-obj,
+#ch3.dimmed .rung-band,
+#ch3.dimmed .energy-fill,
+#ch3.dimmed .energy-ball { opacity: 0.4; }
+
+/* ---------- 安全卡 ---------- */
+.safety {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: stretch;
+  max-width: 960px;
+}
+
+.safety-card {
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  background: var(--c-card-light);
+  border: 1px solid rgba(16, 35, 63, 0.12);
+}
+
+.safety-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.5em;
+}
+
+.safety-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border-radius: 50%;
+}
+
+.safety-coin .safety-icon { background: var(--c-accent); }
+.safety-golf .safety-icon { background: var(--c-warn); }
+
+.safety-mascot-slot { align-self: end; }
+.safety-mascot-slot:empty { display: none; }
+
+.season-tip {
+  max-width: var(--measure);
+  margin-top: 2.2em;
+  padding-left: 14px;
+  border-left: 4px solid var(--c-ink);
+  font-weight: 600;
+}
+
+/* 绘图区不够宽时（手机与窄窗口）：标签在上、条在下；读数挪到标签行右端，免得 170 J 在条尾放不下 */
+@media (max-width: 1000px) {
+  .energy-row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 14px;
+  }
+
+  .energy-axis { grid-template-columns: minmax(0, 1fr); }
+  .energy-ticks { grid-column: 1; margin-top: -10px; }
+
+  .energy-label { padding: 0 0 6px; }
+  .energy-label strong { padding-right: 4.2em; }
+  .energy-plot { position: static; }
+  .energy-rider { display: contents; } /* 不生成盒子：位移对它无效，读数改相对整行定位 */
+  .energy-plot::after { display: none; }
+  .energy-track { --ball: 28px; height: 22px; }
+  /* 窄屏轨道贴着内容列左缘，外侧没有位置：球等在轨道里（读数在标签行右端，压不到） */
+  #ch3:not([data-init-failed]) .energy-row.is-waiting .energy-ball { left: 0; }
+  .energy-fill { border-radius: 0 11px 11px 0; }
+
+  .energy-num {
+    left: auto;
+    right: 0;
+    top: 0;
+    transform: none;
+    transform-origin: 100% 50%;
+    font-size: 20px;
+    line-height: 23px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rung-name { font-size: 13px; }
+  .rung-size { font-size: 13px; }
+  .rung-harm { font-size: 12px; }
+  .ladder-line span { font-size: 12px; }
+
+  .history-card { padding: 20px; gap: 16px; }
+
+  /* 窄屏：两张卡竖排、占满整宽；雹宝不再单占一列（那会让卡片只剩七成宽），改成站在第一张卡的右上角、探出卡片上沿 */
+  .safety { position: relative; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .safety-card { padding: 18px; }
+  .safety-mascot-slot { position: absolute; top: -40px; right: 14px; }
+  .safety-mascot-slot .mascot-wrap { width: 56px !important; height: 56px !important; }
+}

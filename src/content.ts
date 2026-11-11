@@ -1,12 +1,13 @@
+import type { IconName } from './art/icons';
 import type { Outcome } from './lab/model';
 
-// 高度尺参照物（规格 §3）
-export const rulerMarks = [
-  { km: 10, label: '✈️ 民航巡航' },
-  { km: 8.8, label: '⛰️ 珠峰' },
-  { km: 4.5, label: '❄️ 0℃ 层' },
-  { km: 1.5, label: '☁️ 云底' },
-  { km: 0, label: '🏡 地面' },
+// 高度尺参照物（v2 规格 §2.4）：icon 是 src/art/icons.ts 里的图标名
+export const rulerMarks: Array<{ km: number; label: string; icon: IconName }> = [
+  { km: 10, label: '民航巡航', icon: 'plane' },
+  { km: 8.8, label: '珠峰', icon: 'everest' },
+  { km: 4.5, label: '0℃ 层', icon: 'freezing' },
+  { km: 1.5, label: '云底', icon: 'cloudBase' },
+  { km: 0, label: '地面', icon: 'ground' },
 ];
 
 // 第二章坠落竞速的四条赛道：规格速度表给的是范围（如 2–3 cm → 15–20 m/s），
@@ -28,10 +29,10 @@ export const labPresets = [
   { name: '1986 孟加拉', w: 50, h0: 3 },
 ];
 
-// 实验室四种结局的展示元数据
-export const outcomeMeta: Record<Outcome, { emoji: string; label: string; tone: string }> = {
-  rain: { emoji: '☔', label: '只下暴雨', tone: '#4a90d9' },
-  'small-hail': { emoji: '🌨', label: '小雹落地', tone: '#7fb6e8' },
-  hail: { emoji: '🧊', label: '危险冰雹', tone: '#e8a23a' },
-  'giant-hail': { emoji: '💀', label: '巨雹警报', tone: '#e8503a' },
+// 实验室四种结局的名称（图标与颜色在 src/art/ch4.ts）
+export const outcomeMeta: Record<Outcome, { label: string }> = {
+  rain: { label: '只下暴雨' },
+  'small-hail': { label: '小雹落地' },
+  hail: { label: '危险冰雹' },
+  'giant-hail': { label: '巨雹警报' },
 };
