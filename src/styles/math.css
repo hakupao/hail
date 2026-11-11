@@ -1,0 +1,100 @@
+/* ===== 公式（v3 规格 §1）：KaTeX 构建时预渲染，这里只管它在页面里的大小、对齐和公式块的外观 ===== */
+
+/* KaTeX 默认 1.21em，比正文明显大一圈：收到与中文正文协调的大小。颜色继承所在位置的文字色。 */
+.katex { font-size: 1.1em; }
+
+/* \text{冰} 这类中文走页面的中文字体栈，不落到衬线回退字体上 */
+.katex .cjk_fallback { font-family: var(--font); }
+
+/* 行内公式：整体不断行（KaTeX 行内模式允许在关系符后折行），行高不撑开所在行 */
+.tex {
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* 公式连同两侧的括号一起不断行：<span class="nobr">（<span class="tex" …></span>）</span> */
+.nobr { white-space: nowrap; }
+
+/* 标题里的行内公式：标题字号已经很大，不再放大 */
+h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
+
+/* 独立公式：左对齐（全站内容列左对齐）。
+   构建插件把一条式子在「顶层逗号 + 间距」处切成几段 .tex-seg（--gap 是原间距的 em 数）：
+   宽屏排成一行，与整条渲染一致；窄屏放不下时在段间换行。单段仍放不下时这一行自己横向滚动，不撑破页面。 */
+.tex-display {
+  --tex-size: 1.16em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 0;
+  scrollbar-width: thin;
+}
+
+.tex-seg { flex: none; }
+.tex-seg + .tex-seg { margin-left: calc(var(--gap) * var(--tex-size)); }
+
+.tex-display .katex-display {
+  margin: 0;
+  text-align: left;
+}
+
+.tex-display .katex-display > .katex {
+  text-align: left;
+  font-size: var(--tex-size);
+}
+
+/* 公式块：标题 + 若干行独立公式 + 一行小字说明。自带实色底，挪到哪里对比度都不变。
+   各章微调位置只需要改它的 margin / max-width / grid 位置，不要改里面的结构。 */
+.math-block {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 2em;
+  padding: 18px 24px 16px;
+  border-radius: var(--radius);
+  background: var(--c-night);
+  border: 1.5px solid rgba(159, 203, 232, 0.4);
+  color: var(--c-ice);
+}
+
+.on-light .math-block {
+  background: var(--c-card-light);
+  border: 1px solid rgba(16, 35, 63, 0.12);
+  color: var(--c-ink);
+}
+
+.math-title {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: var(--c-accent);
+}
+
+.on-light .math-title { color: var(--c-ink-muted); }
+
+.math-rows {
+  display: grid;
+  row-gap: 10px;
+  min-width: 0;
+}
+
+.math-rows > .tex-display { min-width: 0; }
+
+.math-note {
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  margin-top: 12px;
+  max-width: 44em;
+  color: var(--c-ice);
+}
+
+.on-light .math-note { color: var(--c-ink-muted); }
+
+@media (max-width: 768px) {
+  .math-block { padding: 14px 12px 12px; }
+
+  .tex-display { --tex-size: 0.88em; }
+}

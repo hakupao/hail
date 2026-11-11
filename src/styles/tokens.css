@@ -23,6 +23,7 @@
   --c-ink-muted: #3d5273; /* 亮底次级文字（实色，不用 opacity 降调，保证对比度） */
   --c-warn: #f2994a;      /* 危险色带第三档 */
   --c-card-light: rgba(255, 255, 255, 0.72);
+  --c-blush: #ffb7c5;     /* 腮红：只用在雹宝和小脸上（v3 唯一新增的颜色） */
 
   /* 天空色标（journey/anchors.ts 的 SKY_STOPS 与此一致） */
   --c-sky-10: #132544;
@@ -52,6 +53,17 @@
   --page-left: max(clamp(20px, 6vw, 96px), calc((100vw - var(--maxw) - var(--rail)) / 2));
   --space-section: clamp(72px, 14vh, 160px); /* 章节之间的留白 */
   --radius: 16px;
+
+  /* 动效（v3 规格 §3.1）：与 utils/motion.ts 的 EASE / DUR 一一对应 */
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);       /* EASE.soft   power2.out */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);     /* EASE.inOut  power2.inOut */
+  --ease-settle: cubic-bezier(0.25, 1, 0.5, 1);      /* EASE.settle power3.out */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* EASE.spring back.out(1.7) */
+  --ease-fall: cubic-bezier(0.32, 0, 0.67, 0);       /* EASE.fall   power2.in */
+  --dur-instant: 0.18s;
+  --dur-quick: 0.35s;
+  --dur-base: 0.6s;
+  --dur-slow: 1s;
 }
 
 @media (max-width: 768px) {

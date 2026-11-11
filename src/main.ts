@@ -1,5 +1,8 @@
+import 'katex/dist/katex.min.css';
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/math.css';
+import './styles/mascot.css';
 import './styles/journey.css';
 import './styles/hero.css';
 import './styles/ch1.css';

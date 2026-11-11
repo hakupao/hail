@@ -1,0 +1,94 @@
+/* ===== 雹宝 v2（v3 规格 §2）=====
+   .mascot-wrap 是尺寸盒：外面的 GSAP 位移、getBoundingClientRect 测量都作用在它上面，
+   待机和 react() 只动里面的 .mascot-bob，所以盒子本身永远不动。 */
+.mascot-wrap {
+  display: inline-block;
+  /* 作容器：按实际渲染宽度决定画多少细节（章节 CSS 会用 !important 把它压小，不能只看创建时的 sizePx） */
+  container-type: inline-size;
+}
+
+.mascot-bob {
+  width: 100%;
+  height: 100%;
+  /* 待机：轻微上下浮动 + 极小的左右摇。用独立的 translate / rotate 属性，和 react() 的 transform 互不覆盖 */
+  animation: mascot-idle 3.2s ease-in-out var(--bob-delay, 0s) infinite alternate;
+}
+
+.mascot-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* 只要脸：没有身体，可以叠在别的图形上 */
+.mascot-bare { pointer-events: none; }
+
+/* ---------- 表情部件：叠放，交叉淡入 ---------- */
+.mascot-wrap [data-part] {
+  opacity: 0;
+  transition: opacity var(--dur-instant) linear;
+}
+
+.mascot-wrap [data-part].on { opacity: 1; }
+
+.mascot-wrap .m-line {
+  fill: none;
+  stroke: #222;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 安全帽、护目镜：带一点回弹地弹入 */
+.mascot-wrap .m-gear {
+  transform: scale(0.4);
+  transform-origin: 60px 50px;
+  transition: opacity var(--dur-instant) linear, transform var(--dur-quick) var(--ease-spring);
+}
+
+.mascot-wrap .m-gear.on { transform: none; }
+
+/* ---------- 眨眼：整组眼睛压扁一下，每个实例周期与相位不同 ---------- */
+.mascot-wrap .m-eyes {
+  transform-origin: 60px 54px;
+  animation: mascot-blink var(--blink-dur, 4s) linear var(--blink-delay, 0s) infinite;
+}
+
+/* 闭着眼 / 旋涡眼的表情不眨眼；solemn 保持肃静，不浮动不摇 */
+.mascot-wrap[data-expr='solemn'] .m-eyes,
+.mascot-wrap[data-expr='sleepy'] .m-eyes,
+.mascot-wrap[data-expr='dizzy'] .m-eyes,
+.mascot-wrap[data-expr='solemn'] .mascot-bob,
+.mascot-still .mascot-bob,
+.mascot-still .m-eyes { animation: none; }
+
+@keyframes mascot-idle {
+  from { translate: 0 2.5%; rotate: -1.6deg; }
+  to { translate: 0 -2.5%; rotate: 1.6deg; }
+}
+
+@keyframes mascot-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+
+/* ---------- 小尺寸：省掉腮红、高光，线条加粗，旋涡眼换成叉 ---------- */
+.mascot-wrap .m-coarse { display: none; }
+
+@container (max-width: 44px) {
+  .mascot-wrap .m-fine { display: none; }
+  .mascot-wrap .m-coarse { display: inline; }
+  .mascot-wrap .m-eye { stroke: #222; stroke-width: 3; }
+  .mascot-wrap .m-line { stroke-width: 4.6; }
+  .mascot-wrap .m-mouth { stroke-width: 5.5; }
+  /* 小尺寸下按百分比的浮动不到 1px，只会让像素发虚：这里关掉，需要的地方自己给 .mascot-bob 写 px 幅度的浮动（见 journey.css） */
+  .mascot-bob { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-bob,
+  .mascot-wrap .m-eyes { animation: none; }
+
+  .mascot-wrap [data-part],
+  .mascot-wrap .m-gear { transition: none; }
+}

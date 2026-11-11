@@ -29,7 +29,7 @@
           <div class="num-card">
             <div class="num">10–40+ <small>m/s</small></div>
             <div class="num-label">落地速度</div>
-            <p>个头越大砸得越快：v ∝ √d</p>
+            <p>个头越大砸得越快：<span class="tex" data-tex="v \propto \sqrt{d}"></span></p>
           </div>
           <div class="num-card">
             <div class="num">⌀2 <small>cm</small></div>
@@ -148,8 +148,18 @@
     <!-- ========== 第二章 坠落速度 ========== -->
     <section id="ch2" class="scene on-dark">
       <div class="scene-inner">
-        <h2><span class="ch-no">第二章</span>落地速度：v ∝ √d</h2>
-        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长，迎风面积只随平方增长——所以 <span class="formula"><span class="formula-eq">v ∝ √d</span>：个头越大，落得越快</span>。</p>
+        <h2><span class="ch-no">第二章</span>落地速度：<span class="tex" data-tex="v \propto \sqrt{d}"></span></h2>
+        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长<span class="nobr">（<span class="tex" data-tex="m \propto d^{3}"></span>）</span>，迎风面积只随平方增长<span class="nobr">（<span class="tex" data-tex="A \propto d^{2}"></span>）</span>——所以 <span class="formula"><span class="formula-eq"><span class="tex" data-tex="v \propto \sqrt{d}"></span></span>：个头越大，落得越快</span>。</p>
+
+        <!-- 推导：把上面这句话写成式子（v3 规格 §1.3，TeX 原样） -->
+        <figure class="math-block ch2-math">
+          <figcaption class="math-title">推导一下</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="\underbrace{\rho_{\text{冰}}\,\tfrac{\pi}{6}\,d^{3}\,g}_{\text{重力}} \;=\; \underbrace{\tfrac{1}{2}\,\rho_{\text{气}}\,C_d\,\tfrac{\pi}{4}\,d^{2}\,v^{2}}_{\text{空气阻力}}" data-display></div>
+            <div class="tex-display" data-tex="v \;=\; \sqrt{\frac{4\,\rho_{\text{冰}}\,g}{3\,\rho_{\text{气}}\,C_d}}\;\cdot\sqrt{d}\;\;\propto\;\;\sqrt{d}" data-display></div>
+          </div>
+          <p class="math-note"><span class="tex" data-tex="\rho_{\text{冰}}"></span> 冰的密度、<span class="tex" data-tex="\rho_{\text{气}}"></span> 空气密度、<span class="tex" data-tex="C_d"></span> 阻力系数、<span class="tex" data-tex="g"></span> 重力加速度、<span class="tex" data-tex="d"></span> 直径。</p>
+        </figure>
 
         <!-- 坠落竞速：球落在 .lane-drop 里（终点就是它的静态布局位置），标签在上、读数在下，互不重叠 -->
         <div class="race">
@@ -252,7 +262,7 @@
     <div class="cloudbase" aria-hidden="true">
       <svg viewBox="0 0 1440 160" preserveAspectRatio="xMidYMin slice" focusable="false">
         <!-- 后层：更暗的云腹，从前层的缝隙里探出来 -->
-        <g fill="#234a7d">
+        <g class="cb-back"><g class="cb-drift anim-loop" fill="#234a7d">
           <ellipse cx="128" cy="60" rx="74" ry="52" />
           <ellipse cx="292" cy="58" rx="70" ry="44" />
           <ellipse cx="442" cy="60" rx="64" ry="50" />
@@ -262,10 +272,10 @@
           <ellipse cx="1050" cy="58" rx="64" ry="46" />
           <ellipse cx="1196" cy="62" rx="74" ry="56" />
           <ellipse cx="1340" cy="58" rx="62" ry="46" />
-        </g>
+        </g></g>
         <!-- 前层：填色与分界上缘的天空色相同，和上方天空无缝 -->
-        <g fill="#3f6ea6">
-          <rect width="1440" height="46" />
+        <rect width="1440" height="46" fill="#3f6ea6" />
+        <g class="cb-front"><g class="cb-drift anim-loop" fill="#3f6ea6">
           <ellipse cx="50" cy="48" rx="96" ry="52" />
           <ellipse cx="205" cy="52" rx="112" ry="72" />
           <ellipse cx="372" cy="46" rx="84" ry="44" />
@@ -276,7 +286,7 @@
           <ellipse cx="1114" cy="52" rx="116" ry="82" />
           <ellipse cx="1272" cy="48" rx="92" ry="54" />
           <ellipse cx="1404" cy="50" rx="100" ry="70" />
-        </g>
+        </g></g>
       </svg>
     </div>
 
@@ -354,6 +364,15 @@
 
         <!-- 动能条：三根条共用一把 0–200 J 的线性刻度，宽度 = 焦耳数 / 200 -->
         <h3 class="energy-title">用动能感受一下</h3>
+        <figure class="math-block ch3-math">
+          <figcaption class="math-title">动能怎么算</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="E=\tfrac{1}{2}\,m\,v^{2},\qquad m=\rho_{\text{冰}}\cdot\tfrac{\pi}{6}\,d^{3}" data-display></div>
+            <div class="tex-display" data-tex="d=5\,\text{cm}:\quad m\approx 0.059\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.059\times 26^{2}\approx 20\,\text{J}" data-display></div>
+            <div class="tex-display" data-tex="d=8\,\text{cm}:\quad m\approx 0.24\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.24\times 37.5^{2}\approx 170\,\text{J}" data-display></div>
+          </div>
+          <p class="math-note">冰的密度取 0.9 g/cm³；速度取速度表范围内的值（5 cm：26 m/s，8 cm：37.5 m/s）。</p>
+        </figure>
         <div class="energy">
           <div class="energy-row energy-hail5" style="--j: 20" data-joules="20">
             <div class="energy-label">
@@ -524,7 +543,17 @@
 
           <div class="lab-map" id="lab-map" aria-hidden="true"><!-- 结局地图由 JS 生成（逐格调用 simulate）；键盘操作走上面的两个滑杆 --></div>
         </div>
-        <p class="note">简化教学模型：v = k·√d 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
+        <!-- 模型的三条式子：必须与 src/lab/model.ts 一致，tests/formula.test.ts 会核对其中的常数 -->
+        <figure class="math-block ch4-math">
+          <figcaption class="math-title">模型的三条式子</figcaption>
+          <div class="math-rows">
+            <div class="tex-display" data-tex="v = k\sqrt{d},\qquad k = 11" data-display></div>
+            <div class="tex-display" data-tex="d_{\max} = \eta\left(\frac{W}{k}\right)^{2},\qquad \eta = 0.65" data-display></div>
+            <div class="tex-display" data-tex="d_{\text{落地}} = \max\!\left(0,\; d_{\max} - r\cdot\frac{1000\,H_0}{k\sqrt{d_{\max}}}\right),\qquad r = 0.002\ \text{cm/s}" data-display></div>
+          </div>
+          <p class="math-note">单位：<span class="tex" data-tex="d"></span> 厘米、<span class="tex" data-tex="v"></span> 与 <span class="tex" data-tex="W"></span> 米每秒、<span class="tex" data-tex="H_0"></span> 千米。</p>
+        </figure>
+        <p class="note">简化教学模型：<span class="tex" data-tex="v = k\sqrt{d}"></span> 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
       </div>
     </section>
 
@@ -532,7 +561,7 @@
     <section id="ending" class="scene on-light">
       <div class="scene-inner ending-inner">
         <h2>落地。</h2>
-        <p class="lead">一颗冰雹的一生：在 5–10 公里的高空翻滚长大，以与 √直径 成正比的速度坠落，超过 2 厘米就值得你警惕。</p>
+        <p class="lead">一颗冰雹的一生：在 5–10 公里的高空翻滚长大，以与 <span class="tex" data-tex="\sqrt{d}"></span>（直径的平方根）成正比的速度坠落，超过 2 厘米就值得你警惕。</p>
         <div class="num-cards recap">
           <div class="num-card"><div class="num">5–10 <small>km</small></div><div class="num-label">生成高度</div></div>
           <div class="num-card"><div class="num">10–40+ <small>m/s</small></div><div class="num-label">落地速度</div></div>
