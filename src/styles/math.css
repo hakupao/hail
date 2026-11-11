@@ -84,8 +84,9 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
 
 .math-rows > .tex-display { min-width: 0; }
 
-/* 一条式子后面跟着的常数（k = 11 这类）：与式子拉开距离，退到次级色 */
-.tex-seg + .tex-seg { opacity: 0.82; }
+/* 第四章每条式子后面跟着的常数（k = 11 这类）退到次级色。只限第四章：
+   第三章分段后面的是质量和 ≈20 J、≈170 J 这些结果，那是那几行的重点，不能淡 */
+.ch4-math .tex-seg + .tex-seg { opacity: 0.82; }
 
 /* 符号图例：一个符号一格，不再挤成一句话 */
 .math-legend {
