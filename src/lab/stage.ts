@@ -19,9 +19,9 @@ export function kmToY(km: number): number {
 }
 
 // 冰雹厘米数 → 屏幕直径：一条带下限的线性映射，云中最大与落地用的是同一条。
-// 模型里云中最大雹径最大约 13.4 cm（W = 50）→ 60 单位，放得进舞台；下限让 0.5 cm 也看得见。
-export const UNIT_PER_CM = 4.5;
-export const MIN_HAIL_UNITS = 6;
+// 模型里云中最大雹径最大约 13.4 cm（W = 50）→ 70 单位，放得进舞台；下限让 0.5 cm 也看得见。
+export const UNIT_PER_CM = 5.2;
+export const MIN_HAIL_UNITS = 8;
 
 export function hailSize(dCm: number): number {
   return Math.max(MIN_HAIL_UNITS, UNIT_PER_CM * dCm);

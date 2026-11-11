@@ -27,6 +27,7 @@
   padding: 16px 18px;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-content: start;
   gap: 12px 22px;
 }
 
@@ -300,8 +301,8 @@ html:not(.js) .lab-presets { display: none; }
       'map      map';
   }
 
-  .lab-result { flex-direction: row; flex-wrap: wrap; align-items: center; }
-  .lab-result dl { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; gap: 8px 22px; }
+  .lab-controls { align-self: start; }
+  .lab-result dl { flex-direction: row; flex-wrap: wrap; gap: 8px 28px; }
   /* 窄布局里雹宝缩小，站到结果卡右上角 */
   .lab-mascot-slot { position: absolute; top: 12px; right: 14px; margin: 0; }
   .lab-mascot-slot .mascot-wrap { width: 52px !important; height: 52px !important; }
@@ -325,7 +326,7 @@ html:not(.js) .lab-presets { display: none; }
   .lab-presets button { padding: 5px 10px; font-size: 13px; }
 
   /* 结果读数紧跟滑杆：一行一个读数，名称在左、数值在右 */
-  .lab-result { padding: 12px 14px; gap: 8px; flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .lab-result { padding: 12px 14px; gap: 8px; }
   .lab-chip { width: 40px; height: 40px; border-radius: 12px; }
   .lab-outcome-label { font-size: 20px; }
   .lab-result dl { flex: none; flex-direction: column; flex-wrap: nowrap; gap: 0; }

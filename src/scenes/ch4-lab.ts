@@ -106,7 +106,7 @@ export function initCh4(section: HTMLElement): void {
       drop.setAttribute('transform', `translate(${STAGE.hailX} ${f.y.toFixed(2)})`);
     } else {
       // 描边画在直径以内：圆的外缘直径正好是 f.size（云中最大与落地共用同一条厘米→屏幕映射）
-      const stroke = Math.min(3, f.size * 0.22);
+      const stroke = Math.min(3, Math.max(2, f.size * 0.22));
       hail.setAttribute('transform', `translate(${STAGE.hailX} ${f.y.toFixed(2)})`);
       hailBody.setAttribute('r', ((f.size - stroke) / 2).toFixed(3));
       hailBody.setAttribute('stroke-width', stroke.toFixed(3));
