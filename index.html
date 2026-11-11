@@ -335,20 +335,103 @@
 
     <!-- ========== 结尾 ========== -->
     <section id="ending" class="scene on-light">
-      <div class="scene-inner center">
+      <div class="scene-inner ending-inner">
         <h2>落地。</h2>
-        <div class="ending-stage">
-          <div class="ending-mascot-slot"></div>
-          <div class="puddle"></div>
-          <div class="grass"></div>
-        </div>
         <p class="lead">一颗冰雹的一生：在 5–10 公里的高空翻滚长大，以与 √直径 成正比的速度坠落，超过 2 厘米就值得你警惕。</p>
         <div class="num-cards recap">
           <div class="num-card"><div class="num">5–10 <small>km</small></div><div class="num-label">生成高度</div></div>
           <div class="num-card"><div class="num">10–40+ <small>m/s</small></div><div class="num-label">落地速度</div></div>
           <div class="num-card"><div class="num">⌀2 <small>cm</small></div><div class="num-label">危险起点</div></div>
         </div>
-        <p class="credits">数据为典型范围，详见正文 · Vite + GSAP 手工打造</p>
+        <div class="sources">
+          <h3>数据来源</h3>
+          <ul>
+            <li><a href="https://www.nssl.noaa.gov/education/svrwx101/hail/" target="_blank" rel="noopener">NOAA NSSL《Severe Weather 101: Hail》</a></li>
+            <li>WMO 天气与气候极端事件档案：最重冰雹，1.02 kg，孟加拉国戈帕尔甘尼，<span class="nowrap">1986-04-14</span></li>
+          </ul>
+          <p class="credits">文中数值为典型范围，详见正文。本页用 Vite 与 GSAP 手工制作。</p>
+        </div>
+      </div>
+
+      <!-- 地面：通栏草地贴在页面最底。参照物站在草丛后面，落点在前景草地上。静态内容就是终态（水洼） -->
+      <div class="ground" role="img" aria-label="草地上有一座小房子和两棵树，落地的冰雹融化成了一个带着微笑的小水洼">
+        <div class="ground-props">
+          <svg class="prop-tree" viewBox="0 0 80 176" focusable="false">
+            <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
+            <path d="M40 92 l13 -13" stroke="#7a5c44" stroke-width="7" stroke-linecap="round" />
+            <circle cx="21" cy="60" r="19" fill="#3f8a57" />
+            <circle cx="59" cy="62" r="19" fill="#3f8a57" />
+            <circle cx="40" cy="40" r="33" fill="#3f8a57" />
+            <circle cx="30" cy="30" r="15" fill="#57a866" />
+          </svg>
+          <svg class="prop-house" viewBox="0 0 120 156" focusable="false">
+            <rect x="82" y="12" width="13" height="30" rx="3" fill="#234a7d" />
+            <rect x="18" y="50" width="84" height="106" fill="#ffffff" stroke="#9fcbe8" stroke-width="3" stroke-linejoin="round" />
+            <path d="M8 54 L60 12 L112 54 Z" fill="#234a7d" stroke="#234a7d" stroke-width="6" stroke-linejoin="round" />
+            <rect x="30" y="66" width="22" height="20" rx="4" fill="#9fcbe8" />
+            <path d="M41 68 v16 M32 76 h18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M64 156 V84 a11 11 0 0 1 22 0 V156 Z" fill="#234a7d" />
+          </svg>
+        </div>
+        <svg class="prop-tree prop-tree-small" viewBox="0 0 80 176" focusable="false">
+          <rect x="34" y="66" width="12" height="110" rx="6" fill="#7a5c44" />
+          <circle cx="24" cy="58" r="18" fill="#3f8a57" />
+          <circle cx="56" cy="58" r="18" fill="#3f8a57" />
+          <circle cx="40" cy="38" r="30" fill="#3f8a57" />
+          <circle cx="31" cy="29" r="13" fill="#57a866" />
+        </svg>
+        <!-- 草地：720px 一格的平铺图案，不随视口缩放，草缘的像素位置固定 -->
+        <svg class="ground-grass" width="100%" height="110" focusable="false">
+          <defs>
+            <pattern id="grass-back" width="720" height="110" patternUnits="userSpaceOnUse">
+              <g fill="#57a866">
+                <rect y="40" width="720" height="70" />
+                <ellipse cx="60" cy="40" rx="58" ry="30" />
+                <ellipse cx="170" cy="40" rx="50" ry="22" />
+                <ellipse cx="265" cy="40" rx="62" ry="36" />
+                <ellipse cx="370" cy="40" rx="46" ry="20" />
+                <ellipse cx="455" cy="40" rx="60" ry="32" />
+                <ellipse cx="560" cy="40" rx="52" ry="24" />
+                <ellipse cx="652" cy="40" rx="64" ry="34" />
+              </g>
+            </pattern>
+            <pattern id="grass-front" width="720" height="110" patternUnits="userSpaceOnUse">
+              <g fill="#6fbf73">
+                <rect y="52" width="720" height="58" />
+                <ellipse cx="0" cy="54" rx="60" ry="22" />
+                <ellipse cx="720" cy="54" rx="60" ry="22" />
+                <ellipse cx="105" cy="54" rx="54" ry="14" />
+                <ellipse cx="200" cy="54" rx="64" ry="26" />
+                <ellipse cx="300" cy="54" rx="50" ry="16" />
+                <ellipse cx="395" cy="54" rx="66" ry="28" />
+                <ellipse cx="495" cy="54" rx="52" ry="15" />
+                <ellipse cx="585" cy="54" rx="62" ry="24" />
+                <ellipse cx="668" cy="54" rx="48" ry="17" />
+              </g>
+              <g fill="none" stroke="#57a866" stroke-width="3" stroke-linecap="round">
+                <path d="M64 92 l-5 -9 M64 92 v-12 M64 92 l5 -9" />
+                <path d="M236 76 l-5 -9 M236 76 v-12 M236 76 l5 -9" />
+                <path d="M352 98 l-5 -9 M352 98 v-12 M352 98 l5 -9" />
+                <path d="M520 84 l-5 -9 M520 84 v-12 M520 84 l5 -9" />
+                <path d="M660 96 l-5 -9 M660 96 v-12 M660 96 l5 -9" />
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="110" fill="url(#grass-back)" />
+          <rect width="100%" height="110" fill="url(#grass-front)" />
+        </svg>
+        <div class="landing">
+          <svg class="puddle" viewBox="0 0 120 36" focusable="false">
+            <ellipse cx="60" cy="18" rx="56" ry="14" fill="#cfe9fa" stroke="#9fcbe8" stroke-width="3" />
+            <path d="M22 14 q10 -6 24 -7" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+            <g class="puddle-face">
+              <ellipse cx="50" cy="15.5" rx="3.2" ry="2.4" fill="#222" />
+              <ellipse cx="70" cy="15.5" rx="3.2" ry="2.4" fill="#222" />
+              <path d="M52 21.5 Q60 26.5 68 21.5" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" />
+            </g>
+          </svg>
+          <div class="ending-hail"></div>
+        </div>
       </div>
     </section>
 
