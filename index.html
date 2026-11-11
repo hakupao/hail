@@ -166,7 +166,7 @@
           <div class="race-track">
             <div class="lane" style="--d: 1; --f: 0.21875">
               <div class="lane-head"><span class="lane-icon" data-ref="bean" aria-hidden="true"></span><span class="lane-name">黄豆</span><span class="lane-size">1 cm</span></div>
-              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
               <div class="lane-speed">
                 <div class="lane-read"><span class="lane-kmh">35</span> <span class="lane-unit">km/h</span></div>
                 <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
@@ -174,7 +174,7 @@
             </div>
             <div class="lane" style="--d: 2.5; --f: 0.39375">
               <div class="lane-head"><span class="lane-icon" data-ref="pingpong" aria-hidden="true"></span><span class="lane-name">乒乓球</span><span class="lane-size">2.5 cm</span></div>
-              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
               <div class="lane-speed">
                 <div class="lane-read"><span class="lane-kmh">63</span> <span class="lane-unit">km/h</span></div>
                 <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
@@ -182,7 +182,7 @@
             </div>
             <div class="lane" style="--d: 4.5; --f: 0.61875">
               <div class="lane-head"><span class="lane-icon" data-ref="golf" aria-hidden="true"></span><span class="lane-name">高尔夫</span><span class="lane-size">4.5 cm</span></div>
-              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
               <div class="lane-speed">
                 <div class="lane-read"><span class="lane-kmh">99</span> <span class="lane-unit">km/h</span></div>
                 <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
@@ -190,7 +190,7 @@
             </div>
             <div class="lane" style="--d: 7.5; --f: 0.9">
               <div class="lane-head"><span class="lane-icon" data-ref="softball" aria-hidden="true"></span><span class="lane-name">垒球</span><span class="lane-size">7.5 cm</span></div>
-              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-drop"><div class="race-ball"><span class="race-ball-body"></span></div><i class="lane-ground"></i></div>
               <div class="lane-speed">
                 <div class="lane-read"><span class="lane-kmh">144</span> <span class="lane-unit">km/h</span></div>
                 <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
@@ -390,7 +390,20 @@
               <span>约 150 km/h 的棒球</span>
             </div>
             <div class="energy-plot">
-              <div class="energy-track"><div class="energy-clip"><div class="energy-fill"></div></div></div>
+              <div class="energy-track">
+                <div class="energy-clip"><div class="energy-fill"></div></div>
+                <!-- 条尾的小棒球：红色缝线，和上面的垒球同一种画法 -->
+                <span class="energy-ball" aria-hidden="true">
+                  <svg viewBox="0 0 26 26" focusable="false">
+                    <defs><clipPath id="ch3-bb-clip"><circle cx="13" cy="13" r="12" /></clipPath></defs>
+                    <circle cx="13" cy="13" r="12.2" fill="#fff" stroke="#9fb0c4" stroke-width="1.6" />
+                    <g clip-path="url(#ch3-bb-clip)" fill="none" stroke="#d6363b">
+                      <path d="M6.4 0Q13.6 13 6.4 26M19.6 0Q12.4 13 19.6 26" stroke-width="1" />
+                      <path d="M6.4 0Q13.6 13 6.4 26M19.6 0Q12.4 13 19.6 26" stroke-width="3.6" stroke-dasharray="0.8 2" />
+                    </g>
+                  </svg>
+                </span>
+              </div>
               <div class="energy-rider"><span class="energy-num">125 J</span></div>
             </div>
           </div>
