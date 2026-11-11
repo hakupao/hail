@@ -158,7 +158,14 @@
             <div class="tex-display" data-tex="\underbrace{\rho_{\text{冰}}\,\tfrac{\pi}{6}\,d^{3}\,g}_{\text{重力}} \;=\; \underbrace{\tfrac{1}{2}\,\rho_{\text{气}}\,C_d\,\tfrac{\pi}{4}\,d^{2}\,v^{2}}_{\text{空气阻力}}" data-display></div>
             <div class="tex-display" data-tex="v \;=\; \sqrt{\frac{4\,\rho_{\text{冰}}\,g}{3\,\rho_{\text{气}}\,C_d}}\;\cdot\sqrt{d}\;\;\propto\;\;\sqrt{d}" data-display></div>
           </div>
-          <p class="math-note"><span class="tex" data-tex="\rho_{\text{冰}}"></span> 冰的密度、<span class="tex" data-tex="\rho_{\text{气}}"></span> 空气密度、<span class="tex" data-tex="C_d"></span> 阻力系数、<span class="tex" data-tex="g"></span> 重力加速度、<span class="tex" data-tex="d"></span> 直径。<br />推比例时把前三个量当作常数；实际阻力系数随大小和形状变化，速度并不严格按这条式子增长。</p>
+          <dl class="math-legend">
+            <div><dt><span class="tex" data-tex="\rho_{\text{冰}}"></span></dt><dd>冰的密度</dd></div>
+            <div><dt><span class="tex" data-tex="\rho_{\text{气}}"></span></dt><dd>空气密度</dd></div>
+            <div><dt><span class="tex" data-tex="C_d"></span></dt><dd>阻力系数</dd></div>
+            <div><dt><span class="tex" data-tex="g"></span></dt><dd>重力加速度</dd></div>
+            <div><dt><span class="tex" data-tex="d"></span></dt><dd>直径</dd></div>
+          </dl>
+          <p class="math-note">推比例时把前三个量当作常数；实际阻力系数随大小和形状变化，速度并不严格按这条式子增长。</p>
         </figure>
 
         <!-- 坠落竞速：球落在 .lane-drop 里（终点就是它的静态布局位置），标签在上、读数在下，互不重叠 -->
@@ -371,7 +378,7 @@
             <div class="tex-display" data-tex="d=5\,\text{cm}:\quad m\approx 0.059\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.059\times 26^{2}\approx 20\,\text{J}" data-display></div>
             <div class="tex-display" data-tex="d=8\,\text{cm}:\quad m\approx 0.24\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.24\times 37.5^{2}\approx 170\,\text{J}" data-display></div>
           </div>
-          <p class="math-note">冰的密度取 0.9 g/cm³；速度取第二章速度表对应档位范围内的值（5 cm：26 m/s，8 cm：37.5 m/s），不是用第四章的简化式算的。</p>
+          <p class="math-note">冰的密度取 0.9 g/cm³。速度取第二章速度表对应档位范围内的值，不是用第四章的简化式算的。</p>
         </figure>
         <div class="energy">
           <div class="energy-row energy-hail5" style="--j: 20" data-joules="20">
@@ -575,7 +582,15 @@
             <div class="tex-display" data-tex="d_{\max} = \eta\left(\frac{W}{k}\right)^{2},\qquad \eta = 0.65" data-display></div>
             <div class="tex-display" data-tex="d_{\text{落地}} = \max\!\left(0,\; d_{\max} - r\cdot\frac{1000\,H_0}{k\sqrt{d_{\max}}}\right),\qquad r = 0.002\ \text{cm/s}" data-display></div>
           </div>
-          <p class="math-note">单位：<span class="tex" data-tex="d"></span> 厘米、<span class="tex" data-tex="v"></span> 与 <span class="tex" data-tex="W"></span> 米每秒、<span class="tex" data-tex="H_0"></span> 千米；<span class="tex" data-tex="W"></span> 上升气流强度、<span class="tex" data-tex="H_0"></span> 0℃ 层高度、<span class="tex" data-tex="\eta"></span> 生长效率、<span class="tex" data-tex="r"></span> 融化速率。<br /><span class="tex" data-tex="k"></span> 是按 2–3 厘米的冰雹校准的；直径超过 4 厘米后，典型速度比这条式子高 15–25%——第二章曲线图里高出曲线的圆点就是这个差距。</p>
+          <dl class="math-legend">
+            <div><dt><span class="tex" data-tex="d"></span></dt><dd>直径，厘米</dd></div>
+            <div><dt><span class="tex" data-tex="v"></span></dt><dd>落速，米每秒</dd></div>
+            <div><dt><span class="tex" data-tex="W"></span></dt><dd>上升气流强度，米每秒</dd></div>
+            <div><dt><span class="tex" data-tex="H_0"></span></dt><dd>0℃ 层高度，千米</dd></div>
+            <div><dt><span class="tex" data-tex="\eta"></span></dt><dd>生长效率</dd></div>
+            <div><dt><span class="tex" data-tex="r"></span></dt><dd>融化速率</dd></div>
+          </dl>
+          <p class="math-note"><span class="tex" data-tex="k"></span> 是按 2–3 厘米的冰雹校准的；直径超过 4 厘米后，典型速度比这条式子高 <span class="nobr">15–25%</span>——第二章曲线图里高出曲线的圆点就是这个差距。</p>
         </figure>
           <!-- 代入当前参数：数字全部来自同一次 simulate()（JS 随滑杆更新）；下面写死的是初始参数（25 m/s, 4.0 km）的结果，无 JS 时也可读 -->
           <div class="ch4-live">

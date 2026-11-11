@@ -46,13 +46,14 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
   font-size: var(--tex-size);
 }
 
-/* 公式块：标题 + 若干行独立公式 + 一行小字说明。自带实色底，挪到哪里对比度都不变。
-   各章微调位置只需要改它的 margin / max-width / grid 位置，不要改里面的结构。 */
+/* 公式块：标题 + 若干行独立公式 + 符号图例 + 一句说明。自带实色底，挪到哪里对比度都不变。
+   各章微调位置只需要改它的 margin / max-width / grid 位置，不要改里面的结构。
+   留白要给够：公式本身笔画细密，行与行、公式与说明之间挤在一起会读不动。 */
 .math-block {
   width: fit-content;
   max-width: 100%;
-  margin: 0 0 2em;
-  padding: 18px 24px 16px;
+  margin: 0 0 2.4em;
+  padding: 26px 32px 24px;
   border-radius: var(--radius);
   background: var(--c-night);
   border: 1.5px solid rgba(159, 203, 232, 0.4);
@@ -69,7 +70,7 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
   font-size: var(--fs-small);
   font-weight: 600;
   line-height: 1.4;
-  margin-bottom: 8px;
+  margin-bottom: 18px;
   color: var(--c-accent);
 }
 
@@ -77,24 +78,71 @@ h1 .katex, h2 .katex, h3 .katex { font-size: 1em; }
 
 .math-rows {
   display: grid;
-  row-gap: 10px;
+  row-gap: 22px;
   min-width: 0;
 }
 
 .math-rows > .tex-display { min-width: 0; }
 
-.math-note {
+/* 一条式子后面跟着的常数（k = 11 这类）：与式子拉开距离，退到次级色 */
+.tex-seg + .tex-seg { opacity: 0.82; }
+
+/* 符号图例：一个符号一格，不再挤成一句话 */
+.math-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(159, 203, 232, 0.28);
   font-size: var(--fs-small);
-  line-height: 1.7;
-  margin-top: 12px;
-  max-width: 44em;
+  line-height: 1.5;
   color: var(--c-ice);
 }
 
-.on-light .math-note { color: var(--c-ink-muted); }
+.on-light .math-legend {
+  border-top-color: rgba(16, 35, 63, 0.12);
+  color: var(--c-ink-muted);
+}
+
+.math-legend > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.math-legend dt { color: var(--c-ice); }
+.on-light .math-legend dt { color: var(--c-ink); }
+
+.math-note {
+  font-size: var(--fs-small);
+  line-height: 1.85;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(159, 203, 232, 0.28);
+  max-width: 40em;
+  color: var(--c-ice);
+}
+
+.on-light .math-note {
+  border-top-color: rgba(16, 35, 63, 0.12);
+  color: var(--c-ink-muted);
+}
+
+/* 图例后面紧跟的说明：两者是一组，不再重复画分隔线 */
+.math-legend + .math-note {
+  margin-top: 14px;
+  padding-top: 0;
+  border-top: 0;
+}
 
 @media (max-width: 768px) {
-  .math-block { padding: 14px 12px 12px; }
+  .math-block { padding: 20px 16px 18px; }
+  .math-rows { row-gap: 18px; }
+  .math-legend { gap: 8px 18px; margin-top: 20px; padding-top: 14px; }
+  .math-note { margin-top: 20px; padding-top: 14px; }
+  .math-legend + .math-note { margin-top: 12px; padding-top: 0; }
 
   .tex-display { --tex-size: 0.88em; }
 }

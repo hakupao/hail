@@ -353,7 +353,7 @@
 }
 
 .ch4-live {
-  padding: 12px 24px 14px;
+  padding: 18px 32px 22px; /* 左右与公式块的内边距对齐 */
   border-radius: 0 0 var(--radius) var(--radius);
   background: var(--c-card-light);
   border: 1px solid rgba(16, 35, 63, 0.12);
@@ -363,7 +363,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.live-head { font-weight: 600; color: var(--c-ink-muted); white-space: nowrap; }
+.live-head { margin-bottom: 8px; font-weight: 600; color: var(--c-ink-muted); white-space: nowrap; }
 .live-head span { display: inline-block; margin-left: 0.6em; font-weight: 500; color: var(--c-ink); }
 .ch4-live sub { font-size: 0.72em; line-height: 0; }
 
@@ -440,7 +440,7 @@ html:not(.js) .lab-presets,
 
   .lab-map { padding: 12px 14px 14px; }
 
-  .ch4-live { padding: 10px 12px 12px; }
+  .ch4-live { padding: 14px 16px 16px; }
   .live-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .live-items dd { font-size: 18px; }
   .lab-map-legend { display: grid; grid-template-columns: repeat(2, max-content); gap: 2px 22px; }
