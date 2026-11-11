@@ -19,6 +19,8 @@ import { initHero } from './scenes/hero';
 
 // 告诉 index.html 里的失效保护：模块已经跑起来了
 (window as Window & { __hailBooted?: boolean }).__hailBooted = true;
+// 模块迟到（慢网超过 3 秒）时失效保护已经撤掉了 js 类：这里补回来，否则各章会在静态排版上做 pin 和时间线
+document.documentElement.classList.add('js');
 
 gsap.registerPlugin(ScrollTrigger);
 
