@@ -28,6 +28,37 @@
 .sources .nowrap { white-space: nowrap; }
 .credits { margin-top: 6px; }
 
+/* 文案与草地之间的空天（v3）：flex 吃掉本来就空着的那段高度，自己不撑高页面。
+   里面两朵小云；空天太矮（矮视口、移动端）时不显示，免得贴着文字 */
+.ending-sky {
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+  container-type: size;
+  pointer-events: none;
+}
+
+.sky-cloud { position: absolute; line-height: 0; }
+.sky-cloud svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sky-cloud-a { left: 34%; top: 12%; width: 92px; }
+.sky-cloud-b { left: 61%; top: 52%; width: 60px; }
+/* 第三朵在地面盒子里、房子右边的天上：所有视口都有 */
+.sky-cloud-c { left: calc(var(--page-left) + 236px); top: 26px; width: 72px; }
+
+@container (max-height: 96px) {
+  .sky-cloud { display: none; }
+}
+
+/* 极慢的左右漂移：加在云里面的 svg 上，定位的那层盒子不动 */
+.cloud-drift { animation: end-drift 37s ease-in-out infinite alternate; }
+.sky-cloud-b .cloud-drift { animation-duration: 47s; animation-direction: alternate-reverse; }
+.sky-cloud-c .cloud-drift { animation-duration: 53s; animation-delay: -20s; }
+
+@keyframes end-drift {
+  from { transform: translateX(-16px); }
+  to { transform: translateX(16px); }
+}
+
 /* 地面通栏：用负 margin 抵消 .scene 的左右内边距（不用 100vw，避免滚动条宽度带来的横向溢出）。
    它在 .scene-inner 之外、自身不建层叠上下文，落点层才能盖过 fixed 的高度尺。 */
 .ground {
@@ -60,6 +91,22 @@
 .prop-tree { width: 80px; }
 .prop-house { width: 112px; }
 
+/* 树的轻微摇摆：整棵树绕树根摆一点点（加在 svg 里面的一层 <g> 上） */
+.prop-tree { overflow: visible; }
+
+.tree-sway {
+  transform-box: view-box;
+  transform-origin: 50% 100%;
+  animation: end-sway 5.6s ease-in-out infinite alternate;
+}
+
+.prop-tree-small .tree-sway { animation-duration: 4.3s; animation-delay: -1.7s; }
+
+@keyframes end-sway {
+  from { transform: rotate(-1.1deg); }
+  to { transform: rotate(1.1deg); }
+}
+
 .prop-tree-small {
   position: absolute;
   right: calc(var(--rail) + clamp(10px, 4vw, 64px));
@@ -78,6 +125,48 @@
 
 .puddle { display: block; width: 100%; height: auto; }
 
+/* 水洼的涟漪：一圈细环从中心极慢地荡到岸边、淡出（水洼的 svg 本身由 GSAP 缩放，涟漪是它里面的一层） */
+.puddle-ripple {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  animation: end-ripple 7s linear infinite;
+}
+
+@keyframes end-ripple {
+  0% { transform: scale(0.25); opacity: 0; }
+  20% { opacity: 0.75; }
+  75%, 100% { transform: scale(1); opacity: 0; }
+}
+
+/* 水洼边的小芽（纯装饰）：长在水洼右后方的岸上 */
+.sprout {
+  position: absolute;
+  right: -1%;
+  bottom: 70%;
+  width: 21%;
+  height: auto;
+  overflow: visible;
+}
+
+.sprout-sway {
+  transform-box: view-box;
+  transform-origin: 50% 100%;
+  animation: end-sway 3.7s ease-in-out -1s infinite alternate;
+}
+
+/* 落点前的两丛草：在雹宝和水洼的前面 */
+.tuft {
+  position: absolute;
+  bottom: -9px;
+  width: 20px;
+  height: auto;
+  overflow: visible;
+}
+
+.tuft-l { left: 12%; }
+.tuft-r { right: 10%; }
+
 /* 雹宝的终点：底边落在水洼中线附近。尺寸由这里定（JS 清掉 createMascot 写的内联宽高） */
 .ending-hail {
   position: absolute;
@@ -95,9 +184,23 @@
   will-change: transform, opacity;
 }
 
-/* 允许动效时预隐藏水洼，等雹宝落地融化后再出现；无 JS、reduced-motion、本章 init 抛错时直接是终态 */
+/* 交棒（v3）：对齐在高度尺主角身上的那一小段，结尾雹宝也用精简版的脸（尺上那个只有 18–36px，自动省略了腮红和高光，线条更粗），
+   两个交叉淡化时才一模一样；起跳后摘掉 .is-coarse，腮红和高光随着它长大淡入 */
+.ending-hail .mascot-wrap .m-fine { transition: opacity var(--dur-quick) linear; }
+
+.ending-hail .mascot-wrap.is-coarse .m-fine {
+  opacity: 0;
+  transition: none;
+}
+
+.ending-hail .mascot-wrap.is-coarse .m-eye { stroke: #222; stroke-width: 3; }
+.ending-hail .mascot-wrap.is-coarse .m-line { stroke-width: 4.6; }
+.ending-hail .mascot-wrap.is-coarse .m-mouth { stroke-width: 5.5; }
+
+/* 允许动效时预隐藏水洼和小芽，等雹宝落地融化后再出现；无 JS、reduced-motion、本章 init 抛错时直接是终态 */
 @media (prefers-reduced-motion: no-preference) {
-  html.js #ending:not([data-init-failed]) .puddle { opacity: 0; }
+  html.js #ending:not([data-init-failed]) .puddle,
+  html.js #ending:not([data-init-failed]) .sprout { opacity: 0; }
 }
 
 /* 矮的桌面视口：收紧地面和间距，尽量让结尾仍是一屏 */
@@ -121,4 +224,6 @@
   .prop-house { width: 78px; }
   .prop-tree-small { width: 32px; }
   .ground-props { gap: 4px; }
+  .sky-cloud-c { left: 172px; top: 6px; width: 50px; }
+  .tuft { width: 16px; bottom: -7px; }
 }
