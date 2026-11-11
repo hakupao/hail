@@ -4,7 +4,9 @@ import { getHailRect, setStage } from '../journey/journey';
 import { createMascot } from '../mascot/mascot';
 import { reducedMotion } from '../utils/motion';
 
-const HOP_LIFT = 150; // 跳离高度尺时比起点再高出多少（px）
+const HOP_LIFT = 150; // 跳离高度尺时比起点再高出多少（px）；上方有文字时会收小
+const HOP_MIN_LIFT = 40;
+const HOLD = 0.34; // 起跳前在原位停一下，盖住尺上主角 0.3s 的淡出，交棒时看不到两个雹宝
 const HOP_TIME = 1.1; // 从离开高度尺到触地（s）
 const NEAR_BOTTOM = 12; // 距页面底多少 px 以内算「到底」：此时尺上读数已是 0.0 km
 
@@ -23,53 +25,54 @@ export function initEnding(section: HTMLElement): void {
     return;
   }
 
+  const text = section.querySelector<HTMLElement>('.sources')!;
   const puddle = ground.querySelector<SVGElement>('.puddle')!;
   const face = puddle.querySelector<SVGElement>('.puddle-face')!;
   const mascot = createMascot(0, 'happy');
   const hail = mascot.el;
   hail.style.width = hail.style.height = ''; // 尺寸交给 CSS（随断点变化）
-  ground.querySelector('.ending-hail')!.appendChild(hail);
+  const slot = ground.querySelector<HTMLElement>('.ending-hail')!;
+  slot.appendChild(hail);
   gsap.set(hail, { autoAlpha: 0 });
 
   // 任一时刻只有一方持有雹宝：handed 为 true 时在结尾这边，false 时在高度尺上
   let handed = false;
-  let tl: gsap.core.Timeline | null = null;
+  let anim: gsap.core.Animation | null = null;
 
   function reset(): void {
     if (!handed) return;
     handed = false;
-    tl?.kill();
-    tl = null;
+    anim?.kill();
+    anim = null;
     gsap.set(hail, { autoAlpha: 0 });
     gsap.set(puddle, { opacity: 0 });
     mascot.setExpression('happy');
     setStage('landed', 0);
   }
 
-  function play(): void {
-    if (handed) return;
-    handed = true;
-
-    // 每次播放都重新量：终点是雹宝在布局里的原位，起点是尺上主角此刻的矩形
-    gsap.set(hail, { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, transformOrigin: '50% 50%' });
-    const to = hail.getBoundingClientRect();
+  /** 把雹宝摆到尺上主角此刻的位置和大小上；返回它相对终点（布局原位）的竖直偏移和起点顶边 */
+  function alignToRuler(): { dy: number; top: number | null } {
+    const to = slot.getBoundingClientRect(); // 槽位与雹宝等高、水平居中，且自身没有 transform
+    const size = hail.offsetWidth;
     const from = getHailRect();
     const dx = from ? from.left + from.width / 2 - (to.left + to.width / 2) : 0;
-    const dy = from ? from.top + from.height / 2 - (to.top + to.height / 2) : -to.height * 3;
-    const scale = from ? from.width / to.width : 0.5;
-    // 抛物线：水平匀速，竖直方向先减速上升到顶点、再加速落下，两段时长按 √高度 分配
-    const apex = Math.min(dy, 0) - HOP_LIFT;
+    const dy = from ? from.top + from.height / 2 - (to.top + to.height / 2) : -size * 3;
+    gsap.set(hail, { x: dx, y: dy, scale: from ? from.width / size : 0.5 });
+    return { dy, top: from ? from.top : null };
+  }
+
+  function hop(): void {
+    const { dy, top } = alignToRuler();
+    // 抛物线：水平匀速，竖直方向先减速上升到顶点、再加速落下，两段时长按 √高度 分配。
+    // 顶点不越过上方的文字（移动端文字离地面很近）
+    const room = top === null ? HOP_LIFT : top - text.getBoundingClientRect().bottom - 24;
+    const apex = Math.min(dy, 0) - Math.max(HOP_MIN_LIFT, Math.min(HOP_LIFT, room));
     const up = Math.sqrt(dy - apex);
     const down = Math.sqrt(-apex);
     const tUp = (HOP_TIME * up) / (up + down);
-
-    gsap.set(hail, { x: dx, y: dy, scale, autoAlpha: 1 });
-    gsap.set(puddle, { opacity: 0, scale: 0.2, transformOrigin: '50% 50%' });
-    gsap.set(face, { opacity: 0 });
     mascot.setExpression('scared');
-    setStage('landed', 1);
 
-    tl = gsap
+    anim = gsap
       .timeline()
       .to(hail, { x: 0, scale: 1, rotation: -360, duration: HOP_TIME, ease: 'none' }, 0)
       .to(hail, { y: apex, duration: tUp, ease: 'power1.out' }, 0)
@@ -85,6 +88,19 @@ export function initEnding(section: HTMLElement): void {
       .to(puddle, { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.inOut' }, 'melt')
       .to(hail, { opacity: 0, duration: 0.7, ease: 'power1.in' }, 'melt+=1.1')
       .to(face, { opacity: 1, duration: 0.5 }, 'melt+=1.5');
+  }
+
+  function play(): void {
+    if (handed) return;
+    handed = true;
+
+    gsap.set(hail, { rotation: 0, opacity: 1, transformOrigin: '50% 50%', autoAlpha: 1 });
+    gsap.set(puddle, { opacity: 0, scale: 0.2, transformOrigin: '50% 50%' });
+    gsap.set(face, { opacity: 0 });
+    alignToRuler();
+    setStage('landed', 1);
+    // 起跳前先贴着尺上主角停一下（逐帧对齐，滚动还没停稳也不会错位），等它淡出完再起跳
+    anim = gsap.to({}, { duration: HOLD, onUpdate: alignToRuler, onComplete: hop });
   }
 
   // 滚到页面底才交棒
