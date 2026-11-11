@@ -2,7 +2,7 @@ import { OUTCOME_ORDER, outcomeColor, outcomeIcon } from '../art/ch4';
 import { labPresets, outcomeMeta } from '../content';
 import { simulate } from '../lab/model';
 import type { SimResult } from '../lab/model';
-import { LAB_GRID, fractionOf, gridSize, outcomeGrid, paramsAt } from '../lab/outcome-map';
+import { LAB_GRID, bitmapRow, fractionOf, gridSize, outcomeGrid, paramsAt } from '../lab/outcome-map';
 import { REST_TIME, STAGE, kmToY, stageFrame, updraftArrows } from '../lab/stage';
 import type { StageFrame } from '../lab/stage';
 import { createMascot } from '../mascot/mascot';
@@ -13,9 +13,9 @@ import { reducedMotion } from '../utils/motion';
 // 所有可视化只用 simulate 的输出和两个参数本身。
 
 const ARROW_LANES = [226, 146, 254, 118, 282, 90]; // 箭头所在的竖线（x），按出现顺序由内向外
-const ARROW_REST_Y = [300, 330, 240, 200, 330, 290]; // 静止时（reduced-motion）的位置，与 index.html 一致
 const ARROW_BOTTOM = 372; // 箭头在云体内循环上升的范围
 const ARROW_SPAN = 262;
+const IMPACT_Y = STAGE.groundY - 4; // 落地撞击线的起点：贴着地面线上沿
 const MAP_W_TICKS = [5, 10, 20, 30, 40, 50];
 const MAP_H_TICKS = [2, 3, 4, 5, 6];
 // 预设名在地图上的摆法：靠右边缘的往左放，相邻的上下错开
@@ -80,7 +80,7 @@ export function initCh4(section: HTMLElement): void {
   outcomeGrid(LAB_GRID).forEach((line, row) => {
     line.forEach((outcome, col) => {
       ctx.fillStyle = outcomeColor[outcome];
-      ctx.fillRect(col, rows - 1 - row, 1, 1); // 位图第 0 行在上，对应 H₀ 最高的一行
+      ctx.fillRect(col, bitmapRow(row), 1, 1);
     });
   });
 
@@ -115,7 +115,7 @@ export function initCh4(section: HTMLElement): void {
         const half = f.size / 2 + 4;
         impact.setAttribute(
           'd',
-          `M${(STAGE.hailX - half).toFixed(1)} 466l-6 -6M${(STAGE.hailX + half).toFixed(1)} 466l6 -6`,
+          `M${(STAGE.hailX - half).toFixed(1)} ${IMPACT_Y}l-6 -6M${(STAGE.hailX + half).toFixed(1)} ${IMPACT_Y}l6 -6`,
         );
       }
     }
@@ -129,10 +129,8 @@ export function initCh4(section: HTMLElement): void {
         return;
       }
       el.setAttribute('display', 'inline');
-      if (reducedMotion) {
-        el.setAttribute('transform', `translate(${ARROW_LANES[i]} ${ARROW_REST_Y[i]})`);
-        return;
-      }
+      // reduced-motion：箭头留在 index.html 里写好的静止位置（这里是唯一会改它 transform 的地方）
+      if (reducedMotion) return;
       // 每支箭头在云体内自下而上循环；首尾淡入淡出，避免凭空出现
       const p = ((arrowTravel + (i * ARROW_SPAN * 5) / 6) % ARROW_SPAN) / ARROW_SPAN;
       el.setAttribute('transform', `translate(${ARROW_LANES[i]} ${(ARROW_BOTTOM - p * ARROW_SPAN).toFixed(1)})`);
@@ -175,10 +173,13 @@ export function initCh4(section: HTMLElement): void {
     hOut.textContent = `${h0.toFixed(1)} km`;
 
     const rain = sim.outcome === 'rain';
-    chip.innerHTML = outcomeIcon(sim.outcome);
-    chip.dataset.outcome = sim.outcome;
-    chip.style.background = outcomeColor[sim.outcome];
-    if (label.textContent !== outcomeMeta[sim.outcome].label) label.textContent = outcomeMeta[sim.outcome].label;
+    // 结局没变（拖动时绝大多数帧）就不重建图标
+    if (chip.dataset.outcome !== sim.outcome) {
+      chip.innerHTML = outcomeIcon(sim.outcome);
+      chip.dataset.outcome = sim.outcome;
+      chip.style.background = outcomeColor[sim.outcome];
+      label.textContent = outcomeMeta[sim.outcome].label;
+    }
     dmaxEl.textContent = `${sim.maxDiameterCm.toFixed(1)} cm`;
     dfinalEl.textContent = rain ? '—（全化了）' : `${sim.finalDiameterCm.toFixed(1)} cm`;
     vlandEl.textContent = rain ? '—' : `${sim.landingSpeedMs.toFixed(0)} m/s`;
@@ -223,27 +224,33 @@ export function initCh4(section: HTMLElement): void {
     presetBox.appendChild(btn);
   }
 
-  // 地图：点击或拖动同时设置两个参数。拖动期间在 window 上跟踪，指针滑出地图也不丢。
+  // 地图：点击或拖动同时设置两个参数。按下时捕获这个指针：滑出地图也不丢，别的指针（第二根手指）不掺和。
+  let dragId: number | null = null;
+  let dragRect: DOMRect; // 按下时量一次，拖动过程中不再逐帧量
   const pick = (e: PointerEvent): void => {
-    const r = plot.getBoundingClientRect();
-    const p = paramsAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+    const p = paramsAt((e.clientX - dragRect.left) / dragRect.width, (e.clientY - dragRect.top) / dragRect.height);
     setParams(p.w, p.h0);
   };
-  const endDrag = (): void => {
+  const endDrag = (e: PointerEvent): void => {
+    if (e.pointerId !== dragId) return;
+    dragId = null;
     plot.classList.remove('is-dragging');
-    window.removeEventListener('pointermove', pick);
-    window.removeEventListener('pointerup', endDrag);
-    window.removeEventListener('pointercancel', endDrag);
   };
   plot.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || dragId !== null) return;
     e.preventDefault(); // 不选中文字、不拖出图片幽灵
+    plot.setPointerCapture(e.pointerId);
+    dragId = e.pointerId;
+    dragRect = plot.getBoundingClientRect();
     plot.classList.add('is-dragging');
     pick(e);
-    window.addEventListener('pointermove', pick);
-    window.addEventListener('pointerup', endDrag);
-    window.addEventListener('pointercancel', endDrag);
   });
+  plot.addEventListener('pointermove', (e) => {
+    if (e.pointerId === dragId) pick(e);
+  });
+  plot.addEventListener('pointerup', endDrag);
+  plot.addEventListener('pointercancel', endDrag);
+  plot.addEventListener('lostpointercapture', endDrag); // 捕获被系统收走时也收尾，免得卡在拖动状态
 
   update(); // 初始状态（25 m/s, 4.0 km）→ 危险冰雹
 

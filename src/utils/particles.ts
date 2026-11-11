@@ -1,4 +1,4 @@
-export type ParticleMode = 'off' | 'hail-light' | 'rain' | 'small-hail' | 'hail' | 'giant-hail';
+export type ParticleMode = 'off' | 'hail-light';
 
 interface P {
   x: number;
@@ -9,13 +9,9 @@ interface P {
 
 const MODES: Record<
   Exclude<ParticleMode, 'off'>,
-  { count: number; rMin: number; rMax: number; vMin: number; vMax: number; streak: boolean }
+  { count: number; rMin: number; rMax: number; vMin: number; vMax: number }
 > = {
-  'hail-light': { count: 45, rMin: 2, rMax: 5, vMin: 3, vMax: 6, streak: false },
-  rain: { count: 160, rMin: 1, rMax: 1.6, vMin: 9, vMax: 13, streak: true },
-  'small-hail': { count: 110, rMin: 1.5, rMax: 3, vMin: 5, vMax: 8, streak: false },
-  hail: { count: 90, rMin: 4, rMax: 7, vMin: 8, vMax: 11, streak: false },
-  'giant-hail': { count: 36, rMin: 9, rMax: 16, vMin: 11, vMax: 15, streak: false },
+  'hail-light': { count: 45, rMin: 2, rMax: 5, vMin: 3, vMax: 6 },
 };
 
 export class ParticleField {
@@ -73,24 +69,15 @@ export class ParticleField {
     if (this.ps.length > target) this.ps.length = target;
 
     this.ctx.fillStyle = 'rgba(238,248,255,0.92)';
-    this.ctx.strokeStyle = 'rgba(160,200,235,0.8)';
-    this.ctx.lineWidth = 1.5;
     for (const p of this.ps) {
       p.y += p.vy;
       if (p.y - p.r > h) {
         p.y = -p.r * 2;
         p.x = Math.random() * w;
       }
-      if (cfg.streak) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(p.x, p.y);
-        this.ctx.lineTo(p.x, p.y + p.r * 8);
-        this.ctx.stroke();
-      } else {
-        this.ctx.beginPath();
-        this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      this.ctx.fill();
     }
   };
 }

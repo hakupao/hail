@@ -42,6 +42,11 @@ export function outcomeGrid(g: MapGrid = LAB_GRID): Outcome[][] {
   );
 }
 
+/** 结局矩阵的行号 → 位图（canvas）的像素行。位图第 0 行在最上面，对应 H₀ 最高的一行；列号不用换（col 0 = W 最小 = 最左） */
+export function bitmapRow(row: number, g: MapGrid = LAB_GRID): number {
+  return gridSize(g).rows - 1 - row;
+}
+
 const clampIndex = (i: number, n: number): number => Math.min(n - 1, Math.max(0, i));
 
 /** 参数 → 所在格的行列号（超出范围的参数夹到边缘格） */

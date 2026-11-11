@@ -29,10 +29,10 @@ export const labPresets = [
   { name: '1986 孟加拉', w: 50, h0: 3 },
 ];
 
-// 实验室四种结局的展示元数据
-export const outcomeMeta: Record<Outcome, { emoji: string; label: string; tone: string }> = {
-  rain: { emoji: '☔', label: '只下暴雨', tone: '#4a90d9' },
-  'small-hail': { emoji: '🌨', label: '小雹落地', tone: '#7fb6e8' },
-  hail: { emoji: '🧊', label: '危险冰雹', tone: '#e8a23a' },
-  'giant-hail': { emoji: '💀', label: '巨雹警报', tone: '#e8503a' },
+// 实验室四种结局的名称（图标与颜色在 src/art/ch4.ts）
+export const outcomeMeta: Record<Outcome, { label: string }> = {
+  rain: { label: '只下暴雨' },
+  'small-hail': { label: '小雹落地' },
+  hail: { label: '危险冰雹' },
+  'giant-hail': { label: '巨雹警报' },
 };

@@ -1,6 +1,6 @@
 import type { Outcome } from '../lab/model';
 
-// 第四章专用：四种结局的内联 SVG 图标与颜色（替代 content.ts → outcomeMeta 里的 emoji / tone）。
+// 第四章专用：四种结局的内联 SVG 图标与颜色（结局名称在 content.ts → outcomeMeta）。
 // 图标规则同 icons.ts：24×24、currentColor、圆头线端。
 
 const OUTCOME_ICONS: Record<Outcome, string> = {

@@ -4,11 +4,8 @@ import type { SimResult } from './model';
 // 坐标单位是舞台 SVG 的 viewBox 单位（index.html 里 #lab-stage-svg 的 viewBox = 0 0 320 520）。
 
 export const STAGE = {
-  width: 320,
-  height: 520,
   groundY: 470, // 0 km
   unitPerKm: 55, // 纵轴等比：8 km 在 y = 30
-  topKm: 8,
   hailX: 186, // 示范冰雹下落的竖线
   growKm: 7, // 冰雹在云里长大的位置：高于 0℃ 线能到的最高处（6 km）
 } as const;
