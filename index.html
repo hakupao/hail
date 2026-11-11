@@ -75,44 +75,102 @@
     <section id="ch2" class="scene on-dark">
       <div class="scene-inner">
         <h2><span class="ch-no">第二章</span>落地速度：v ∝ √d</h2>
-        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长，迎风面积只随平方增长——所以 <span class="formula">v ∝ √d：个头越大，落得越快</span>。</p>
+        <p class="lead">下落时重力与空气阻力很快平衡，进入"终端速度"。质量随直径三次方增长，迎风面积只随平方增长——所以 <span class="formula"><span class="formula-eq">v ∝ √d</span>：个头越大，落得越快</span>。</p>
+
+        <!-- 坠落竞速：球落在 .lane-drop 里（终点就是它的静态布局位置），标签在上、读数在下，互不重叠 -->
         <div class="race">
           <div class="race-track">
-            <div class="lane">
-              <div class="race-dial">35 km/h</div>
-              <div class="race-ball" style="--d: 10px"></div>
-              <div class="lane-label">黄豆 1 cm</div>
+            <div class="lane" style="--d: 1; --f: 0.21875">
+              <div class="lane-head"><span class="lane-icon" data-ref="bean" aria-hidden="true"></span><span class="lane-name">黄豆</span><span class="lane-size">1 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">35</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">63 km/h</div>
-              <div class="race-ball" style="--d: 25px"></div>
-              <div class="lane-label">乒乓球 2.5 cm</div>
+            <div class="lane" style="--d: 2.5; --f: 0.39375">
+              <div class="lane-head"><span class="lane-icon" data-ref="pingpong" aria-hidden="true"></span><span class="lane-name">乒乓球</span><span class="lane-size">2.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">63</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">99 km/h</div>
-              <div class="race-ball" style="--d: 45px"></div>
-              <div class="lane-label">高尔夫 4.5 cm</div>
+            <div class="lane" style="--d: 4.5; --f: 0.61875">
+              <div class="lane-head"><span class="lane-icon" data-ref="golf" aria-hidden="true"></span><span class="lane-name">高尔夫</span><span class="lane-size">4.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">99</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
-            <div class="lane">
-              <div class="race-dial">144 km/h</div>
-              <div class="race-ball" style="--d: 75px"></div>
-              <div class="lane-label">垒球 7.5 cm</div>
+            <div class="lane" style="--d: 7.5; --f: 0.9">
+              <div class="lane-head"><span class="lane-icon" data-ref="softball" aria-hidden="true"></span><span class="lane-name">垒球</span><span class="lane-size">7.5 cm</span></div>
+              <div class="lane-drop"><div class="race-ball"></div></div>
+              <div class="lane-speed">
+                <div class="lane-read"><span class="lane-kmh">144</span> <span class="lane-unit">km/h</span></div>
+                <div class="lane-gauge" aria-hidden="true"><div class="lane-gauge-bar"><div class="lane-gauge-fill"></div></div><i class="lane-ref lane-ref-60"><b>60</b></i><i class="lane-ref lane-ref-120"><b>120</b></i></div>
+              </div>
             </div>
           </div>
-          <button class="race-replay" type="button">↻ 再比一次</button>
+          <div class="race-foot">
+            <button class="race-replay" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4.2h-4.2"/></svg>
+              再比一次
+            </button>
+            <p class="race-legend">四颗冰雹从同一高度同时落下。读数下的速度条满格是 160 km/h，两道刻线是 <b>60</b> 城市行车、<b>120</b> 高速公路。</p>
+          </div>
         </div>
-        <table class="speed-table">
-          <thead>
-            <tr><th scope="col">直径</th><th scope="col">参照物</th><th scope="col">落地速度</th><th scope="col">危险程度</th></tr>
-          </thead>
-          <tbody>
-            <tr class="speed-row"><td>1 cm</td><td>黄豆～指甲</td><td>~10 m/s（35 km/h）</td><td>砸着疼，基本无害</td></tr>
-            <tr class="speed-row"><td>2–3 cm</td><td>硬币～乒乓球</td><td>15–20 m/s（50–70 km/h）</td><td>可致淤青、砸伤眼睛</td></tr>
-            <tr class="speed-row"><td>4–5 cm</td><td>高尔夫球</td><td>25–30 m/s（约 100 km/h）</td><td>头部裂伤、脑震荡风险</td></tr>
-            <tr class="speed-row"><td>7–8 cm</td><td>棒球～垒球</td><td>35–45 m/s（130–160 km/h）</td><td>可能致命</td></tr>
-          </tbody>
-        </table>
-        <p class="note">数值受形状、密度、风的影响，为典型范围。</p>
+
+        <div class="ch2-data">
+          <!-- 曲线图：横轴 0–8 cm，纵轴 0–45 m/s。SVG 的 viewBox 就是数据坐标（y 朝下，所以 y = 45 − v）；
+               曲线与圆点的静态值供无 JS 时使用，有 JS 时由 ch2-speed.ts 按 terminalVelocity / raceLanes 重算覆盖 -->
+          <figure class="vchart ch2-panel">
+            <h3>直径越大，落得越快</h3>
+            <div class="vchart-plot" role="img" aria-label="冰雹直径与落地速度的曲线图。横轴直径 0 到 8 厘米，纵轴速度 0 到 45 米每秒。曲线是简化规律 v ∝ √d；四个圆点是典型实测值：黄豆 1 厘米、乒乓球 2.5 厘米、高尔夫 4.5 厘米、垒球 7.5 厘米，速度依次升高。两条虚线是参照：城市行车 60 km/h、高速公路 120 km/h。">
+              <svg class="vchart-svg" viewBox="0 0 8 45" preserveAspectRatio="none" aria-hidden="true">
+                <defs><clipPath id="vchart-clip"><rect x="-0.5" y="-5" width="9" height="55" /></clipPath></defs>
+                <path class="vchart-grid" d="M0 35H8M0 25H8M0 15H8M0 5H8M2 0V45M4 0V45M6 0V45M8 0V45" />
+                <path class="vchart-ref" d="M0 28.333H8M0 11.667H8" />
+                <path class="vchart-axis" d="M0 0V45H8" />
+                <path class="vchart-curve" clip-path="url(#vchart-clip)" d="M0 45L0.0125 43.77L0.025 43.261L0.05 42.54L0.1 41.521L0.2 40.081L0.3 38.975L0.4 38.043L0.5 37.222L0.6 36.479L0.7 35.797L0.8 35.161L0.9 34.564L1 34L1.1 33.463L1.2 32.95L1.3 32.458L1.4 31.985L1.5 31.528L1.6 31.086L1.7 30.658L1.8 30.242L1.9 29.838L2 29.444L2.1 29.059L2.2 28.684L2.3 28.318L2.4 27.959L2.5 27.607L2.6 27.263L2.7 26.925L2.8 26.593L2.9 26.268L3 25.947L3.1 25.633L3.2 25.323L3.3 25.018L3.4 24.717L3.5 24.421L3.6 24.129L3.7 23.841L3.8 23.557L3.9 23.277L4 23L4.1 22.727L4.2 22.457L4.3 22.19L4.4 21.926L4.5 21.665L4.6 21.408L4.7 21.153L4.8 20.9L4.9 20.65L5 20.403L5.1 20.159L5.2 19.916L5.3 19.676L5.4 19.438L5.5 19.203L5.6 18.969L5.7 18.738L5.8 18.508L5.9 18.281L6 18.056L6.1 17.832L6.2 17.61L6.3 17.39L6.4 17.172L6.5 16.955L6.6 16.74L6.7 16.527L6.8 16.316L6.9 16.105L7 15.897L7.1 15.69L7.2 15.484L7.3 15.28L7.4 15.077L7.5 14.875L7.6 14.675L7.7 14.476L7.8 14.279L7.9 14.082L8 13.887" />
+              </svg>
+              <span class="vaxis-title vaxis-y">速度（m/s）</span>
+              <span class="vtick vtick-y" style="bottom: 22.222%">10</span>
+              <span class="vtick vtick-y" style="bottom: 44.444%">20</span>
+              <span class="vtick vtick-y" style="bottom: 66.667%">30</span>
+              <span class="vtick vtick-y" style="bottom: 88.889%">40</span>
+              <span class="vtick vtick-x" style="left: 0%">0</span>
+              <span class="vtick vtick-x" style="left: 25%">2</span>
+              <span class="vtick vtick-x" style="left: 50%">4</span>
+              <span class="vtick vtick-x" style="left: 75%">6</span>
+              <span class="vtick vtick-x" style="left: 100%">8</span>
+              <span class="vaxis-title vaxis-x">直径（cm）</span>
+              <span class="vref-label" style="bottom: 37.037%">城市行车 60 km/h</span>
+              <span class="vref-label" style="bottom: 74.074%">高速公路 120 km/h</span>
+              <div class="vdot lbl-br" style="left: 12.5%; bottom: 22.222%; --r: 9px"><i class="vdot-mark"></i><span class="vdot-label">黄豆</span></div>
+              <div class="vdot lbl-br" style="left: 31.25%; bottom: 38.889%; --r: 12px"><i class="vdot-mark"></i><span class="vdot-label">乒乓球</span></div>
+              <div class="vdot lbl-tl" style="left: 56.25%; bottom: 61.111%; --r: 15px"><i class="vdot-mark"></i><span class="vdot-label">高尔夫</span></div>
+              <div class="vdot lbl-tl" style="left: 93.75%; bottom: 88.889%; --r: 19px"><i class="vdot-mark"></i><span class="vdot-label">垒球</span></div>
+            </div>
+            <figcaption>曲线是简化规律，圆点是典型实测值——点不完全落在线上是对的。虚线是两个参照速度。</figcaption>
+          </figure>
+
+          <div class="speed-panel ch2-panel">
+            <table class="speed-table" role="table">
+              <thead role="rowgroup">
+                <tr role="row"><th scope="col" role="columnheader">直径</th><th scope="col" role="columnheader">参照物</th><th scope="col" role="columnheader">落地速度</th><th scope="col" role="columnheader" class="danger-h">危险程度</th></tr>
+              </thead>
+              <tbody role="rowgroup">
+                <tr role="row" class="tier-1"><td role="cell">1 cm</td><td role="cell">黄豆～指甲</td><td role="cell"><span class="sp-ms">~10 m/s</span><span class="sp-kmh">（35 km/h）</span></td><td class="danger" role="cell">砸着疼，基本无害</td></tr>
+                <tr role="row" class="tier-2"><td role="cell">2–3 cm</td><td role="cell">硬币～乒乓球</td><td role="cell"><span class="sp-ms">15–20 m/s</span><span class="sp-kmh">（50–70 km/h）</span></td><td class="danger" role="cell">可致淤青、砸伤眼睛</td></tr>
+                <tr role="row" class="tier-3"><td role="cell">4–5 cm</td><td role="cell">高尔夫球</td><td role="cell"><span class="sp-ms">25–30 m/s</span><span class="sp-kmh">（约 100 km/h）</span></td><td class="danger" role="cell">头部裂伤、脑震荡风险</td></tr>
+                <tr role="row" class="tier-4"><td role="cell">7–8 cm</td><td role="cell">棒球～垒球</td><td role="cell"><span class="sp-ms">35–45 m/s</span><span class="sp-kmh">（130–160 km/h）</span></td><td class="danger" role="cell">可能致命</td></tr>
+              </tbody>
+            </table>
+            <p class="note">数值受形状、密度、风的影响，为典型范围。</p>
+          </div>
+        </div>
       </div>
     </section>
 
