@@ -158,7 +158,7 @@
             <div class="tex-display" data-tex="\underbrace{\rho_{\text{冰}}\,\tfrac{\pi}{6}\,d^{3}\,g}_{\text{重力}} \;=\; \underbrace{\tfrac{1}{2}\,\rho_{\text{气}}\,C_d\,\tfrac{\pi}{4}\,d^{2}\,v^{2}}_{\text{空气阻力}}" data-display></div>
             <div class="tex-display" data-tex="v \;=\; \sqrt{\frac{4\,\rho_{\text{冰}}\,g}{3\,\rho_{\text{气}}\,C_d}}\;\cdot\sqrt{d}\;\;\propto\;\;\sqrt{d}" data-display></div>
           </div>
-          <p class="math-note"><span class="tex" data-tex="\rho_{\text{冰}}"></span> 冰的密度、<span class="tex" data-tex="\rho_{\text{气}}"></span> 空气密度、<span class="tex" data-tex="C_d"></span> 阻力系数、<span class="tex" data-tex="g"></span> 重力加速度、<span class="tex" data-tex="d"></span> 直径。</p>
+          <p class="math-note"><span class="tex" data-tex="\rho_{\text{冰}}"></span> 冰的密度、<span class="tex" data-tex="\rho_{\text{气}}"></span> 空气密度、<span class="tex" data-tex="C_d"></span> 阻力系数、<span class="tex" data-tex="g"></span> 重力加速度、<span class="tex" data-tex="d"></span> 直径。<br />推比例时把前三个量当作常数；实际阻力系数随大小和形状变化，速度并不严格按这条式子增长。</p>
         </figure>
 
         <!-- 坠落竞速：球落在 .lane-drop 里（终点就是它的静态布局位置），标签在上、读数在下，互不重叠 -->
@@ -237,7 +237,7 @@
               <div class="vdot lbl-tl" style="left: 56.25%; bottom: 61.111%; --r: 15px"><i class="vdot-mark"></i><span class="vdot-label">高尔夫</span></div>
               <div class="vdot lbl-tl" style="left: 93.75%; bottom: 88.889%; --r: 19px"><i class="vdot-mark"></i><span class="vdot-label">垒球</span></div>
             </div>
-            <figcaption>曲线是简化规律，圆点是各尺寸的典型值——点不完全落在线上是对的。虚线是两个参照速度。</figcaption>
+            <figcaption>曲线是简化规律（按 2–3 厘米的冰雹校准），圆点是各尺寸的典型值——大冰雹的实际速度比曲线高，点不完全落在线上是对的。虚线是两个参照速度。</figcaption>
           </figure>
 
           <div class="speed-panel ch2-panel">
@@ -371,7 +371,7 @@
             <div class="tex-display" data-tex="d=5\,\text{cm}:\quad m\approx 0.059\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.059\times 26^{2}\approx 20\,\text{J}" data-display></div>
             <div class="tex-display" data-tex="d=8\,\text{cm}:\quad m\approx 0.24\,\text{kg},\;\; E\approx\tfrac{1}{2}\times 0.24\times 37.5^{2}\approx 170\,\text{J}" data-display></div>
           </div>
-          <p class="math-note">冰的密度取 0.9 g/cm³；速度取速度表范围内的值（5 cm：26 m/s，8 cm：37.5 m/s）。</p>
+          <p class="math-note">冰的密度取 0.9 g/cm³；速度取第二章速度表对应档位范围内的值（5 cm：26 m/s，8 cm：37.5 m/s），不是用第四章的简化式算的。</p>
         </figure>
         <div class="energy">
           <div class="energy-row energy-hail5" style="--j: 20" data-joules="20">
@@ -551,7 +551,7 @@
             <div class="tex-display" data-tex="d_{\max} = \eta\left(\frac{W}{k}\right)^{2},\qquad \eta = 0.65" data-display></div>
             <div class="tex-display" data-tex="d_{\text{落地}} = \max\!\left(0,\; d_{\max} - r\cdot\frac{1000\,H_0}{k\sqrt{d_{\max}}}\right),\qquad r = 0.002\ \text{cm/s}" data-display></div>
           </div>
-          <p class="math-note">单位：<span class="tex" data-tex="d"></span> 厘米、<span class="tex" data-tex="v"></span> 与 <span class="tex" data-tex="W"></span> 米每秒、<span class="tex" data-tex="H_0"></span> 千米。<span class="tex" data-tex="k"></span> 是按小冰雹校准的，对大冰雹会偏低——第二章曲线图里高出曲线的圆点就是这个差距。</p>
+          <p class="math-note">单位：<span class="tex" data-tex="d"></span> 厘米、<span class="tex" data-tex="v"></span> 与 <span class="tex" data-tex="W"></span> 米每秒、<span class="tex" data-tex="H_0"></span> 千米；<span class="tex" data-tex="W"></span> 上升气流强度、<span class="tex" data-tex="H_0"></span> 0℃ 层高度、<span class="tex" data-tex="\eta"></span> 生长效率、<span class="tex" data-tex="r"></span> 融化速率。<br /><span class="tex" data-tex="k"></span> 是按 2–3 厘米的冰雹校准的；直径超过 4 厘米后，典型速度比这条式子高 15–25%——第二章曲线图里高出曲线的圆点就是这个差距。</p>
         </figure>
         <p class="note">简化教学模型：<span class="tex" data-tex="v = k\sqrt{d}"></span> 加线性融化损耗，用于直觉演示，并非数值天气预报。</p>
       </div>
