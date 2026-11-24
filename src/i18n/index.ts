@@ -40,8 +40,8 @@ function mountSwitcher(locale: Locale): void {
   select.addEventListener('change', () => {
     const next = select.value as LangPref;
     try {
-      if (next === 'auto') localStorage.removeItem(PREF_KEY);
-      else localStorage.setItem(PREF_KEY, next);
+      if (next === 'auto') sessionStorage.removeItem(PREF_KEY);
+      else sessionStorage.setItem(PREF_KEY, next);
     } catch {
       /* 隐私模式存不了：只影响记忆，不影响这次切换 */
     }

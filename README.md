@@ -62,7 +62,7 @@ TeX 写错，构建会失败并给出 KaTeX 的报错位置；占位没被转换
 ## 多语言
 
 - 语言选择在 Hero 左上角：跟随系统 / 中文 / 日本語 / English。跟随系统时，系统首选语言是中文系 → 中文、日文 → 日文，其余一律英文。
-- 偏好存在 `localStorage`（`hail-lang`）；分享链接可以带 `?lang=zh|ja|en`，它优先于偏好但不会被记住。
+- 每次打开都跟随系统语言。手动选的语言存在 `sessionStorage`（`hail-lang`），只在当前标签页有效，关掉再开又回到跟随系统。分享链接可以带 `?lang=zh|ja|en`，它优先于手动选择。
 - 中文是源文本，直接写在 `index.html` 里，也是无 JS 时的兜底。要翻译的元素加 `data-i18n="key"`（属性用 `data-i18n-attr="aria-label:key"`），日文 / 英文写进 `src/i18n/strings/{ja,en}.ts`。
 - 段落里的公式等节点：给它加 `data-slot="f"`，译文里写 `{f}`，原节点会原样搬过去。
 - 公式里带汉字的（`\text{冰}` 之类）每种语言各写一份占位，用 `data-tex-lang="zh|ja|en"` 标明，运行时只留当前语言那份。

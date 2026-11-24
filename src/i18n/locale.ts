@@ -1,5 +1,5 @@
 // 三语：中文（页面源文本，也是无 JS 时的兜底）、日文、英文。
-// 偏好存在 localStorage：'auto' 跟随系统语言——中文系 → zh、日文 → ja、其余一律 en。地址里的 ?lang= 优先于偏好（只在 head 脚本里处理）。
+// 每次打开都跟随系统语言（中文系 → zh、日文 → ja、其余一律 en）；手动选的语言存在 sessionStorage，只在本标签页有效（切换要刷新页面，靠它记住）。地址里的 ?lang= 优先于偏好（只在 head 脚本里处理）。
 // index.html 的 <head> 内联脚本里有一份同样逻辑的副本（它必须在任何模块加载前跑完），改这里要同步改那里。
 
 export type Locale = 'zh' | 'ja' | 'en';
@@ -29,7 +29,7 @@ export function resolveLocale(pref: string | null | undefined, languages: readon
 
 export function readPref(): LangPref {
   try {
-    const v = localStorage.getItem(PREF_KEY);
+    const v = sessionStorage.getItem(PREF_KEY);
     return isLocale(v) ? v : 'auto';
   } catch {
     return 'auto';

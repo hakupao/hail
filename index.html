@@ -9,11 +9,11 @@
   <script>
     // html.js 门控预隐藏（防入场闪现）。失效保护：模块脚本 3 秒内没跑起来（不支持 module、加载失败、顶层抛错）就撤掉 js 类，内容照常可读
     document.documentElement.classList.add('js');
-    // 语言：偏好 zh / ja / en，或跟随系统（中文系 → zh、日文 → ja、其余 → en）。与 src/i18n/locale.ts 的 resolveLocale 同一逻辑。
+    // 语言：默认跟随系统；本标签页里手动选过就用选的（中文系 → zh、日文 → ja、其余 → en）。与 src/i18n/locale.ts 的 resolveLocale 同一逻辑。
     // 页面源文本是中文：要换成日文 / 英文时先藏起 #app，等 main.ts 换完文案再显示，避免先闪一下中文
     (function () {
       var pref = (/[?&]lang=(zh|ja|en)(?:&|$)/.exec(location.search) || [])[1] || null; // ?lang= 优先（分享链接用，不写入偏好）
-      if (!pref) try { pref = localStorage.getItem('hail-lang'); } catch (e) {}
+      if (!pref) try { pref = sessionStorage.getItem('hail-lang'); } catch (e) {} // 手动选的语言只在本标签页有效：每次新打开都跟随系统
       if (pref !== 'zh' && pref !== 'ja' && pref !== 'en') {
         var n = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
         pref = n.indexOf('zh') === 0 ? 'zh' : n.indexOf('ja') === 0 ? 'ja' : 'en';
