@@ -5,6 +5,7 @@ import type { Outcome, SimResult } from '../lab/model';
 import { LAB_GRID, bitmapRow, fractionOf, gridSize, outcomeGrid, paramsAt } from '../lab/outcome-map';
 import { LOOP_SECONDS, REST_TIME, STAGE, TIMING, fallSeconds, kmToY, landingBounce, meltedCm, stageFrame, updraftArrows } from '../lab/stage';
 import type { StageFrame } from '../lab/stage';
+import { tr } from '../i18n/locale';
 import { createMascot } from '../mascot/mascot';
 import type { Expression, Reaction } from '../mascot/mascot';
 import { observeInView, reducedMotion } from '../utils/motion';
@@ -21,6 +22,8 @@ const MAP_W_TICKS = [5, 10, 20, 30, 40, 50];
 const MAP_H_TICKS = [2, 3, 4, 5, 6];
 // 预设名在地图上的摆法：靠右边缘的往左放，相邻的上下错开
 const PRESET_LABEL_SIDE = ['right', 'right-up', 'left-down'];
+const ALL_MELTED = tr({ zh: '—（全化了）', ja: '—（全部融けた）', en: '– (all melted)' });
+const LIST_SEP = tr({ zh: '，', ja: '、', en: ', ' });
 
 // ---------- v3：示范冰雹的小脸 ----------
 const STAGE_W = 320; // 舞台 viewBox（index.html 里 #lab-stage-svg）
@@ -97,7 +100,7 @@ export function initCh4(section: HTMLElement): void {
   const mapEl = q<HTMLElement>('#lab-map');
   const pct = (f: number): string => `${(f * 100).toFixed(2)}%`;
   mapEl.innerHTML = `
-    <div class="lab-map-head"><span class="lab-map-title">结局地图</span><span class="lab-map-hint">点一下或拖动，两个参数一起调</span></div>
+    <div class="lab-map-head"><span class="lab-map-title">${tr({ zh: '结局地图', ja: '結末マップ', en: 'Outcome map' })}</span><span class="lab-map-hint">${tr({ zh: '点一下或拖动，两个参数一起调', ja: 'タップかドラッグで2つの値を同時に調整', en: 'Tap or drag to set both at once' })}</span></div>
     <div class="lab-map-body">
       <div class="lab-map-yaxis">${MAP_H_TICKS.map((h) => `<span style="top:${pct(fractionOf(LAB_GRID.wMin, h).fy)}">${h}</span>`).join('')}</div>
       <div class="lab-map-plot">
@@ -112,7 +115,7 @@ export function initCh4(section: HTMLElement): void {
       </div>
       <div class="lab-map-xaxis">${MAP_W_TICKS.map((w) => `<span style="left:${pct(fractionOf(w, LAB_GRID.hMin).fx)}">${w}</span>`).join('')}</div>
     </div>
-    <p class="lab-map-axes">横轴：上升气流（m/s）　纵轴：0℃ 层（km）</p>
+    <p class="lab-map-axes">${tr({ zh: '横轴：上升气流（m/s）　纵轴：0℃ 层（km）', ja: '横軸：上昇気流（m/s）　縦軸：0℃ 層（km）', en: 'Horizontal: updraft (m/s) · Vertical: 0℃ level (km)' })}</p>
     <ul class="lab-map-legend">${OUTCOME_ORDER.map((o) => `<li><i style="background:${outcomeColor[o]}"></i>${outcomeMeta[o].label}</li>`).join('')}</ul>`;
 
   const plot = q<HTMLElement>('.lab-map-plot');
@@ -281,11 +284,11 @@ export function initCh4(section: HTMLElement): void {
       shownOutcome = sim.outcome;
     }
     dmaxEl.textContent = `${sim.maxDiameterCm.toFixed(1)} cm`;
-    dfinalEl.textContent = rain ? '—（全化了）' : `${sim.finalDiameterCm.toFixed(1)} cm`;
+    dfinalEl.textContent = rain ? ALL_MELTED : `${sim.finalDiameterCm.toFixed(1)} cm`;
     vlandEl.textContent = rain ? '—' : `${sim.landingSpeedMs.toFixed(0)} m/s`;
 
     // 公式块下「代入当前参数」：同一次 simulate 的结果（落地直径按模型输出，全化了就是 0）
-    liveParams.innerHTML = `W = ${w} m/s，H<sub>0</sub> = ${h0.toFixed(1)} km`;
+    liveParams.innerHTML = `W = ${w} m/s${LIST_SEP}H<sub>0</sub> = ${h0.toFixed(1)} km`;
     liveDmax.textContent = `${sim.maxDiameterCm.toFixed(2)} cm`;
     liveFall.textContent = `${fallSeconds(sim, h0).toFixed(0)} s`;
     liveMelt.textContent = `${meltedCm(sim).toFixed(2)} cm`;

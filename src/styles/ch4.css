@@ -363,8 +363,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-.live-head { margin-bottom: 8px; font-weight: 600; color: var(--c-ink-muted); white-space: nowrap; }
-.live-head span { display: inline-block; margin-left: 0.6em; font-weight: 500; color: var(--c-ink); }
+/* 标题和参数各自不折行；整行放不下时（英文的标题更长）参数整体换到下一行 */
+.live-head { margin-bottom: 8px; font-weight: 600; color: var(--c-ink-muted); }
+.live-head > span { white-space: nowrap; }
+#lab-live-params { display: inline-block; margin-left: 0.6em; font-weight: 500; color: var(--c-ink); }
 .ch4-live sub { font-size: 0.72em; line-height: 0; }
 
 /* 四个量各占一格、格宽固定：数字位数变了也不会把后面的挤走或换行 */

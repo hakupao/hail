@@ -1,0 +1,56 @@
+/* ===== 多语言 ===== */
+
+/* 日文：汉字要用日文字形（中文字体栈里的 PingFang SC 会把「関」「気」画成简体字形）；标题优先丸ゴシック */
+html:lang(ja) {
+  --font: 'Fredoka Variable', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+    'Yu Gothic', YuGothic, Meiryo, 'Noto Sans JP', 'Noto Sans CJK JP', sans-serif;
+  --font-title: 'Fredoka Variable', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Yu Gothic', YuGothic, Meiryo,
+    'Noto Sans JP', 'Noto Sans CJK JP', sans-serif;
+}
+
+/* 英文：长单词在窄卡片 / 表格里允许断开，不撑出横向滚动 */
+html:lang(en) #app { overflow-wrap: break-word; }
+
+/* 带汉字的公式每种语言一份：JS 只留当前语言那份；无 JS 时只显示中文 */
+[data-tex-lang]:not([data-tex-lang='zh']) { display: none; }
+
+/* 语言选择：Hero 左上角，随页面滚走 */
+#hero { position: relative; }
+.lang-switch {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(159, 203, 232, 0.45);
+  background: rgba(19, 37, 68, 0.55);
+  color: var(--c-ice);
+  font-size: 14px;
+  cursor: pointer;
+}
+.lang-switch:hover, .lang-switch:focus-within { border-color: var(--c-ice-line); }
+.lang-switch select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding-right: 14px;
+  cursor: pointer;
+  /* 小三角 */
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 5px center, right 0 center;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.lang-switch select:focus { outline: none; }
+.lang-switch:focus-within { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.lang-switch option { color: #10233f; background: #fff; }
+
+/* 日文赛道名：只在译文里的 <wbr> 处折行（「ソフト／ボール」），不在词中间断开 */
+html:lang(ja) .lane-name { word-break: keep-all; }

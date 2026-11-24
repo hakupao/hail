@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'vitest';
-import html from '../index.html?raw';
+import rawHtml from '../index.html?raw';
 import { GROWTH_EFF, K, MELT_RATE } from '../src/lab/model';
 import { decodeEntities, prerenderTex, splitDisplayTex } from '../tools/katex-prerender';
 
 // v3 规格 §1.3：第四章「模型的三条式子」里的常数必须等于 model.ts 导出的常数。
 // 以后改了模型常数而忘了改页面，这里会红。
+// 带汉字的公式每种语言各有一份占位（data-tex-lang）：常数与结构只核对中文那份，日文 / 英文的由 i18n.test.ts 核对与中文只差 \text{…}
+const html = rawHtml.replace(/<(span|div)\b[^>]*\bdata-tex-lang="(?:ja|en)"[^>]*><\/\1>/g, '');
 const allTex = [...html.matchAll(/\bdata-tex="([^"]*)"/g)].map((m) => m[1]);
 
 function ch4Formulas(): string[] {
@@ -84,7 +86,7 @@ describe('第三章的代入数值与动能条一致', () => {
 describe('公式预渲染', () => {
   test('index.html 里每一条 TeX 都能渲染，占位全部被填充', () => {
     expect(allTex.length).toBeGreaterThan(0);
-    const out = prerenderTex(html);
+    const out = prerenderTex(rawHtml);
     expect(out.match(/class="katex"/g)!.length).toBeGreaterThanOrEqual(allTex.length);
     expect(out).not.toMatch(/data-tex="[^"]*"[^>]*><\/(span|div)>/);
   });

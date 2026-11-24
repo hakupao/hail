@@ -19,6 +19,7 @@ import { initCh3 } from './scenes/ch3-danger';
 import { initCh4 } from './scenes/ch4-lab';
 import { initEnding } from './scenes/ending';
 import { initHero } from './scenes/hero';
+import { initI18n } from './i18n';
 
 // 告诉 index.html 里的失效保护：模块已经跑起来了
 (window as Window & { __hailBooted?: boolean }).__hailBooted = true;
@@ -26,6 +27,14 @@ import { initHero } from './scenes/hero';
 document.documentElement.classList.add('js');
 
 gsap.registerPlugin(ScrollTrigger);
+
+// 文案换成当前语言：必须在各章 init 之前（GSAP 在 init 时按文字排版量尺寸、建 pin）
+try {
+  initI18n();
+} catch (e) {
+  console.error('[hail] 多语言初始化失败', e);
+  document.documentElement.classList.remove('i18n-pending');
+}
 
 // 六个章节场景：各自独立，缺一个或某一个 init 抛错都不影响其他
 const scenes: Array<[string, (el: HTMLElement) => void]> = [
