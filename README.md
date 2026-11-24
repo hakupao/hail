@@ -48,6 +48,11 @@ npm test           # 单测：物理模型、旅程锚点、结局地图、舞�
 npm run build      # 类型检查 + 产物构建（纯静态，可托管任何静态服务）
 ```
 
+## 部署
+
+托管在 Cloudflare Workers（纯静态资源，配置见 `wrangler.jsonc`），自定义域名 hail.bojiangz.com。
+GitHub 仓库已接入 Cloudflare Workers Builds：推送到 `main` 后自动执行 `npm run build` → `npx wrangler deploy`，构建记录在 Cloudflare 后台 hail → Deployments。其他分支不构建。本机手动部署仍可用 `npm run deploy`。
+
 ## 写公式
 
 在 `index.html` 里放空的占位元素，构建（和 dev）时会被替换成排好版的公式：

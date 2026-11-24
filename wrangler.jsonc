@@ -1,5 +1,6 @@
 // Cloudflare Workers 静态资源部署：纯静态站点，没有 Worker 脚本，只上传 vite build 的产物。
-// 部署：npm run deploy（先构建再 wrangler deploy）。首次需要 wrangler login。
+// 部署：推送到 main 后由 Cloudflare Workers Builds 自动构建（npm run build）并部署（npx wrangler deploy）。
+// 本机手动部署仍可用 npm run deploy（首次需要 wrangler login）。
 {
   "name": "hail",
   "compatibility_date": "2026-11-11",
